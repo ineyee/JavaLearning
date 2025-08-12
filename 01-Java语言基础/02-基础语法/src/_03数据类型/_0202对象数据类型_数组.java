@@ -8,6 +8,8 @@ import java.util.List;
 public class _0202对象数据类型_数组 {
 
 	public static void main(String[] args) {
+		test0();
+		
 		test();
 		test1();
 		test2();
@@ -19,7 +21,22 @@ public class _0202对象数据类型_数组 {
 	}
 	
 	/*
-	 * 1、数组的声明及初始化
+	 * 0、不可变数组的声明及初始化
+	 * 
+	 * T[]类似于OC里的NSArray
+	 * 
+	 * 不可变数组的类型为：T[]，T就是数组里存储的数据类型
+	 * 不可变数组的语法糖为：{}，不像其它语言里那样是[]
+	 */
+	private static void test0() {
+		int[] arr = {};
+		int[] arr1 = { 1, 2, 3 };
+		System.out.println(arr.length); // 0
+		System.out.println(arr1.length); // 3
+ 	}
+	
+	/*
+	 * 1、可变数组的声明及初始化
 	 * 
 	 * ArrayList类似于OC里的NSMutableArray
 	 */
