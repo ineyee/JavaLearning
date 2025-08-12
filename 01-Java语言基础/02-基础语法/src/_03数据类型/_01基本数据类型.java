@@ -161,6 +161,7 @@ public class _01基本数据类型 {
 		 * 所以这样搞的话，初始化出来的bd其实已经不是0.7了
 		 */
 		BigDecimal bd = new BigDecimal(0.7);
+		System.out.println(bd); // 0.6999999999999999555910790149937383830547332763671875
 		
 		/*
 		 * 建议用字符串来初始化BigDecimal

@@ -10,7 +10,7 @@ public class _00概述 {
 		
 		int i = 10;
 	    double d = (double)i;
-	    System.out.println(i);
+	    System.out.println(d); // 10.0
 	}
 
 }
