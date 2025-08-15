@@ -1,6 +1,6 @@
 package _01_类_对象_成员变量_成员函数;
 
-public class _08属性的初始化 {
+public class _08_属性的初始化 {
 
 	public static void main(String[] args) {
 		Person08 mother = new Person08("女");

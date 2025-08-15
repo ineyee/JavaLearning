@@ -1,6 +1,6 @@
 package _01_类_对象_成员变量_成员函数;
 
-public class _07构造方法 {
+public class _07_构造方法 {
 
 	public static void main(String[] args) {
 		Person0701 p1 = new Person0701();
