@@ -1,4 +1,4 @@
-package _04包;
+package _04_包;
 
 public class Test {
 
