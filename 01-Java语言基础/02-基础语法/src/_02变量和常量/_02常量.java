@@ -4,7 +4,7 @@ public class _02常量 {
 
 	public static void main(String[] args) {
 	    final double PI = 3.14;
-	    System.out.println(PI); // 3.14
+	    System.out.println(PI); // 3.14 
 	}
 
 }
@@ -27,4 +27,14 @@ public class _02常量 {
    
     final double PI = 3.14;
     System.out.println(PI); // 3.14
+ */
+
+/*
+	3、Java 中的常量
+	不过在 Java 中，常量最常见的场景就是跟 static 连用，比如：
+	
+	public final class Math {
+		public static final double PI = 3.141592653589793;
+    	public static final double E = 2.718281828459045;
+    }
  */
