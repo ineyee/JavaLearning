@@ -1,4 +1,35 @@
-package _19抽象类;
+package _03_内存管理_抽象类_接口;
+
+// 抽象类
+public abstract class _02_抽象类 {
+	// 抽象方法
+	public abstract void abstractMethod1();
+	public abstract void abstractMethod2(int num1);
+	public abstract void abstractMethod3(int num1, int num2);
+}
+
+/*
+ * SubClass1自己也是个抽象类，所以它不用全部实现抽象父类里面的抽象方法也可以
+ */
+abstract class SubClass1 extends _02_抽象类 {
+	@Override
+	public void abstractMethod1() {}
+}
+
+/*
+ * SubClass2本身不是个抽象类，所以它得实现它抽象父类里所有的抽象方法
+ */
+class SubClass2 extends _02_抽象类 {
+	@Override
+	public void abstractMethod1() {}
+
+	@Override
+	public void abstractMethod2(int num1) {}
+
+	@Override
+	public void abstractMethod3(int num1, int num2) {}
+}
+
 
 /*
  * 在说抽象类之前，我们先说一下抽象方法。
@@ -68,11 +99,3 @@ package _19抽象类;
  * 5、回过头来想想这种实现方法比起在GraphicsElement里搞个枚举来决定是什么图形、在FileElement搞个枚举来决定是什么文件、
  * 并且直接实例化GraphicsElement和FileElement的实现方法写出来的代码肯定更加清晰、别人更容易看懂
  */
-
-// 抽象类
-public abstract class AbstractClass {
-	// 抽象方法
-	public abstract void abstractMethod1();
-	public abstract void abstractMethod2(int num1);
-	public abstract void abstractMethod3(int num1, int num2);
-}
