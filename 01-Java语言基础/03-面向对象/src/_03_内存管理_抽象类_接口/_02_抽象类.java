@@ -2,10 +2,18 @@ package _03_内存管理_抽象类_接口;
 
 // 抽象类
 public abstract class _02_抽象类 {
-	// 抽象方法
+	// 可以定义属性
+	int age = 0;
+	
+	// 可以定义抽象方法
 	public abstract void abstractMethod1();
 	public abstract void abstractMethod2(int num1);
 	public abstract void abstractMethod3(int num1, int num2);
+	
+	// 可以定义非抽象方法
+	void eat() {
+        System.out.println("Animal is eating");
+    }
 }
 
 /*
