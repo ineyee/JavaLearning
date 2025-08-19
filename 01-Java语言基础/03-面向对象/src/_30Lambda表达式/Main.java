@@ -1,7 +1,7 @@
 package _30Lambda表达式;
 
-import _27匿名类.example2.TimeUtil;
-import _27匿名类.example2.TimeUtil.Block;
+import _06匿名类.example2.TimeUtil;
+import _06匿名类.example2.TimeUtil.Block;
 
 /*
  * 一、函数式接口
