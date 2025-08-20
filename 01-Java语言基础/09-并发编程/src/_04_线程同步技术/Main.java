@@ -1,5 +1,7 @@
 package _04_线程同步技术;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /*
  * 线程同步技术是专门用来处理线程安全问题的，线程同步技术最终的效果就是使得多条线程串行地访问同一个资源，都串行了所以就不存在数据竞争了
  * 
@@ -7,11 +9,14 @@ package _04_线程同步技术;
  * 技术，而不是说只要使用了多线程就得使用线程同步技术。比如多个线程同一时间访问同一资源，但是大家都只是进行读操作，那就不存在数据错乱问题，
  * 所以也就没必要使用线程同步技术，不使用线程同步技术时代码的执行效率会更高
  * 
- * 线程同步技术的方案之一就是加锁，加锁在 Java 里有两种具体实现：
+ * 线程同步技术的方案之一就是加锁，加锁在 Java 里有三种具体实现：
  * 	同步语句（Synchronized Statement）
  *	同步方法（Synchronized Method）
+ *  可重入锁（ReentranrLock，其实就是递归锁）
  */
 public class Main {
+	// 创建锁
+	private static ReentrantLock lock = new ReentrantLock();
 	
 	// 总票数
 	private static int totalTicketCount = 10; 
@@ -58,13 +63,34 @@ public class Main {
 	 *
 	 * 同步方法明显没有同步语句灵活，因为同步方法会把整个方法里的代码都锁住，而同步语句则可以更精准地锁住我们需要被锁住的代码
 	 */
+//	private static synchronized void saleTicket() {
+//		// 卖一张票
+//		if (totalTicketCount <= 0) {
+//			System.out.println("没票了"  + " " + Thread.currentThread());
+//		} else {
+//			totalTicketCount--;
+//			System.out.println("剩余票数：" + totalTicketCount + " " + Thread.currentThread());
+//		}
+//	}
+	
+	/*
+	 * 线程同步方案三：可重入锁
+	 */
 	private static synchronized void saleTicket() {
-		// 卖一张票
-		if (totalTicketCount <= 0) {
-			System.out.println("没票了"  + " " + Thread.currentThread());
-		} else {
-			totalTicketCount--;
-			System.out.println("剩余票数：" + totalTicketCount + " " + Thread.currentThread());
+		try {
+			// 加锁
+			lock.lock();
+			
+			// 卖一张票
+			if (totalTicketCount <= 0) {
+				System.out.println("没票了"  + " " + Thread.currentThread());
+			} else {
+				totalTicketCount--;
+				System.out.println("剩余票数：" + totalTicketCount + " " + Thread.currentThread());
+			}
+		} finally {
+			// 解锁
+			lock.unlock();
 		}
 	}
 	
