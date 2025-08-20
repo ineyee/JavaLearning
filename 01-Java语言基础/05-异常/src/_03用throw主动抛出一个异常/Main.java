@@ -20,6 +20,7 @@ public class Main {
 	 * 2、所以我们可以用throw主动抛出一个检查型异常，类似于其它语言里的断言，并且通过throws把这个异常抛给上层方法——也就是外界调用的地方，
 	 * 这样外界在使用这个方法的时候就被抛检查型异常，那外界不处理的话编译就通不过，所以他们点进来一看就知道什么情况下会抛异常，从而在外面
 	 * try-catch规避掉这种情况了，这样程序就不会崩了
+	 * 系统和很多三方库的 api 就是这些抛检查型异常的
 	 */
 	public static double div(double num1, double num2) throws Exception {
 //		if (num2 == 0) {
