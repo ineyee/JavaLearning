@@ -1,4 +1,4 @@
-package _07Lambda表达式;
+package _07_Lambda表达式;
 
 /*
  * 一、函数式接口

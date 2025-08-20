@@ -1,4 +1,4 @@
-package _06匿名类;
+package _06_匿名类;
 
 /*
  * 一、匿名类是什么？
@@ -187,7 +187,7 @@ public class Main {
 		 * 就是接口 Result 的实现类，我们并没有显式定义 Result 的实现类，而是直接用接口的匿名类创建了对象，然后把这个对象传递给了函数的形参
 		 */
 		// 回调函数要素三：匿名类
-		NetworkUtil.get("http://xxx", new _06匿名类.NetworkUtil.Result() {
+		NetworkUtil.get("http://xxx", new _06_匿名类.NetworkUtil.Result() {
 			@Override
 			public void successCallback(Object data) {
 				System.out.println("请求成功了: " + data);
