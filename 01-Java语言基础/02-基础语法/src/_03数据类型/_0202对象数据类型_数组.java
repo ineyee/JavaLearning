@@ -39,6 +39,7 @@ public class _0202对象数据类型_数组 {
 	 * 1、可变数组的声明及初始化
 	 * 
 	 * ArrayList类似于OC里的NSMutableArray
+	 * ArrayList不是线程安全的，对应的线程安全类为Vector
 	 */
 	public static void test() {
 		ArrayList<Integer> arrayList = new ArrayList<Integer>();

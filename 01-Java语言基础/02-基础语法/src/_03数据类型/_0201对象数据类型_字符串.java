@@ -58,6 +58,7 @@ public class _0201对象数据类型_字符串 {
 
 	/*
 	 * 二、可变字符串StringBuilder
+	 * StringBuilder不是线程安全的，对应的线程安全类为StringBuffer
 	 */
 	public static void test2() {
 		/*

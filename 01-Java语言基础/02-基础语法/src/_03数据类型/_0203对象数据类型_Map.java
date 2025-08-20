@@ -15,6 +15,7 @@ public class _0203对象数据类型_Map {
 	 * 1、Map的声明及初始化
 	 * 
 	 * HashMap类似于OC里的NSMutableDictionary
+	 * HashMap不是线程安全的，对应的线程安全类为Hashtable
 	 * 
 	 * 等号的左边我们一般不会直接用HashMap，而是用Map。Map是个接口，HashMap等很多类都实现了这个接口
 	 * 所以左边如果写成Map，将来如果我们右边想换一个Map，就直接换下右边的东西就可以了，左边不用动，这就是面向接口编程
