@@ -1,4 +1,4 @@
-package _02File;
+package _01_File;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -7,11 +7,14 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class Main {
+	
 	public static void main(String[] args) throws IOException {
-		test2();
+		test1();
+//		test2();
 	}
 	
-	public static void test() {
+	@SuppressWarnings("unused")
+	public static void test1() {
 		/*
 		 * 一、File
 		 * 一个File对象就代表一个文件或者文件夹/目录
@@ -33,6 +36,7 @@ public class Main {
 		System.out.println(File.pathSeparator);
 	}
 	
+	@SuppressWarnings("unused")
 	public static void test2() throws IOException {
 		/*
 		 * 二、File的常用方法及属性
@@ -139,4 +143,5 @@ public class Main {
 		// 14、删除文件或空文件夹（如果文件夹里有东西则不会删除，注意不会放到回收站，直接就抹掉了，所以要慎重）
 //		file2.delete();
 	}
+	
 }
