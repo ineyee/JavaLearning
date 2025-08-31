@@ -1,4 +1,4 @@
-package _07对象流;
+package _07_对象流;
 
 import java.io.Serializable;
 

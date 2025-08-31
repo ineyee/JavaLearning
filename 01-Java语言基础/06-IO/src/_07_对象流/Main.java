@@ -1,4 +1,4 @@
-package _07对象流;
+package _07_对象流;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,9 +7,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class Main {
+	
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		/*
-		 * 五、对象流（Object Streams）：输入流为ObjectInputStream、输出流为ObjectOutputStream
+		 * 对象流（Object Streams）：输入流为ObjectInputStream、输出流为ObjectOutputStream
 		 * 它主要用来读写引用类型到磁盘上的文件里，但是要求类必须实现Serializable接口，这个接口仅仅是一个标记接口，
 		 * 不要求我们实现任何方法，仅仅是标记这个类可以被序列化
 		 * 
@@ -62,4 +63,5 @@ public class Main {
 		System.out.println(person);
 		ois.close();
 	}
+	
 }
