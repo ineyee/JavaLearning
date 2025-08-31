@@ -49,8 +49,10 @@ public class Main {
 	 * 四、IO流的分类，常用的IO流都在java.io包中
 	 * 1、字节流（Byte Streams）：所谓字节流是指一次性读取一个字节的二进制数据，常用的输入流为FileInputStream、输出流为FileOutputStream，
 	 * 它们是万能文件流，主要用来读写文本文件、图片文件、MP3文件、MP4文件等各种文件到磁盘上的文件里
-	 * 2、字符流（Character Streams）：所谓字节流是指一次性读取一个字符的二进制数据，输入流为Reader、输出流为Writer，
+	 * 比如一个英文字符“M”在UTF-8编码下占用一个字节、一个汉字“你”在UTF-8编码下占用三个字，那一次字节流总是只读取一个字节的数据
+	 * 2、字符流（Character Streams）：所谓字节流是指一次性读取一个字符的二进制数据，常用的输入流为FileReader、输出流为FileWriter，
 	 * 它是个文本流，只能用来读写文本文件到磁盘上的文件里
+	 * 比如一个英文字符“M”在UTF-8编码下占用一个字节，那这一次字符流就只会读取一个字节的数据，而一个汉字“你”在UTF-8编码下占用三个字节，那这一次字符流就会读取三个字节的数据
 	 * 3、缓冲留（Buffered Streams）：输入流为BufferedInputStream/BufferedReader、输出流为BufferedOutputStream/BufferedWriter，
 	 * 它其实是字节流和字符流的包装流，我们更推荐使用缓冲流
 	 * 

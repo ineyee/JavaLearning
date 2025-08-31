@@ -1,20 +1,12 @@
-package _04字符流;
+package _04_字符流;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class Main {
+	
 	public static void main(String[] args) throws IOException {
-		/*
-		 * 二、字符流（Character Streams）的特点：
-		 * 1、一次只读写一个字符的二进制数据（比如一个英文字符“M”在UTF-8编码下占用一个字节，那这一次字符流就只会读取一个字节的数据，而
-		 * 一个汉字“你”在UTF-8编码下占用三个字节，那这一次字符流就会读取三个字节的数据)
-		 * 2、输入流最终都继承自Reader（要把数据读到程序里嘛，当然就是用FileReader）、输出流最终都继承自Writer（要把数据从程序输出嘛，当然就是用FileWriter）
-		 * 3、常用的字符流有FileReader、FileWriter，这一看就是跟文件操作有关的（需要注意的是这两个类只适合处理文本文件，比如.txt里存储的文本、.java里存储的代码等这类文本文件，
-		 * 因为它是以字符为单位来处理数据的嘛，你图片、mp3、mp4等文件的二进制的数据又不是什么UTF-8编码encode出来的二进制，那要用字符流处理肯定数据就错乱了，前面讲的字节流则是一
-		 * 个万能流，文本、图片、mp3、mp4等文件都可以搞)
-		 */
 		test1();
 		test2();
 	}
@@ -32,10 +24,8 @@ public class Main {
 		
 		/*
 		 * 既然是字符流，我们就可以直接write字符了
-		 * 需要注意的是任何流的底层读写数据肯定都是二进制，只不过这里的FileWriter类提供的API可以帮助我们直接写字符而已，
-		 * 这些API内部肯定会自己做转换的，千万不要以为字符流就是直接写入和读取字符的，字符流的定义是一次性读取或写入一个字符的二进制数据
-		 * 
-		 * 当然它也有别的API可以直接写二进制数据
+		 * 需要注意的是任何流的底层读写数据肯定都是二进制，只不过这里的FileWriter类提供了快捷API可以帮助我们直接写字符而已
+		 * 当然FileWriter也有原始API可以直接写二进制数据
 		 */
 		fw.write("M");
 		fw.write("J");
@@ -43,8 +33,8 @@ public class Main {
 		fw.write(74);
 		
 		/*
-		 * 当然我们也可以直接写一个字符数组进去，即多个字符一次性写进去
-		 * 直接写一个字符串进去，底层调用地就是写一个字符数组进去，所以也是可以的
+		 * 当然我们也可以直接写一个字符数组，然后一个字符一个字符写进去
+		 * 直接写一个字符串，底层调用地就是写一个字符数组进去，所以也是可以的
 		 */
 		char[] chars = "你好".toCharArray();
 		fw.write(chars);
@@ -75,6 +65,8 @@ public class Main {
 		 * 但需要注意的是这个数据不直接是字符，而是这个字符对应的二进制数据，我们得通过(char)强转decode成字符
 		 * 2、char2：同理
 		 * 3、char3：同理
+		 * 
+		 * 每调用一次read()方法就是读取一个字符的数据
 		 */
 		int char1 = fr.read();
 		System.out.println(char1); // 77，因为M在UTF-8编码下M只占一个字节
@@ -87,7 +79,7 @@ public class Main {
 		System.out.println((char)char3); // 你
 		
 		/*
-		 * 当然我们也可以一次性多读一些字符出来
+		 * read()方法也可以接收一个char数组，然后从文件里读取数据一个字符一个字符写进char数组
 		 * 创建一个能装100个字符的数组，尝试读取100个字符的东西存到这个数组里，如果超过100个字符则只读取100个字符，如果不够100个字符则全部读取出来然后数组空着剩余的字符
 		 */
 		char[] chars = new char[100];
@@ -108,4 +100,5 @@ public class Main {
 		 */
 		fr.close();
 	}
+	
 }
