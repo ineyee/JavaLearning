@@ -1,20 +1,13 @@
-package _03字节流;
+package _03_字节流;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class Main {
+	
 	public static void main(String[] args) throws IOException {
-		/*
-		 * 一、字节流（Byte Streams）的特点：
-		 * 1、一次只读写一个字节的二进制数据
-		 * 2、输入流最终都继承自InputStream、输出流最终都继承自OutputStream
-		 * 3、常用的字节流有FileInputStream、FileOutputStream，这一看就是跟文件操作有关的，字节流则是一
-		 * 个万能流，文本、图片、mp3、mp4等文件都可以搞
-		 */
-//		test1();
+		test1();
 		test2();
 	}
 	
@@ -27,19 +20,19 @@ public class Main {
 		 * 给定文件的路径
 		 * 如果我们是要往文件里追加内容而非覆盖文件的内容，则把后面的append传个true即可，覆盖直接不写就行
 		 */                    
-		FileOutputStream fos = new FileOutputStream("/users/yiyi/desktop/test/123.txt", true);
+		FileOutputStream fos = new FileOutputStream("/Users/ineyee/Desktop/123.txt", true);
 		
 		/*
-		 * 这个函数接收一个int类型，int类型不刚好就是占一个字节嘛，所以这个方法是一个字节一个字节的数据往文件里写，注意IO流读写的数据都直接是二进制，默认都是UTF-8编码
-		 * 77这个字节的数据在ASCII码表里对应的字符为大写字母M
-		 * 74这个字节的数据在ASCII码表里对应的字符为大写字母J
-		 * 所以你此时可以去用文本编辑器打开之后，会直接看到MJ，而不是7774这两个数字
+		 * write()方法可以接收一个int类型，int类型占用4个字节，但其实这里只会把int类型的低8位————即1个字节的数据给写进去，注意IO流读写的数据都直接是二进制，默认都是UTF-8编码
+		 * 77这1个字节的数据在ASCII码表里对应的字符为大写字母M
+		 * 74这1个字节的数据在ASCII码表里对应的字符为大写字母J
+		 * 所以你此时可以去用文本编辑器打开之后，会直接看到MJ，而不是77、74这两个数字，文本编辑器会自动解码给我们呈现
 		 */
 		fos.write(77);
 		fos.write(74);
 		
 		/*
-		 * 当然我们也可以直接写一个byte数组进去，即多个字节一次性写进去
+		 * write()方法也可以接收一个byte数组，然后一个字节一个字节写进去
 		 */
 		byte[] bytes = "你好Hello".getBytes();
 		fos.write(bytes);
@@ -58,19 +51,20 @@ public class Main {
 		 * 我们要从一个文件里读数据，那数据相对于我们的程序来说是输入进来了，所以得用输入流
 		 * 给定文件的路径
 		 */                    
-		FileInputStream fis = new FileInputStream("/users/yiyi/desktop/test/123.txt");
+		FileInputStream fis = new FileInputStream("/Users/ineyee/Desktop/123.txt");
 		
 		/*
-		 * 读取一个字节的数据，注意读出来的是二进制喔，就像写的时候只能写入二进制一样
+		 * read()方法可以直接返回一个int类型，int类型占用4个字节，但其实这里只会把int类型的低8位————即1个字节的数据给返回出来，注意IO流读写的数据都直接是二进制，这里不会自动解码
+		 * 每调用一次read()方法就是读取一个字节的数据
 		 */
 		int byte1 = fis.read();
-		System.out.println(byte1); // 77，decode之后对应的是大写字母M
+		System.out.println(byte1); // 77，UTF-8 decode之后对应的是大写字母M
 		int byte2 = fis.read();
-		System.out.println(byte2); // 74，decode之后对应的是大写字母J
+		System.out.println(byte2); // 74，UTF-8 decode之后对应的是大写字母J
 		
 		/*
-		 * 当然我们也可以一次性多读一些字节出来
-		 * 创建一个100个字节的数组，尝试读取100个字节的东西存到这个数组里，如果超过100个字节则只读取100个字节，如果不够100个字节则全部读取出来然后数组空着剩余的字节
+		 * read()方法也可以接收一个byte数组，然后从文件里读取数据一个字节一个字节写进byte数组
+		 * 创建一个100字节的数组，尝试读取100个字节的东西存到这个数组里，如果超过100个字节则只读取100个字节，如果不够100个字节则全部读取出来然后数组空着剩余的字节
 		 */
 		byte[] bytes = new byte[100];
 		int len = fis.read(bytes);
@@ -90,4 +84,5 @@ public class Main {
 		 */
 		fis.close();
 	}
+	
 }
