@@ -1,4 +1,4 @@
-package _05缓冲流;
+package _05_缓冲流;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -29,7 +29,7 @@ public class Main {
 		 * 也就是说缓冲流的read和write操作其实是在操作缓冲区，只有当缓冲区满了或者空了才会真正调用操作系统底层API————本地输入API（Native Input API）
 		 * 和本地输出API（Native Output API）去读写磁盘。
 		 * 
-		 * 三、缓冲流（Buffered Streams）的特点：
+		 * 缓冲流（Buffered Streams）的特点：
 		 * 1.1、缓冲输入流（BufferedInputStream/BufferedReader）：调用read方法是从缓冲区读取数据，并且只有当缓冲区为空时才调用本地输入API真正去磁盘读取数据
 		 * 1.2、缓冲输出流（BufferedOutputStream/BufferedWriter）：调用write方法将数据写入缓冲区，并且只有当缓冲区已满时才调用本地输出API真正往磁盘写入数据
 		 * 

@@ -54,7 +54,7 @@ public class Main {
 	 * 它是个文本流，只能用来读写文本文件到磁盘上的文件里
 	 * 比如一个英文字符“M”在UTF-8编码下占用一个字节，那这一次字符流就只会读取一个字节的数据，而一个汉字“你”在UTF-8编码下占用三个字节，那这一次字符流就会读取三个字节的数据
 	 * 3、缓冲留（Buffered Streams）：输入流为BufferedInputStream/BufferedReader、输出流为BufferedOutputStream/BufferedWriter，
-	 * 它其实是字节流和字符流的包装流，我们更推荐使用缓冲流
+	 * 它其实是字节流和字符流的包装流，我们更推荐使用缓冲流来降低对磁盘的频繁读写和降低对CPU的消耗
 	 * 
 	 * 4、数据流（Data Streams）：输入流为DataInputStream、输出流为DataOutputStream，
 	 * 它主要用来读写基本数据类型和字符串到磁盘上的文件里
