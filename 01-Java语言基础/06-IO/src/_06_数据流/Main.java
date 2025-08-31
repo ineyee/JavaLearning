@@ -1,4 +1,4 @@
-package _06数据流;
+package _06_数据流;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -7,9 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class Main {
+	
 	public static void main(String[] args) throws IOException {
 		/*
-		 * 四、数据流（Data Streams）：输入流为DataInputStream、输出流为DataOutputStream，
+		 * 数据流（Data Streams）：输入流为DataInputStream、输出流为DataOutputStream，
 		 * 它主要用来读写基本数据类型和字符串到磁盘上的文件里
 		 */
 		test();
@@ -48,4 +49,5 @@ public class Main {
 		System.out.println(dim.readUTF());
 		dim.close();
 	}
+	
 }
