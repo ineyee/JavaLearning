@@ -1,4 +1,4 @@
-package _01单字符匹配;
+package _01_单字符匹配;
 
 public class Main {
 	public static void main(String[] args) {

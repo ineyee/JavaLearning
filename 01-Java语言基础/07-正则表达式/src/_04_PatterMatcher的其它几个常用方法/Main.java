@@ -1,4 +1,4 @@
-package _04PatterMatcher的其它几个常用方法;
+package _04_PatterMatcher的其它几个常用方法;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

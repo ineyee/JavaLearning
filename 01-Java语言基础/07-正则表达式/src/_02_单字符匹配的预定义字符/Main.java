@@ -1,4 +1,4 @@
-package _02单字符匹配的预定义字符;
+package _02_单字符匹配的预定义字符;
 
 public class Main {
 	public static void main(String[] args) {
