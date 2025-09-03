@@ -2,7 +2,7 @@
  * 这个 Servlet 演示获取请求头
  */
 
-package com.ineyee.helloservlet._04_requestheaders;
+package com.ineyee.helloservlet._03_requestheaders;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/login04")
+@WebServlet("/login03")
 public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

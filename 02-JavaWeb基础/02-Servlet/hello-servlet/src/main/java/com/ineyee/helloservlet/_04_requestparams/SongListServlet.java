@@ -2,7 +2,7 @@
  * 这个 Servlet 演示获取 get 请求和 post 请求的参数
  */
 
-package com.ineyee.helloservlet._03_requestparams;
+package com.ineyee.helloservlet._04_requestparams;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/songList03")
+@WebServlet("/songList04")
 public class SongListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

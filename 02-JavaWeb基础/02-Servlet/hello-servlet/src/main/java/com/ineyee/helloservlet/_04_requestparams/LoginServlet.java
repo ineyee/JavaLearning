@@ -2,7 +2,7 @@
  * 这个 Servlet 演示获取 get 请求和 post 请求的参数
  */
 
-package com.ineyee.helloservlet._03_requestparams;
+package com.ineyee.helloservlet._04_requestparams;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-@WebServlet("/login03")
+@WebServlet("/login04")
 public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
