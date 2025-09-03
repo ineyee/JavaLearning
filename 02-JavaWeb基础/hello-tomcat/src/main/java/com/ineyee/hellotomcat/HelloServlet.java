@@ -1,4 +1,4 @@
-package com.example.hellotomcat;
+package com.ineyee.hellotomcat;
 
 import java.io.*;
 

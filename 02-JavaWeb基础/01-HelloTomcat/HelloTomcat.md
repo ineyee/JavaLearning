@@ -7,11 +7,11 @@
 * 一台服务器
 
 * 服务器上得安装 JDK，因为 JDK 里包含 JRE、JRE 里又包含 JVM，而服务器软件 Tomcat 本身也是用 Java 写的，它也得靠 JVM 才能运行起来
-* 服务器上得安装 Tomcat
+* 服务器上得安装 Tomcat，因为
   * 对外：Tomcat 负责监听端口
     * 端口不是物理部件，只是一个虚拟概念——即一个端口对应一个 Tomcat 进程，Tomcat 在启动时肯定会设置监听某个端口，此时两者就形成了绑定关系。Tomcat 和端口是一对多的关系，即一个 Tomcat 可以监听一个或多个端口，但是一个端口只能被一个 Tomcat 监听
     * 端口用 2 个字节的无符号整形来表示，所以一台服务器理论上有 65536 个端口。端口只有在被某个 Tomcat 监听时，才处于“打开”状态；没有被监听的端口，默认都处于“关闭”状态
-  * 对内：Tomcat 内部部署着一个或多个 Java 项目
+  * 对内：Tomcat 内部部署着一个或多个 JavaWeb 项目， JavaWeb 项目必须部署到 Tomcat 这样的服务器软件中才能运行起来
 
 
 
@@ -36,7 +36,7 @@
 
 ## 二、本机安装 Tomcat
 
-服务器软件有很多，但用的最多的就是 Tomcat
+《Java语言基础》那里我们已经安装好了 JDK，这里我们安装一下服务器软件。服务器软件有很多，但用的最多的就是 Tomcat：
 
 * Tomcat 下载地址：https://tomcat.apache.org/
 * 这里选择下载 Tomcat 11
@@ -91,27 +91,47 @@ bash shutdown.sh
 
 ###### 方式三：把 Tomcat 集成到 IDEA 里，通过 IDEA 来启动和关闭 Tomcat
 
-把 Tomcat 集成到 IDEA 里
+把 Tomcat 集成到 IDEA 里：
 
 * IDEA - Settings... - Build, Execution, Deployment - Application Servers
 * New - Tomcat Server - Tomcat Home
 * Apply - OK
 
-通过 IDEA 来启动和关闭 Tomcat，得有 Java 项目/模块
+通过 IDEA 来启动和关闭 Tomcat，得有 JavaWeb 项目/模块：
 
-* IDEA - New Project - Jakarta EE
+* IDEA - New Project - Jakarta EE（原来的 Java Enterprise）
 * Name：hello-tomcat
-
-* Template：Web application
+* Location：项目所在父目录
+* Template：Web application（JavaWeb 项目）
 * Application server：Tomcat 11.0.10（我们刚才集成的）
-* 其它的先保持默认 - Next - Create（这样就创建好了项目）
-* 然后我们在 webapp 目录下创建了一个 login.html
+* Language：Java
+* Build system：Maven
+* Group（公司域名倒写）：com.ineyee
+* Artifact（默认就是项目名）
+* JDK：选择相应版本的 JDK
+* Next - Create（这样就创建好了项目）
+
+***
+
+* 然后我们在 webapp 目录下自定义创建一个 login.html
 * 然后 Tomcat 11.0.10 - Edit Configurations
-* Server - HTTP port，由 8080 换成自定义的端口比如“9999”，本机上可能有其它软件已经在监听 8080 端口了，会导致 Tomcat 无法监听
-* Deployment - 选中我们的项目，把下面的 Application context 由 “/hello_tomcat_war_exploded”这么长的一串换成自定义的“/helloTomcat”（注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的）
+  * Server - HTTP port，由 8080 换成自定义的端口比如“9999”（本机上可能有其它软件已经在监听 8080 端口了，会导致 Tomcat 无法监听）
+  * Deployment - 选中我们的项目，把下面的 Application context 由 “/hello_tomcat_war_exploded”这么长的一串换成自定义的“/helloTomcat”（注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的）
 * Apply - OK
-* 点击 Run 或 Debug 就可以启动 Tomcat 了，Tomcat 就会把我们的项目部署好
-* 然后我们去浏览器里就可以通过“http://localhost:9999/helloTomcat/login.html”来访问我们的页面了
+* 点击 Run 或 Debug 就可以启动 Tomcat 了，Tomcat 就会把我们的 JavaWeb 项目给自动部署好
+* 然后我们去浏览器里通过“http://localhost:9999/helloTomcat”来访问，项目默认返回的是 webapp 目录下的 index.jsp 文件，我们还可以通过“http://localhost:9999/helloTomcat/login.html”来访问我们自己创建的登录页面
 * 点击 Stop 就可以关闭 Tomcat
+
 * 其实我们可以在 Tomcat 11.0.10 - Edit Configurations - Startup/Connection 里看到 IDEA 启动和关闭 Tomcat 本质也是在调用 catalina
 
+***
+
+![Edit Configurations-Server](asset/Server.jpg)
+
+![Edit Configurations-Deployment](asset/Deployment.png)
+
+![Edit Configurations-Logs](asset/Logs.png)
+
+![Edit Configurations-CodeCoverage](asset/CodeCoverage.png)
+
+![Edit Configurations-Startup/Connection](asset/StartupConnection.png)
