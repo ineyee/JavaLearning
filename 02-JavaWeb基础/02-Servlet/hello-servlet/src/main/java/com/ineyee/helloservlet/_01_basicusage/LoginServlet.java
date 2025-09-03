@@ -2,7 +2,7 @@
  * 这个 Servlet 演示基本使用
  */
 
-package com.ineyee.helloservlet;
+package com.ineyee.helloservlet._01_basicusage;
 
 // 第一步：导入 servlet 相关的包
 import jakarta.servlet.ServletException;
@@ -17,8 +17,8 @@ import java.io.IOException;
 // 约定俗成地我们会把这个类实例命名为 XxxServlet
 // 第三步：指定请求路径 path，注意 / 不能少
 // 将来客户端发送请求 http://ip:port/applicationContext/path 就能找到这个 servlet
-@WebServlet("/basicUsage")
-public class _01_BasicUsageServlet extends HttpServlet {
+@WebServlet("/login01")
+public class LoginServlet extends HttpServlet {
     /**
      * 第四步：监听来自客户端的请求并返回响应
      * 调用的方法：如果是 get 请求那就调用 doGet 方法，如果是 post 请求那就调用 doPost 方法
@@ -43,5 +43,5 @@ public class _01_BasicUsageServlet extends HttpServlet {
 // 第五步：点击 Run 或 Debug 启动 Tomcat，Tomcat 就会把我们的 JavaWeb 项目给自动部署好
 // 我们已经设置了 Tomcat 监听 9999 端口，启动 Tomcat 时会启动一个本地服务器
 //
-// 打开 Postman，访问 http://localhost:9999/helloServlet/basicUsage 就可以了
+// 打开 Postman，访问 http://localhost:9999/helloServlet/login01 就可以了
 // 注意：每次修改了服务器的代码后，都需要重新部署甚至重启服务器，否则服务器不会自动更新
