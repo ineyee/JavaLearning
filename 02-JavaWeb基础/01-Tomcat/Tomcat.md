@@ -121,8 +121,8 @@ bash shutdown.sh
 * 点击 Run 或 Debug 就可以启动 Tomcat 了，Tomcat 就会把我们的 JavaWeb 项目给自动部署好
 * 然后我们去浏览器里通过“http://localhost:9999/helloTomcat”来访问，项目默认返回的是 webapp 目录下的 index.jsp 文件，我们还可以通过“http://localhost:9999/helloTomcat/login.html”来访问我们自己创建的登录页面
 * 点击 Stop 就可以关闭 Tomcat
-
 * 其实我们可以在 Tomcat 11.0.10 - Edit Configurations - Startup/Connection 里看到 IDEA 启动和关闭 Tomcat 本质也是在调用 catalina
+* 此外我们还可以在 Tomcat 11.0.10 - Edit Configurations - Server - On 'Update' action 来设置更新 Tomcat 默认是重新部署还是重启服务器等
 
 ***
 

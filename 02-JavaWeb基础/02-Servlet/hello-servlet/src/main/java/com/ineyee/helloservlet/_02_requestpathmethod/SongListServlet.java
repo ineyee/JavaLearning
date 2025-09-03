@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 // 通过定义不同的 servlet 类和指定不同的路径来区分请求路径
-@WebServlet("/songList")
+@WebServlet("/songList02")
 public class SongListServlet extends HttpServlet {
     // 如果是 get 请求那就调用 doGet 方法
     @Override

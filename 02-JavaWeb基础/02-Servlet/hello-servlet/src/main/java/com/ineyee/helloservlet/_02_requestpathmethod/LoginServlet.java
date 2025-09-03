@@ -11,9 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-@WebServlet("/login")
-// 通过定义不同的 servlet 类和指定不同的路径来区分请求路径
 
+// 通过定义不同的 servlet 类和指定不同的路径来区分请求路径
+@WebServlet("/login02")
 public class LoginServlet extends HttpServlet {
     // 如果是 post 请求那就调用 doPost 方法
     @Override
