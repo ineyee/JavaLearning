@@ -29,15 +29,19 @@ public class _01_BasicUsageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.getWriter().write("登录成功");
+        // 返回响应、结束本次请求
+        resp.getWriter().write("获取歌单成功");
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 返回响应、结束本次请求
         resp.getWriter().write("登录成功");
     }
 }
 
 // 第五步：点击 Run 或 Debug 启动 Tomcat，Tomcat 就会把我们的 JavaWeb 项目给自动部署好
+// 我们已经设置了 Tomcat 监听 9999 端口，启动 Tomcat 时会启动一个本地服务器
+//
 // 打开 Postman，访问 http://localhost:9999/helloServlet/basicUsage 就可以了
 // 注意：每次修改了服务器的代码后，都需要重新部署甚至重启服务器，否则服务器不会自动更新
