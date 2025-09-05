@@ -1,6 +1,6 @@
 ## 一、本机安装 MySQL
 
-![MySQL Server](MySQL Server.png)
+![MySQLServer](MySQLServer.png)
 
 MySQL Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯定会设置监听某个端口（默认 3306）来跟客户端通信（如 mysql 命令行工具、JDBC、各种编程语言的驱动等），MySQL Server 内部又存放着一个或多个 MySQL 数据库
 
