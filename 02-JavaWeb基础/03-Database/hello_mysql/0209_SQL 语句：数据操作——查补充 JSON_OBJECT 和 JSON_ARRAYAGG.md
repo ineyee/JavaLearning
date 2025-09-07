@@ -109,7 +109,8 @@ CREATE TABLE IF NOT EXISTS `t_song` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `name` VARCHAR(100) NOT NULL,
   `cover` VARCHAR(100) DEFAULT(''),
-  -- 必须与 t_singer.id 类型一致
+  
+  -- 外键字段，必须与 t_singer.id 类型一致
   `singerId` BIGINT,
   -- 在 CREATE 语句的最后添加一个外键约束，含义为：
   -- 当前表中的外键 `singerId`，引用的是 `t_singer` 表中的 `id`
@@ -147,7 +148,7 @@ SELECT
   `t_singer`.`sex` AS `singerSex`
 -- `t_song`是从表
 FROM `t_song`
--- `t_singer`是主表
+-- `t_singer`是主表，从表.外键 = 主表.主键
 LEFT JOIN `t_singer` ON `t_song`.`singerId` = `t_singer`.`id`;
 ```
 
@@ -281,19 +282,19 @@ LEFT JOIN `t_singer` ON `t_song`.`singerId` = `t_singer`.`id`;
 
 ```SQL
 SELECT
--- t_song 的字段对应 FROM `t_song`，代表是从 t_song 里的查询
--- 这里是在给从表的字段取别名
+  -- t_song 的字段对应 FROM `t_song`，代表是从 t_song 里的查询
+	-- 这里是在给从表的字段取别名
   `t_song`.`id` AS `songId`,
   `t_song`.`name` AS `songName`,
   `t_song`.`cover` AS `songCover`,
--- t_singer 的字段对应 LEFT JOIN `t_singer`，代表是从 t_singer 里的查询
--- 这里就是在把主表里的字段搞成一个对象，而不再是平铺
--- 格式：JSON_OBJECT(
---        '对象的自定义属性名1', 表里对应字段1的值,
---        '对象的自定义属性名2', 表里对应字段2的值,
---        '对象的自定义属性名3', 表里对应字段3的值
---        ...
---      ) AS '对象的 key'
+  -- t_singer 的字段对应 LEFT JOIN `t_singer`，代表是从 t_singer 里的查询
+  -- 这里就是在把主表里的字段搞成一个对象，而不再是平铺
+  -- 格式：JSON_OBJECT(
+  --        '对象的自定义属性名1', 表里对应字段1的值,
+  --        '对象的自定义属性名2', 表里对应字段2的值,
+  --        '对象的自定义属性名3', 表里对应字段3的值
+  --        ...
+  --      ) AS '对象的 key'
   JSON_OBJECT(
     'id', `t_singer`.`id`,
     'name', `t_singer`.`name`,
@@ -301,7 +302,7 @@ SELECT
   ) AS 'singer'
 -- `t_song`是从表
 FROM `t_song`
--- `t_singer`是主表
+-- `t_singer`是主表，从表.外键 = 主表.主键
 LEFT JOIN `t_singer` ON `t_song`.`singerId` = `t_singer`.`id`;
 ```
 
@@ -360,9 +361,10 @@ CREATE TABLE IF NOT EXISTS `t_song` (
 ```SQL
 CREATE TABLE IF NOT EXISTS `t_singer_song` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-  -- 必须与 t_singer.id 类型一致
+  
+  -- 外键字段，必须与 t_singer.id 类型一致
   `singerId` BIGINT,
-    -- 必须与 t_song.id 类型一致
+  -- 外键字段，必须与 t_song.id 类型一致
   `songId` BIGINT,
   -- 在 CREATE 语句的最后添加一个外键约束，含义为：
   -- 当前表中的外键 `singerId`，引用的是 `t_singer` 表中的 `id`
@@ -413,9 +415,9 @@ SELECT
   `t_singer`.`sex` AS `singerSex`
 -- `t_song`是主表2
 FROM `t_song`
--- 中间表
+-- `t_singer_song`是中间表，中间表.外键 = 表2.主键
 LEFT JOIN `t_singer_song` ON `t_singer_song`.`songId` = `t_song`.`id`
--- `t_singer`是主表1
+-- `t_singer`是主表1，中间表.外键 = 表1.主键
 LEFT JOIN `t_singer` ON `t_singer_song`.`singerId` = `t_singer`.`id`;
 ```
 
@@ -588,14 +590,14 @@ LEFT JOIN `t_singer` ON `t_singer_song`.`singerId` = `t_singer`.`id`;
 
 ```SQL
 SELECT
--- t_song 的字段对应 FROM `t_song`，代表是从 t_song 里的查询
--- 这里是在给主表2——歌曲表——的字段取别名
+	-- t_song 的字段对应 FROM `t_song`，代表是从 t_song 里的查询
+	-- 这里是在给主表2——歌曲表——的字段取别名
   `t_song`.`id` AS `songId`,
   `t_song`.`name` AS `songName`,
   `t_song`.`cover` AS `songCover`,
--- t_singer 的字段对应 LEFT JOIN `t_singer`，代表是从 t_singer 里的查询
--- 这里就是在把主表1——歌手表——对象合并成一个数组，数组里又放的是一个一个的主表1对象
--- 格式：JSON_ARRAYAGG(主表1对象) AS '数组的 key'
+	-- t_singer 的字段对应 LEFT JOIN `t_singer`，代表是从 t_singer 里的查询
+	-- 这里就是在把主表1——歌手表——对象合并成一个数组，数组里又放的是一个一个的主表1对象
+	-- 格式：JSON_ARRAYAGG(主表1对象) AS '数组的 key'
   JSON_ARRAYAGG(
     -- 这里就是在把主表1里的字段搞成一个对象，而不再是平铺
     -- 格式：JSON_OBJECT(
@@ -612,9 +614,9 @@ SELECT
   ) AS 'singers'
 -- `t_song`是主表2
 FROM `t_song`
--- 中间表
+-- `t_singer_song`是中间表，中间表.外键 = 表2.主键
 LEFT JOIN `t_singer_song` ON `t_singer_song`.`songId` = `t_song`.`id`
--- `t_singer`是主表1
+-- `t_singer`是主表1，中间表.外键 = 表1.主键
 LEFT JOIN `t_singer` ON `t_singer_song`.`singerId` = `t_singer`.`id`
 -- 通过主表2——歌曲表——的主键进行分组（即主要查询、外层对象的主键）
 GROUP BY `t_song`.`id`;
