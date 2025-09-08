@@ -44,6 +44,7 @@ public class _0303_预处理语句的使用 {
 //            Class.forName(DRIVER_CLASS_NAME);
             // 3、不写法：
             // 实际上 JDK6 之后，我们可以不用手动注册数据库驱动了，我们只要安装好，DriverManager 就会自动搜索类目录来注册
+            // 当然如果在开发中你遇到“无法注册驱动”的错误，那就用自动注册法显示注册一下
 
             // 第三步：利用 DriverManager 新建一个连接 connection，连接上我们已启动的某个 MySQL 服务器及数据库
             //
