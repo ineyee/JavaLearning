@@ -1,4 +1,4 @@
-package com.ineyee.hello_mysql;
+package com.ineyee.hello_mysql._03_jdbc;
 
 public class _0301_概述 {
 
