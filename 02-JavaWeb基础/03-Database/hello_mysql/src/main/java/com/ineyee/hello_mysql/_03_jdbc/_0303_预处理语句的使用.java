@@ -3,12 +3,9 @@ package com.ineyee.hello_mysql._03_jdbc;
 //import com.mysql.cj.jdbc.Driver;
 //import java.sql.DriverManager;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
-public class _0302_基本使用 {
+public class _0303_预处理语句的使用 {
 
     // MySQL 数据库驱动库的类名
     private static final String DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
@@ -50,52 +47,35 @@ public class _0302_基本使用 {
 
             // 第三步：利用 DriverManager 新建一个连接 connection，连接上我们已启动的某个 MySQL 服务器及数据库
             //
-            // 第四步：利用 connection 创建 SQL 语句对象 statement
+            // 第四步：利用 connection 创建 SQL 预处理语句对象 preparedStatement
+            // 之前我们是直接把 SQL 语句先写完整，然后直接塞到 executeXxx() 函数里去执行
+            // 但是这样写的话，如果 SQL 语句里包含变量，比如用户 1 要查询 id 大于 3 的歌曲，用户 2 要查询 id 大于 5 的歌曲，那每次执行一条完整的 SQL 语句时，MySQL 都会重新解析和编译一次 SQL 语句，这样查询性能就比较低
             //
-            // 第六步：关闭资源（关闭语句 statement、关闭连接 connection）
+            // 而使用了预处理语句的话（编写 SQL 语句时把原来写死的值都换成问号?，将来执行 SQL 语句时把值作为参数传递进去即可），我们其实是将 SQL 语句模板传递给了 MySQL，MySQL 会对这个语句模板进行解析、编译、缓存
+            // 而当我们真正执行 SQL 语句时、把参数传递进去，MySQL 就不会再对这条 SQL 语句进行解析和编译了，而是直接执行
+            // 所以相当于是解析和编译一次，后续无论执行多少次都不会再解析和编译，所以查询性能更高
+            //
+            // 此外预处理语句还可以防止 SQL 注入攻击，因为变量值在执行前会被预处理
+            //
+            // 第六步：关闭资源（关闭预处理语句 preparedStatement、关闭连接 connection）
             // JDK7 之后提供了 try-with-resources 语法———— try(...) {...}（跟 try-catch 是两个独立语法）
             // 对于那些需要关闭的资源对象，我们可以把它们的创建过程放在 try 的小括号里，那么当 try 大括号里的代码执行完毕后，就会自动关闭这些资源对象
             // 而且关闭的顺序跟创建的顺序是倒序的
-            try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD); Statement statement = connection.createStatement()) {
-                // 第五步：利用 statement 执行 SQL 语句
+            String selectSql = """
+                    SELECT *
+                    FROM t_product
+                    WHERE brand = ?;
+                    """;
+            try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+                // 第五步：利用 preparedStatement 执行 SQL 语句
                 // 实际开发中，一般都是先通过 Navicat GUI 工具或命令行先把数据库和表创建好，项目里就只做些增删改查操作，很少在项目里通过代码来创建数据库和表
-                String insertSql = """
-                            INSERT INTO t_product (
-                                name,
-                                `desc`,
-                                price,
-                                brand,
-                                score
-                            ) VALUES (
-                                'iPhone11 Pro Max',
-                                '大屏更好用',
-                                11888,
-                                '苹果',
-                                4.7
-                            );
-                        """;
-                String deleteSql = """
-                        DELETE FROM t_product
-                        WHERE name = 'iPhone11 Pro Max';
-                        """;
-                String updateSql = """
-                        UPDATE t_product
-                        SET `desc` = '价格低，质量高'
-                        WHERE price <= 6666;
-                        """;
-                String selectSql = """
-                        SELECT *
-                        FROM t_product
-                        WHERE brand = '苹果';
-                        """;
 
-                // 使用 executeUpdate(...) 方法来执行增删改操作，返回值为影响的记录条数
-//                int insertRet = statement.executeUpdate(insertSql);
-//                int deleteRet = statement.executeUpdate(deleteSql);
-//                int updateRet = statement.executeUpdate(updateSql);
-
+                // 给 SQL 语句设置实参
+                // 第一个参数代表参数的下标，从 1 开始
+                // 第二个参数代表参数的值
+                preparedStatement.setString(1, "苹果");
                 // 使用 executeQuery(...) 方法来执行查操作，返回值为查询到的数据集
-                ResultSet selectRet = statement.executeQuery(selectSql);
+                ResultSet selectRet = preparedStatement.executeQuery();
                 // ResultSet 的游标刚开始是不指向任何一行的，调用一下 next() 方法就指向下一条数据
                 // next() 方法：当指向的那行有数据时，就返回 true，否则返回 false
                 while (selectRet.next()) {
