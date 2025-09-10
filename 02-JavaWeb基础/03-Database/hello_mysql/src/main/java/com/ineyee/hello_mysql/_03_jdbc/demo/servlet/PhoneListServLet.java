@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,12 @@ public class PhoneListServLet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 获取数据
-        List<PhoneBean> phoneBeanlist = phoneDao.getPhoneList();
+        List<PhoneBean> phoneBeanlist = null;
+        try {
+            phoneBeanlist = phoneDao.getPhoneList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // 处理数据
         Map<String, Object> responseMap = new HashMap<>();
