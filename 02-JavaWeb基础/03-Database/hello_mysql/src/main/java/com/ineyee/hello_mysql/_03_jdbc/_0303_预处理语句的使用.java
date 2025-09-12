@@ -12,15 +12,15 @@ public class _0303_预处理语句的使用 {
     // jdbc:mysql://：MySQL 的固定写法
     // localhost、3306：域名和端口号
     // db_hello_mysql：数据库的名称
-    // root、mysqlroot：数据库的用户名和密码
     // serverTimezone=UTC：推荐设置当前会话时区为零时区，以便 MySQL 能正确处理 DATETIME、TIMESTAMP 字段
     //     因为 DATETIME、TIMESTAMP 字段的默认值是获取服务器所在时区的时间，如服务器 1 部署在东八区，服务器 2 部署在西八区， 那么
     //     用户 1 通过东八区的服务器注册时存储在数据库的 createTime 就是东八区的时间 "2025-06-17 17:59:00"、并且没有携带时区信息
     //     用户 2 通过西八区的服务器注册时存储在数据库的 createTime 就是西八区的时间 "2025-06-17 09:59:00"、并且没有携带时区信息
     //     这样在西八区展示东八区用户的 createTime 就会有问题，因为我们不知道 "2025-06-17 17:59:00" 是东八区的、也没法转换为西八区对应的时间
     //     因此我们统一把 DATETIME、TIMESTAMP 字段都设置成零时区的，各个区在拿到时间后转换成自己时区的时间展示即可
+    // root、mysqlroot：数据库的用户名和密码
     private static final String URL = "jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC";
-    private static final String USER = "root";
+    private static final String USERNAME = "root";
     private static final String PASSWORD = "mysqlroot";
 
     public static void main(String[] args) {
@@ -41,10 +41,10 @@ public class _0303_预处理语句的使用 {
             // 实际开发中一般都是这样注册，JVM 一看到 Class.forName(...) 就会去装在这个类，就会执行类的 static {...} 静态代码块
             // 而数据库驱动 Driver 内部的静态代码块里已经写好了注册流程，为的就是不想让各厂商的数据库驱动污染我们的代码，而是让各厂商的数据库驱动 Driver 托管给 JDBC 的驱动管理者 DriverManager
             // 也就是说我们不需要再导入数据库驱动相关的东西，只需要用字符串写个数据库驱动的类名就可以了，要换数据库驱动也只需要换个字符串而已
-//            Class.forName(DRIVER_CLASS_NAME);
+            Class.forName(DRIVER_CLASS_NAME);
             // 3、不写法：
             // 实际上 JDK6 之后，我们可以不用手动注册数据库驱动了，我们只要安装好，DriverManager 就会自动搜索类目录来注册
-            // 当然如果在开发中你遇到“无法注册驱动”的错误，那就用自动注册法显示注册一下
+            // 当然如果在开发中你遇到“无法注册驱动”的错误，那就用自动注册法显示注册一下，换句话说不写可能有事、写了肯定没事
 
             // 第三步：利用 DriverManager 新建一个连接 connection，连接上我们已启动的某个 MySQL 服务器及数据库
             //
@@ -67,7 +67,7 @@ public class _0303_预处理语句的使用 {
                     FROM t_product
                     WHERE brand = ?;
                     """;
-            try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+            try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD); PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
                 // 第五步：利用 preparedStatement 执行 SQL 语句
                 // 实际开发中，一般都是先通过 Navicat GUI 工具或命令行先把数据库和表创建好，项目里就只做些增删改查操作，很少在项目里通过代码来创建数据库和表
 
