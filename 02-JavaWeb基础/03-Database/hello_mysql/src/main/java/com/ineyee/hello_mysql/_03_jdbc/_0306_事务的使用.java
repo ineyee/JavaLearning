@@ -16,11 +16,11 @@ import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
-public class _0305_事务的使用 {
+public class _0306_事务的使用 {
     private static DataSource connectionPool;
 
     static {
-        try (InputStream is = _0304_连接池的使用.class.getClassLoader().getResourceAsStream("druid.properties")) {
+        try (InputStream is = _0305_连接池的使用.class.getClassLoader().getResourceAsStream("druid.properties")) {
             Properties properties = new Properties();
             properties.load(is);
             connectionPool = DruidDataSourceFactory.createDataSource(properties);

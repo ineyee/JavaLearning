@@ -10,18 +10,17 @@ import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
-public class _0304_连接池的使用 {
+public class _0305_连接池的使用 {
     // 连接池
     private static DataSource connectionPool;
 
-    // “配置文件是什么，我们为什么要使用配置文件”，后面会详细说，这里先按步骤搞就行
     // druid.properties 文件应该创建在 src/main/resources 目录下，这是 Maven 项目的标准结构，src/main/resources 目录专门用于存放配置文件（如 .properties、.xml等）
     // 当项目编译时，该目录下的文件会自动被复制到最终的构建产物（如 WAR 或 JAR 包）的类路径（classpath）中，这样您的 Java 代码就可以通过类加载器轻松访问到这些配置文件了
     //
     // 静态代码块会在类被加载时调用，而且只会调用一次
     static {
         // 用类加载器和输入流读取 Druid 连接池的配置文件 druid.properties
-        try (InputStream is = _0304_连接池的使用.class.getClassLoader().getResourceAsStream("druid.properties")) {
+        try (InputStream is = _0305_连接池的使用.class.getClassLoader().getResourceAsStream("druid.properties")) {
             Properties properties = new Properties();
             properties.load(is);
             // 用配置文件创建连接池
