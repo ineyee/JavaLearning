@@ -42,7 +42,7 @@
 * 这里选择下载 Tomcat 11
 * 下载完双击解压，把解压后的文件夹拖动到你想要的目录下就算安装完成了，这里选择安装在跟 JDK 一样的目录 Macintosh HD/Library/Java/apache-tomcat-11.0.10
 
-## 三、Tomcat 操作
+## 三、Tomcat 操作：启动和关闭 Tomcat
 
 `TOMCAT_HOME = Tomcat 的安装目录 = Macintosh HD/Library/Java/apache-tomcat-11.0.10 `
 
@@ -53,11 +53,9 @@ cd TOMCAT_HOME/bin
 chmod +x *.sh
 ```
 
-#### 1、启动和关闭 Tomcat
-
 Tomcat 默认监听 8080 端口来提供 HTTP 服务，所以当 Tomcat 启动成功后，我们可以通过 http://localhost:8080 来访问一下 Tomcat
 
-###### 方式一：执行脚本文件 catalina
+#### 方式一：执行脚本文件 catalina
 
 ```shell
 cd TOMCAT_HOME/bin
@@ -73,7 +71,7 @@ cd TOMCAT_HOME/bin
 bash catalina.sh stop
 ```
 
-###### 方式二：执行脚本文件 startup、shutdown
+#### 方式二：执行脚本文件 startup、shutdown
 
 ```shell
 cd TOMCAT_HOME/bin
@@ -89,7 +87,7 @@ cd TOMCAT_HOME/bin
 bash shutdown.sh
 ```
 
-###### 方式三：把 Tomcat 集成到 IDEA 里，通过 IDEA 来启动和关闭 Tomcat
+#### 方式三：把 Tomcat 集成到 IDEA 里，通过 IDEA 来启动和关闭 Tomcat
 
 把 Tomcat 集成到 IDEA 里：
 
@@ -115,7 +113,7 @@ bash shutdown.sh
 
 * 然后我们在 webapp 目录下自定义创建一个 login.html
 * 然后 Tomcat 11.0.10 - Edit Configurations
-  * Server - HTTP port，由 8080 换成自定义的端口比如“9999”（本机上可能有其它软件已经在监听 8080 端口了，会导致 Tomcat 无法监听）
+  * Server - HTTP port，由 8080 换成自定义的端口比如“9999”（本机上可能有其它软件已经在监听 8080 端口了，会导致 Tomcat 无法监听；${TOMCAT_HOME}/conf/server.xml 文件，\<Connector\> 标签里也能修改端口）
   * Deployment - 选中我们的项目，把下面的 Application context 由 “/hello_tomcat_war_exploded”这么长的一串换成自定义的“/helloTomcat”（注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的）
 * Apply - OK
 * 点击 Run 或 Debug 就可以启动 Tomcat 了，Tomcat 就会把我们的 JavaWeb 项目给自动部署好
@@ -135,3 +133,62 @@ bash shutdown.sh
 ![Edit Configurations-CodeCoverage](asset/CodeCoverage.png)
 
 ![Edit Configurations-Startup/Connection](asset/StartupConnection.png)
+
+## 四、Tomcat 部署 JaveWeb 项目的方式
+
+`TOMCAT_HOME = Tomcat 的安装目录 = Macintosh HD/Library/Java/apache-tomcat-11.0.10 `
+
+#### 方式一：把 JavaWeb 项目打包后的文件夹，直接放在 ${TOMCAT_HOME}/webapps 目录下
+
+* Build - Build Artifacts - ${项目名}:war exploded（注意这里有 exploded，代表打包成爆炸物文件夹）
+* 这样对 JaveWeb 项目打包后，产物是一个文件夹：${项目名}-${项目版本}-SNAPSHOT，放在 target 目录下
+* 我们需要把产物文件夹名改成 ${Application context}，以便将来访问
+* 把产物文件夹直接复制到 ${TOMCAT_HOME}/webapps  目录下
+* 启动 Tomcat
+* 然后我们去浏览器里通过“http://localhost:9999/helloTomcat”来访问，项目默认返回的是 webapp 目录下的 index.jsp 文件，我们还可以通过“http://localhost:9999/helloTomcat/login.html”来访问我们自己创建的登录页面，验证是否部署成功
+
+```
+缺点：要复制一堆文件夹和文件，万一漏了就出错了，而且这堆文件夹和文件的体积也可能比较大，复制起来会比较慢
+```
+
+#### 方式二：把 JavaWeb 项目打包后的 war 包，直接放在 ${TOMCAT_HOME}/webapps 目录下
+
+* Build - Build Artifacts - ${项目名}:war（注意这里没有 exploded，代表打包成非爆炸物压缩包）
+* 这样对 JaveWeb 项目打包后，产物是一个 war 压缩包：${项目名}-${项目版本}-SNAPSHOT.war，放在 target 目录下
+* 我们需要把产物 war 包名改成 ${Application context}.war，以便将来访问
+* 把产物 war 包直接复制到 ${TOMCAT_HOME}/webapps  目录下
+* 启动 Tomcat，此时会自动解压 war 包为文件夹，其实也就变成方式一了
+* 然后我们去浏览器里通过“http://localhost:9999/helloTomcat”来访问，项目默认返回的是 webapp 目录下的 index.jsp 文件，我们还可以通过“http://localhost:9999/helloTomcat/login.html”来访问我们自己创建的登录页面，验证是否部署成功
+
+```
+优点：只需要复制一个 war 压缩包，不容易漏，复制起来也比较快
+缺点：还是得复制来复制去
+```
+
+#### 方式三：在 ${TOMCAT_HOME}/conf/Catalina/localhost 文件夹下创建一个 xml 文件，xml 文件名为 ${Application context}
+
+* Build - Build Artifacts - ${项目名}:war exploded（注意这里有 exploded，代表打包成爆炸物文件夹）
+* 这样对 JaveWeb 项目打包后，产物是一个文件夹：${项目名}-${项目版本}-SNAPSHOT，放在 target 目录下
+* 我们需要把产物文件夹名改成 ${Application context}，以便将来访问
+* 把产物文件夹放到指定的路径，这里假设我们的产物文件夹放在桌面上
+
+* 在 ${TOMCAT_HOME}/conf/Catalina/localhost 文件夹下创建一个 xml 文件，xml 文件名为 ${Application context}，以便将来访问
+
+* 在 xml 文件里新建一个标签
+
+  ```XML
+  # 这里假设我们的产物文件夹放在桌面上: <Context docBase="/Users/yiyi/Desktop/helloTomcat" />
+  <Context docBase="产物文件夹的路径" />
+  ```
+
+  ```XML
+  其实我们在 IDEA 里启动 Tomcat，Tomcat 就是按这种方式部署 JavaWeb 项目的
+  
+  启动 Tomcat 后，控制台可以看到一个 CATALINA_BASE 的路径，复制并前往这个路径，进入 /conf/Catalina/localhost，就能看到 ${Application context}.xml 文件了，它里面 Context 标签的 docBase 就指向我们项目里 target 目录下的产物文件夹
+  <Context docBase="/Users/yiyi/Desktop/JavaLearning/02-JavaWeb基础/01-Tomcat/hello-tomcat/target/hello-tomcat-1.0-SNAPSHOT" />
+  ```
+
+  ```
+  优点：产物不需要复制来复制去
+  ```
+
