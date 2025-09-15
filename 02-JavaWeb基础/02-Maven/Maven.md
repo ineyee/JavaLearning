@@ -1,6 +1,6 @@
 ## 一、Maven 是什么
 
-Maven 是一个**包管理工具和项目构建工具**，最初由 Apache 开发，最常用于 Java 项目。
+Maven 是一个**创建项目工具 + 包管理工具 + 项目构建工具**，最初由 Apache 开发，最常用于 Java 项目。
 
 ## 二、本机安装 Maven
 
@@ -10,10 +10,48 @@ Maven 是一个**包管理工具和项目构建工具**，最初由 Apache 开�
 
 * 在 .bash_profile 里配置一下环境变量：export PATH="/Library/Java/apache-maven-3.9.11/bin:$PATH"，并执行 source ~/.bash_profile 来让修改立即生效
 * 终端执行 mvn --version 或 mvn -v 来验证是否安装成功
+* 然后在 IDEA - Settings - Build, Execution, Deployment - Build Tools - Maven - Maven home path 换成我们自己安装的 Maven，不要用 IDEA 自带的 Maven
+
+## 三、Maven 作为创建项目工具
+
+我们知道用 Eclipse 创建的 Java 项目是无法用 IDEA 运行的，用 IDEA 创建的 Java 项目是无法用 Eclipse 运行的，主要是因为用不同的 IDE 创建出来的项目结构和配置文件互不兼容。但是如果用 Maven 来创建的项目的话，它有自己的一套项目结构和配置文件，可以保证不同开发人员使用不同 IDE 时都能够顺利运行项目，下面是用 Maven 创建项目时的基本目录：
+
+```
+├─${project-name}/(项目名)
+│  ├─src/(项目的源文件)
+│  │  ├─main/
+│  │  │  ├─java/(我们编写的 Java 代码都放在这个文件夹里)
+│  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
+│  │  ├─test/
+│  │  │  ├─java/(单元测试的 Java 代码都放在这个文件夹里)
+│  │  │  ├─resources/(单元测试的配置文件都放在这个文件夹里)
+│  │  ├─webapp/(JavaWeb 项目的 web 资源)
+│  ├─target/(项目的打包产物)
+│  ├─pom.xml(项目的配置文件，里面记录着项目的很多信息)
+```
+
+用 IDEA 创建一个 Maven 项目/模块：
+
+* IDEA - New Project - Maven Archetype
+* Name：hello-maven
+* Location：项目所在父目录
+
+* JDK：选择相应版本的 JDK
+* Catalog：提供不同的 Archetype 列表
+  * Internal（一般选这个就够用了）：IDE 自带的 Archetype 列表，不依赖网络，模板有限
+  * Default Local：本地 Maven 仓库里已有的 Archetype 列表（~/.m2/repository），如果之前下载过模板会显示
+  * Maven Central：官方 Maven 中央仓库提供的 Archetype 列表，网络可访问最新模板，模板最全
+
+* Archetype：Maven 的项目模板，用来快速生成一个规范化的项目结构和配置文件
+  * maven-archetype-quickstart：最基本的 Java 项目模板，包含 main/test 目录
+  * maven-archetype-webapp：Web 项目模板，生成 WEB-INF、web.xml 等基础结构
+
+* GroupId（公司域名倒写）：com.ineyee
+* Artifact（默认就是项目名）
+
+
 
 二、Maven 作为
-
-pom.xml 记录着项目的很多信息，类似于 xxx
 
 包管理工具
 
@@ -146,3 +184,62 @@ pom.xml 记录着项目的很多信息，类似于 xxx
 一句话总结：
 
 👉 **Maven 就是 Java 世界里的 npm + webpack + 发布工具三合一**。
+
+
+
+
+
+**Maven** 本质上是一个 **项目管理和构建工具**，而不是单纯的“创建项目工具”。它的主要功能包括：
+
+
+
+1. **项目结构管理**
+
+   
+
+   - Maven 有一个标准的项目目录结构（src/main/java、src/test/java 等），当你用 Maven 创建项目时，会自动生成这些规范结构。
+   - 所以它可以帮你“初始化项目”，这也是你说的“创建项目”功能的一部分。
+
+   
+
+2. **依赖管理**
+
+   
+
+   - Maven 可以自动下载和管理你项目所需的第三方库（依赖），通过 pom.xml 文件声明依赖即可。
+   - 不用手动去下载 jar 包或管理 classpath。
+
+   
+
+3. **构建和打包**
+
+   
+
+   - Maven 可以编译代码、运行测试、打包成 jar/war/ear 等格式，并能执行其他自定义任务。
+
+   
+
+4. **生命周期管理**
+
+   
+
+   - Maven 定义了一整套生命周期（compile → test → package → install → deploy），让项目构建流程标准化。
+
+   
+
+
+
+
+
+✅ 总结
+
+
+
+- **Maven 是项目管理+构建工具**。
+- 它可以帮助你快速创建一个标准化的项目，但它的核心价值是 **依赖管理和构建自动化**，不是单纯的“创建项目”。
+
+
+
+
+
+如果你愿意，我可以给你画一张 **Maven 的功能结构图**，让你一眼看懂它的作用。你希望我画吗？
