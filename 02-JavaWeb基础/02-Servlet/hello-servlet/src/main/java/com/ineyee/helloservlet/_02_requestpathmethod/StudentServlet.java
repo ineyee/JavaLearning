@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,31 +36,30 @@ public class StudentServlet extends HttpServlet {
     // 定义只允许 GET 请求和 POST 请求的方法
     private static final List<String> GET_METHODS = Arrays.asList("query");
     private static final List<String> POST_METHODS = Arrays.asList("insert", "delete", "update");
+    // 全部方法
+    private static final List<String> ALL_METHODS = new ArrayList<>();
+
+    static {
+        ALL_METHODS.addAll(GET_METHODS);
+        ALL_METHODS.addAll(POST_METHODS);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String methodName = getMethodName(req.getRequestURI());
-
-        if (!GET_METHODS.contains(methodName)) {
-            System.out.println(methodName + " only supports GET");
-            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, methodName + " only supports GET");
-            return;
+        Boolean ret = checkMethod(methodName, "GET", req, resp);
+        if (ret) {
+            invokeMethod(methodName, req, resp);
         }
-
-        invokeMethod(methodName, req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String methodName = getMethodName(req.getRequestURI());
-
-        if (!POST_METHODS.contains(methodName)) {
-            System.out.println(methodName + " only supports POST");
-            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, methodName + " only supports POST");
-            return;
+        Boolean ret = checkMethod(methodName, "POST", req, resp);
+        if (ret) {
+            invokeMethod(methodName, req, resp);
         }
-
-        invokeMethod(methodName, req, resp);
     }
 
     private String getMethodName(String requestURI) {
@@ -79,6 +79,37 @@ public class StudentServlet extends HttpServlet {
         System.out.println("methodName = " + methodName); // [, helloServlet, student, insert]
 
         return methodName;
+    }
+
+    private Boolean checkMethod(String methodName, String method, HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            if (!ALL_METHODS.contains(methodName)) {
+                System.out.println(methodName + " not found");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, methodName + " not found");
+                return false;
+            }
+
+            if (method.equals("GET") || method.equals("get")) {
+                if (!GET_METHODS.contains(methodName)) {
+                    System.out.println(methodName + " only supports GET");
+                    resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, methodName + " only supports GET");
+                    return false;
+                }
+            }
+
+            if (method.equals("POST") || method.equals("post")) {
+                if (!POST_METHODS.contains(methodName)) {
+                    System.out.println(methodName + " only supports POST");
+                    resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, methodName + " only supports POST");
+                    return false;
+                }
+            }
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private void invokeMethod(String methodName, HttpServletRequest req, HttpServletResponse resp) {
