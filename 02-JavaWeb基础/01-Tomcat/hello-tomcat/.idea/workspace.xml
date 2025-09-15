@@ -2,17 +2,14 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="hello-tomcat:war" />
+      <artifact name="hello-tomcat:war exploded" />
     </artifacts-to-build>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="208f307d-13c3-45c7-8d45-e0cd85587eae" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../Tomcat.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Tomcat.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="208f307d-13c3-45c7-8d45-e0cd85587eae" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -188,7 +185,7 @@
       <updated>1756871134443</updated>
       <workItem from="1756871136080" duration="235000" />
       <workItem from="1757921179963" duration="93000" />
-      <workItem from="1757921277048" duration="5613000" />
+      <workItem from="1757921277048" duration="6898000" />
     </task>
     <servers />
   </component>

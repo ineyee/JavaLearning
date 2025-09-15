@@ -41,6 +41,8 @@
 * Tomcat 下载地址：https://tomcat.apache.org/
 * 这里选择下载 Tomcat 11
 * 下载完双击解压，把解压后的文件夹拖动到你想要的目录下就算安装完成了，这里选择安装在跟 JDK 一样的目录 Macintosh HD/Library/Java/apache-tomcat-11.0.10
+* 在 .bash_profile 里配置一下环境变量：export PATH="/Library/Java/apache-tomcat-11.0.10/bin:$PATH"，并执行 source ~/.bash_profile 来让修改立即生效
+* Tomcat 没有 tomcat --version 或 tomcat -v 之类的命令来验证是否安装成功
 
 ## 三、Tomcat 操作：启动和关闭 Tomcat
 
