@@ -1,12 +1,12 @@
 ## 一、本机安装 MySQL
 
-![MySQLServer](MySQLServer.png)
+![MySQL 服务器](MySQL 服务器.png)
 
-MySQL Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯定会设置监听某个端口（默认 3306）来跟客户端通信（如 mysql 命令行工具、JDBC、各种编程语言的驱动等），MySQL Server 内部又存放着一个或多个 MySQL 数据库
+MySQL Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯定也会设置监听某个端口（默认 3306）来跟客户端通信（如 mysql 命令行工具、各种编程语言的驱动、GUI 工具等），MySQL Server 内部又存放着一个或多个 MySQL 数据库
 
 * MySQL 下载地址：https://dev.mysql.com/downloads/mysql/
 * 这里选择下载 MySQL Community Server 8.4.6 LTS
-* 下载完双击安装即可（期间设置一下 root 用户的密码，比如是 mysqlroot），macOS 上会默认安装在 Macintosh HD/usr/local/mysql，数据库数据默认存放路径为 Macintosh HD/usr/local/mysq/data
+* 下载完双击安装即可（期间设置一下 root 用户的密码，比如是 mysqlroot），macOS 上会默认安装在 /usr/local/mysql，数据库数据默认存放路径为 /usr/local/mysql/data（/ 代表根目录 Macintosh HD，~/ 代表当前用户目录 /Users/ineyee）
 * 在 .bash_profile 里配置一下环境变量：export PATH="/usr/local/mysql/bin:$PATH"，并执行 source ~/.bash_profile 来让修改立即生效
 * 终端执行 mysql --version 或 mysql -V 来验证是否安装成功
 * macOS 电脑上可以在【系统设置】里找到 MySQL 软件，我们可以在这里启动或者停止 MySQL 服务，也可以勾选开关机自动启动或停止 MySQL 服务
