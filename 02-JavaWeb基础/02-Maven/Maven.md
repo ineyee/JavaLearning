@@ -8,7 +8,7 @@ Maven 依赖于 JDK，而《Java语言基础》那里我们已经安装好了 JD
 
 - Maven 下载地址：https://maven.apache.org/download.cgi
 - 这里选择下载 Maven 3.9.11
-- 下载完双击解压，把解压后的文件夹拖动到你想要的目录下就算安装完成了，这里选择安装在跟 JDK 一样的目录 /Library/Java/apache-maven-3.9.11，Maven 默认的本地仓库路径为 ~/.m2（/ 代表根目录 Macintosh HD，~/ 代表当前用户目录 /Users/ineyee）
+- 下载完双击解压，把解压后的文件夹拖动到你想要的目录下就算安装完成了，这里选择安装在跟 JDK 一样的目录 /Library/Java/apache-maven-3.9.11，Maven 默认的本地仓库路径为 \~/.m2（/ 代表根目录 Macintosh HD，\~/ 代表当前用户目录 /Users/ineyee）
 
 * 在 .bash_profile 里配置一下环境变量：export PATH="/Library/Java/apache-maven-3.9.11/bin:$PATH"，并执行 source ~/.bash_profile 来让修改立即生效
 * 终端执行 mvn --version 或 mvn -v 来验证是否安装成功
@@ -99,11 +99,14 @@ pom.xml 文件是项目的配置文件，里面记录着项目的很多信息。
     </dependency>
   </dependencies>
   
-  <!-- 属性信息，比如文本编码等 -->
+  <!-- 属性信息 -->
   <properties>
     <!-- 告诉 Maven 编译、打包源码时使用 UTF-8，避免有些环境（如 Windows 服务器）使用系统默认的 GBK、ISO-8859-1 编码 -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <!-- 告诉 Maven 编译器插件，把源码编译成兼容 JDK8 的字节码文件 -->
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+  </properties>
   
   <!-- 构建信息，比如输出产物的名字、插件配置等 -->
   <build>
@@ -126,19 +129,21 @@ groupId、artifactId、version 这三个东西组合在一起称为一个 Maven 
 
 #### 3、依赖
 
+###### 远程仓库依赖
+
 直接在 pom.xml 文件里的 dependencies 标签下添加相应 Maven 坐标的依赖即可，比如：
 
 ```XML
 <!-- 所有的依赖 -->
 <dependencies>
-  <!-- 某一个依赖 -->
+  <!-- 某一个依赖（远程仓库有） -->
   <dependency>
     <groupId>junit</groupId>
     <artifactId>junit</artifactId>
     <version>3.8.1</version>
     <scope>test</scope>
   </dependency>
-  <!-- 某一个依赖 -->
+  <!-- 某一个依赖（远程仓库有） -->
   <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
@@ -147,9 +152,117 @@ groupId、artifactId、version 这三个东西组合在一起称为一个 Maven 
 </dependencies>
 ```
 
-然后点击 Sync Maven Changes，Maven 就会自动去远程仓库（https://mvnrepository.com/、公司私服等）下载依赖，并缓存到本地仓库（默认 ~/.m2/repository），我们在项目的 External Libraries 里面就能看到新增的依赖了，这样一来，开发阶段所有的项目就都可以共用本地仓库里的三方库了，只有在打包项目的时候才会把需要的三方库从本地仓库复制一份出来到当前项目的打包产物里，从而大大节省我们电脑的磁盘空间。并且 Maven 还会自动下载依赖的依赖、处理依赖冲突等。
+然后点击 Sync Maven Changes，Maven 就会自动去远程仓库（Maven 中央仓库或 Maven 公司私有仓库）下载依赖，并缓存到本地仓库（默认 ~/.m2/repository），我们在项目的 External Libraries 里面就能看到新增的依赖了，这样一来，开发阶段所有的项目就都可以共用本地仓库里的三方库了，只有在打包项目的时候才会把需要的三方库从本地仓库复制一份出来到当前项目的打包产物里，从而大大节省我们电脑的磁盘空间。并且 Maven 还会自动下载依赖的依赖、处理依赖冲突等。
 
-## 五、本机 Maven 作为打包发布工具项目构建工具
+###### 本地仓库依赖
+
+但是还有一个问题，并不是所有的依赖都会发布到 Maven 中央仓库或 Maven 公司私有仓库。比如有一个三方库，人家没有把 jar 包发布到 Maven 中央仓库，只提供了直接去人家官网下载 jar 包来使用的方式；又比如我们公司自己的项目打包出来的 jar 包，也没有发布到 Maven 公司私有仓库，只提供了直接使用 jar 包的方式。那我们该怎么在主项目里依赖这类”本地 jar 包“呢？
+
+其实很简单，我们已经知道 Maven 在管理依赖时，其实是先去本地仓库找有没有依赖的缓存，有的话就不会去远程下载依赖了，所以我们可以直接把这类”本地 jar 包“安装到本地仓库不就完事了嘛，Maven 肯定能在本地仓库里找到，这样一来我们就可以依旧在 pom.xml 文件里通过 dependency 来依赖这类”本地 jar 包“了。
+
+这里假设我们电脑桌面上已经下载好了一份三方库的”本地 jar 包“——sayhello.jar：
+
+* 我们需要先执行命令把”本地 jar 包“安装到本地仓库
+
+```shell
+// mvn install:install-file -Dfile=${jar包的路径} -DgroupId=${公司域名倒写} -DartifactId=${jar包名} -Dversion=${版本} -Dpackaging=jar
+mvn install:install-file -Dfile=/Users/ineyee/Desktop/sayhello.jar -DgroupId=com.ineyee -DartifactId=sayhello -Dversion=1.0.0 -Dpackaging=jar
+```
+
+* 然后依然直接去 pom.xml 文件里添加依赖就可以了
+
+```XML
+<!-- 某一个依赖（远程仓库没有、本地仓库有） -->
+<dependency>
+  <groupId>com.ineyee</groupId>
+  <artifactId>sayhello</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+## 五、本机 Maven 作为项目构建工具
+
+#### 1、打包
+
+###### 1.2 普通 Java 项目
+
+普通 jar 是指不能独立运行的 jar 包，里面就是一些 api 供别人调用；runnable jar 是指能独立运行的 jar 包，里面有 main 函数。
+
+**打包成普通 jar**
+
+**打包成 runnable jar**
+
+* 首先我们需要将打包方式设置成 jar
+
+  ```XML
+  <packaging>jar</packaging>
+  ```
+
+* 然后执行 mvn package 命令
+
+  ```shell
+  mvn package
+  ```
+
+* 然后对打包好的 jar 包执行运行命令
+
+  ```shell
+  java -jar /Users/ineyee/Desktop/helloMaven.jar
+  ```
+
+* 发现报错 “/Users/ineyee/Desktop/helloMaven.jar中没有主清单属性”，这个报错其实是由两个问题造成的：
+
+  * 第一个问题，我们没有指定程序的入口是哪个类，毕竟 Java 程序的每个类里都可以写 main 函数，那到底哪个类的 main 是入口呢，所以我们需要指定一下
+  * 第二个问题，我们解压打包好的 jar 包后会发现其实并没有把三方库的 jar 包给复制一份到产物里面去，也就是说依赖都缺失了，所以我们的 jar 包肯定是无法正常运行的
+  * 要解决这两个问题，得在 pom.xml 文件里配置使用一下 spring-boot-maven-plugin 插件
+
+  ```XML
+  <!-- 构建信息，比如输出产物的名字、插件配置等 -->
+  <build>
+    <!-- 输出产物的名字 -->
+    <finalName>helloMaven</finalName>
+    <!-- 插件配置 -->
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>4.0.0-M2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+            <configuration>
+              <!-- 指定程序的入口是哪个类 -->
+              <mainClass>Main</mainClass>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  ```
+
+* 然后重新打包、重新执行，发现 ok 了
+
+#### 2、发布
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 1. **统一构建生命周期**
 
@@ -256,8 +369,6 @@ groupId、artifactId、version 这三个东西组合在一起称为一个 Maven 
    
 
 3. **构建和打包**
-
-   
 
    - Maven 可以编译代码、运行测试、打包成 jar/war/ear 等格式，并能执行其他自定义任务。
 

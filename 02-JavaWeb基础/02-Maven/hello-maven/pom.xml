@@ -33,16 +33,39 @@
         </dependency>
     </dependencies>
 
-    <!-- 属性信息，比如文本编码等 -->
+    <!-- 属性信息 -->
     <properties>
         <!-- 告诉 Maven 编译、打包源码时使用 UTF-8，避免有些环境（如 Windows 服务器）使用系统默认的 GBK、ISO-8859-1 编码 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 告诉 Maven 编译器插件，把源码编译成兼容 JDK8 的字节码文件 -->
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
     <!-- 构建信息，比如输出产物的名字、插件配置等 -->
     <build>
         <!-- 输出产物的名字 -->
         <finalName>helloMaven</finalName>
+        <!-- 插件配置 -->
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>4.0.0-M2</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 指定程序的入口是哪个类 -->
+                            <mainClass>Main</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <!--
@@ -50,5 +73,5 @@
         如果不写这个标签，默认是打包成 jar
         如果是个 JavaWeb 项目，那应该打包成 war
     -->
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 </project>

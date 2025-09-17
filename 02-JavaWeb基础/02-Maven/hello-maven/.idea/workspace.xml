@@ -10,11 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cb241ac-5856-44cf-b89e-f93de3a70f0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/hellomaven/HelloMaven.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Maven.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Maven.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,8 +24,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="HTML File" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -57,9 +57,11 @@
     "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
     "Maven.hello-maven [clean].executor": "Run",
     "Maven.hello-maven [compile].executor": "Run",
+    "Maven.hello-maven [install].executor": "Run",
     "Maven.hello-maven [package].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Tomcat Server.Tomcat 11.0.10.executor": "Debug",
     "git-widget-placeholder": "main",
@@ -205,7 +207,7 @@
       <workItem from="1757945761160" duration="874000" />
       <workItem from="1758034143613" duration="26000" />
       <workItem from="1758063163443" duration="597000" />
-      <workItem from="1758111239111" duration="4635000" />
+      <workItem from="1758111239111" duration="12911000" />
     </task>
     <servers />
   </component>
