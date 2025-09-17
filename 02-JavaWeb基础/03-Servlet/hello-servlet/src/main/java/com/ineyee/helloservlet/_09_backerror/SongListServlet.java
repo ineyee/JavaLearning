@@ -34,6 +34,7 @@ public class SongListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String token = req.getHeader("token");
+        resp.setContentType("application/json;charset=utf-8");
         if (!token.equals("qwertyuiop")) {
             resp.getWriter().write("{\"code\":-1001,\"message\":\"token 校验出错\"}");
         } else {

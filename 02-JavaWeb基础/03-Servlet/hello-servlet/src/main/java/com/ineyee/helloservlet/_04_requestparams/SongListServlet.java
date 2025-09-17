@@ -28,6 +28,6 @@ public class SongListServlet extends HttpServlet {
 
         System.out.println("请求参数：" + idNum + " " + pageNum + " " + sizeNum);
 
-        resp.getWriter().write("{\"code\":0,\"message\":\"获取歌单成功\",\"data\":{\"id\":" + idNum + ",\"page\":" + pageNum + ",\"size\":" + sizeNum + "}}");
+        resp.getWriter().write("获取歌单成功");
     }
 }

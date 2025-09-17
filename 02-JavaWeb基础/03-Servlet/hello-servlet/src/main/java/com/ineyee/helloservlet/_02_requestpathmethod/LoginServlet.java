@@ -15,9 +15,9 @@ import java.io.IOException;
 // 通过定义不同的 servlet 类和指定不同的路径来区分请求路径
 @WebServlet("/login02")
 public class LoginServlet extends HttpServlet {
-    // 如果是 post 请求那就调用 doPost 方法
+    // 如果是 post 请求那就会触发 doPost 方法
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.getWriter().write("{\"code\":0,\"message\":\"登录成功\",\"data\":{\"token\":\"1234567890\"}}");
+        resp.getWriter().write("登录成功");
     }
 }

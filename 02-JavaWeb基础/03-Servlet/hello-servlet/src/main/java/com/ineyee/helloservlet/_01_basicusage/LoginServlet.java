@@ -21,7 +21,7 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
     /**
      * 第四步：监听来自客户端的请求并返回响应
-     * 调用的方法：如果是 get 请求那就调用 doGet 方法，如果是 post 请求那就调用 doPost 方法
+     * 调用的方法：如果是 get 请求那就会触发 doGet 方法，如果是 post 请求那就会触发 doPost 方法
      *
      * @param req 请求对象，用来读取客户端发过来的请求数据。包含了客户端请求服务器时的所有信息，如请求方法、请求路径、请求头、请求体等
      * @param resp 响应对象，用来写入响应数据给客户端。包含了服务器要返回给客户端的所有信息，如响应状态码、响应头、响应体等
@@ -30,7 +30,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 返回响应、结束本次请求
-        resp.getWriter().write("获取歌单成功");
+        resp.getWriter().write("登录成功");
     }
 
     @Override

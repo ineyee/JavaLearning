@@ -18,9 +18,10 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 常见的响应头详见这篇文章：https://www.jianshu.com/p/27a32885fa7a
 
-        // 告诉客户端响应体的格式为 json 或普通文本，编码方式为 utf-8
-        // 如果不设置这个 header 的话，浏览器默认是按照二进制数据来解析的，所以会乱码；其它客户端可能默认就是 utf-8 解码
-//        resp.setContentType("application/json;charset=utf-8");
-        resp.setContentType("text/plain;charset=utf-8");
+        // 我们可以根据实际情况告诉客户端响应体的格式为 json（用的较多，要跟客户端约定好）、普通文本还是 html 文本
+        // 现在响应体的编码方式普通默认就是 UTF-8
+        resp.setContentType("application/json;charset=utf-8");
+//        resp.setContentType("text/plain;charset=utf-8");
+//        resp.setContentType("text/html;charset=utf-8");
     }
 }
