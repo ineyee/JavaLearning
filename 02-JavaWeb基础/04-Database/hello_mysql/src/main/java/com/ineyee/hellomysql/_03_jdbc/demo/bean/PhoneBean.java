@@ -1,4 +1,4 @@
-package com.ineyee.hello_mysql._03_jdbc.demo.bean;
+package com.ineyee.hellomysql._03_jdbc.demo.bean;
 
 // 标准 Java Bean 写法：
 // 1、属性必须是 private 修饰，保证封装性

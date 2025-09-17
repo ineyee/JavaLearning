@@ -1,8 +1,8 @@
-package com.ineyee.hello_mysql._03_jdbc.demo.servlet;
+package com.ineyee.hellomysql._03_jdbc.demo.servlet;
 
 import com.google.gson.Gson;
-import com.ineyee.hello_mysql._03_jdbc.demo.bean.PhoneBean;
-import com.ineyee.hello_mysql._03_jdbc.demo.dao.PhoneDao;
+import com.ineyee.hellomysql._03_jdbc.demo.bean.PhoneBean;
+import com.ineyee.hellomysql._03_jdbc.demo.dao.PhoneDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,14 +1,8 @@
-package com.ineyee.hello_mysql._03_jdbc;
+package com.ineyee.hellomysql._03_jdbc;
 
 //import com.mysql.cj.jdbc.Driver;
 //import java.sql.DriverManager;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;

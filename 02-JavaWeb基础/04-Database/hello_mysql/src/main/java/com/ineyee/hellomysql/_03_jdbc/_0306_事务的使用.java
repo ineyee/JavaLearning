@@ -7,7 +7,7 @@
   所以只有需要把多条 SQL 语句当做当作一个操作序列来执行时才需要用到事务，比如转账（扣钱 + 加钱）、下单（扣库存 + 生成订单 + 写日志）等，平常单条 SQL 语句的增删改查操作一般不需要用到事务
 */
 
-package com.ineyee.hello_mysql._03_jdbc;
+package com.ineyee.hellomysql._03_jdbc;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 
