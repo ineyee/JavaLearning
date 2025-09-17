@@ -27,10 +27,11 @@ Maven 依赖于 JDK，而《Java语言基础》那里我们已经安装好了 JD
 │  │  ├─main/
 │  │  │  ├─java/(我们编写的 Java 代码都放在这个文件夹里)
 │  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
+│  │  │  ├─webapp/(JavaWeb 项目的 web 资源)
 │  │  ├─test/
-│  │  │  ├─java/(单元测试的 Java 代码都放在这个文件夹里)
+│  │  │  ├─java 或 webapp/(单元测试的 Java 代码都放在这个文件夹里)
 │  │  │  ├─resources/(单元测试的配置文件都放在这个文件夹里)
-│  │  ├─webapp/(JavaWeb 项目的 web 资源)
+│  │  │  ├─webapp/(单元测试的 web 资源)
 │  ├─target/(项目的打包产物)
 │  ├─pom.xml(项目的配置文件，里面记录着项目的很多信息)
 ```
@@ -58,49 +59,95 @@ Maven 依赖于 JDK，而《Java语言基础》那里我们已经安装好了 JD
 
 ## 四、本机 Maven 作为包管理工具
 
-1. **依赖声明**
+#### 1、pom.xml 文件
 
-   在 pom.xml 文件里声明依赖，比如：
+pom.xml 文件是项目的配置文件，里面记录着项目的很多信息。
 
+```XML
+<!-- 根元素 project -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!--
+		声明 pom.xml 文件的版本，就像 .html 文件里声明是 H5 那样，决定了该文件里能写什么标签不能写什么标签
+		目前都使用 4.0.0，是必要元素
+	-->
+  <modelVersion>4.0.0</modelVersion>
+  
+  <!--
+		groupId：com.ineyee，公司域名倒写，我们创建项目时填写的
+		artifactId：默认就是项目名，我们创建项目时填写的
+		version：1.0.0，项目版本号，我们创建项目时填写的
+	-->
+  <groupId>com.ineyee</groupId>
+  <artifactId>hello-maven</artifactId>
+  <version>1.0.0</version>
+  
+  <!-- 所有的依赖 -->
+  <dependencies>
+    <!-- 某一个依赖 -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- 某一个依赖 -->
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.13.2</version>
+    </dependency>
+  </dependencies>
+  
+  <!-- 属性信息，比如文本编码等 -->
+  <properties>
+    <!-- 告诉 Maven 编译、打包源码时使用 UTF-8，避免有些环境（如 Windows 服务器）使用系统默认的 GBK、ISO-8859-1 编码 -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+  
+  <!-- 构建信息，比如输出产物的名字、插件配置等 -->
+  <build>
+    <!-- 输出产物的名字 -->
+    <finalName>helloMaven</finalName>
+  </build>
+  
+  <!--
+		打包方式，比如 jar、war 等
+		如果不写这个标签，默认是打包成 jar
+		如果是个 JavaWeb 项目，那应该打包成 war
+	-->
+  <packaging>war</packaging>
+</project>
 ```
-<dependency>
-    <groupId>org.springframework</groupId>
-    <artifactId>spring-context</artifactId>
-    <version>5.3.30</version>
-</dependency>
+
+#### 2、Maven 坐标
+
+groupId、artifactId、version 这三个东西组合在一起称为一个 Maven 坐标，因为它们仨能唯一确定一个项目。
+
+#### 3、依赖
+
+直接在 pom.xml 文件里的 dependencies 标签下添加相应 Maven 坐标的依赖即可，比如：
+
+```XML
+<!-- 所有的依赖 -->
+<dependencies>
+  <!-- 某一个依赖 -->
+  <dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>3.8.1</version>
+    <scope>test</scope>
+  </dependency>
+  <!-- 某一个依赖 -->
+  <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.13.2</version>
+  </dependency>
+</dependencies>
 ```
 
-
-
-1. Maven 会自动去远程仓库（中央仓库、公司私服等）下载依赖，并缓存到本地仓库（默认 ~/.m2/repository）。
-
-2. **传递依赖**
-
-   
-
-   - 如果 A 依赖 B，B 又依赖 C，那只要声明 A，Maven 会自动把 B、C 全部拉下来。
-   - 避免了手动找 JAR 包、处理复杂依赖的痛苦。
-
-   
-
-3. **依赖冲突管理**
-
-   
-
-   - Maven 提供 **依赖树** (mvn dependency:tree) 来查看冲突。
-   - 默认使用“最近路径优先”来解决版本冲突，也可以在 pom.xml 里手动指定。
-
-   
-
-
-
-
-
-------
-
-
-
-
+然后点击 Sync Maven Changes，Maven 就会自动去远程仓库（https://mvnrepository.com/、公司私服等）下载依赖，并缓存到本地仓库（默认 ~/.m2/repository），我们在项目的 External Libraries 里面就能看到新增的依赖了，这样一来，开发阶段所有的项目就都可以共用本地仓库里的三方库了，只有在打包项目的时候才会把需要的三方库从本地仓库复制一份出来到当前项目的打包产物里，从而大大节省我们电脑的磁盘空间。并且 Maven 还会自动下载依赖的依赖、处理依赖冲突等。
 
 ## 五、本机 Maven 作为打包发布工具项目构建工具
 
