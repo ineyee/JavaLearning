@@ -119,8 +119,8 @@ bash shutdown.sh
 
 * Server - HTTP port，由默认的 8080 换成自定义的端口比如 9999（本机上可能有其它软件已经在监听 8080 端口了，会导致 Tomcat 无法监听；${TOMCAT_HOME}/conf/server.xml 文件，\<Connector\> 标签里也能修改端口）
 * Deployment - Add - Artifact - ${项目名}:war exploded 或 ${项目名}:war
-  * ${项目名}:war exploded 代表不打包成 war 包，直接把项目以展开的文件夹形式部署到 Tomcat 上去，适用于开发阶段
-  * ${项目名}:war 代表把项目打包成 war 包，再部署到 Tomcat 上去，适用于发布阶段
+  * ${项目名}:war exploded 代表不打包成 war 包，直接把项目以展开的文件夹形式部署到 Tomcat 上去，适用于开发阶段。也就是说我们在电脑上开发项目的时候适合用这个，因为开发阶段我们要频繁修改代码重新部署来看效果，这样一来就不用每次都打成压缩包，效率更快，换言之就是热部署效率更高
+  * ${项目名}:war 代表把项目打包成 war 包，再部署到 Tomcat 上去，适用于发布阶段。也就是说我们在部署到正式或测试服务器的时候适合用这个，因为发布阶段用压缩包，文件传输速率和文件完整性都更容易得到保证
 * `把下面的 Application context 由 “/hello_tomcat_war_exploded”或”/hello_tomcat_war“这么长的一串换成自定义的“/helloTomcat”（注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的）`
 
 * Apply - OK
