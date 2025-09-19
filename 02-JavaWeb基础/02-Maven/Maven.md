@@ -8,7 +8,7 @@ Maven 依赖于 JDK，而《Java语言基础》那里我们已经安装好了 JD
 
 - Maven 下载地址：https://maven.apache.org/download.cgi
 - 这里选择下载 Maven 3.9.11
-- 下载完双击解压，把解压后的文件夹拖动到你想要的目录下就算安装完成了，这里选择安装在跟 JDK 一样的目录 /Library/Java/apache-maven-3.9.11，Maven 默认的本地仓库路径为 \~/.m2（/ 代表根目录 Macintosh HD，\~/ 代表当前用户目录 /Users/ineyee）
+- 下载完双击解压，把解压后的文件夹拖动到你想要的目录下就算安装完成了，这里选择安装在跟 JDK 一样的目录 /Library/Java/apache-maven-3.9.11，Maven 默认的本地仓库路径为 \~/.m2/repository（/ 代表根目录 Macintosh HD，\~/ 代表当前用户目录 /Users/ineyee）
 
 * 在 .bash_profile 里配置一下环境变量：export PATH="/Library/Java/apache-maven-3.9.11/bin:$PATH"，并执行 source ~/.bash_profile 来让修改立即生效
 * 终端执行 mvn --version 或 mvn -v 来验证是否安装成功
@@ -93,9 +93,16 @@ pom.xml 文件是项目的配置文件，里面记录着项目的很多信息。
     </dependency>
     <!-- 某一个依赖 -->
     <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.13.2</version>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.13.2</version>
+    </dependency>
+    <!-- 某一个依赖 -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>6.1.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   
@@ -112,6 +119,9 @@ pom.xml 文件是项目的配置文件，里面记录着项目的很多信息。
   <build>
     <!-- 输出产物的名字 -->
     <finalName>helloMaven</finalName>
+    <!-- 插件配置 -->
+    <plugins>
+    </plugins>
   </build>
   
   <!--
@@ -143,52 +153,54 @@ groupId、artifactId、version 这三个东西组合在一起称为一个 Maven 
   </dependency>
   <!-- 某一个依赖 -->
   <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.13.2</version>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.13.2</version>
+  </dependency>
+  <!-- 某一个依赖 -->
+  <dependency>
+    <groupId>jakarta.servlet</groupId>
+    <artifactId>jakarta.servlet-api</artifactId>
+    <version>6.1.0</version>
+    <scope>provided</scope>
   </dependency>
 </dependencies>
 ```
 
-然后点击 Sync Maven Changes，Maven 就会自动去远程仓库（Maven 中央仓库或 Maven 公司私有仓库）下载依赖，并缓存到本地仓库（默认 ~/.m2/repository），我们在项目的 External Libraries 里面就能看到新增的依赖了，这样一来，开发阶段所有的项目就都可以共用本地仓库里的三方库了，只有在打包项目的时候才会把需要的三方库从本地仓库复制一份出来到当前项目的打包产物里，从而大大节省我们电脑的磁盘空间。并且 Maven 还会自动下载依赖的依赖、处理依赖冲突等。
-
-###### 本地仓库依赖
-
-但是还有一个问题，并不是所有的依赖都会发布到 Maven 中央仓库或 Maven 公司私有仓库。比如有一个三方库，人家没有把 jar 包发布到 Maven 中央仓库，只提供了直接去人家官网下载 jar 包来使用的方式；又比如我们公司自己的项目打包出来的 jar 包，也没有发布到 Maven 公司私有仓库，只提供了直接使用 jar 包的方式。那我们该怎么在主项目里依赖这类”本地 jar 包“呢？
-
-其实很简单，我们已经知道 Maven 在管理依赖时，其实是先去本地仓库找有没有依赖的缓存，有的话就不会去远程下载依赖了，所以我们可以直接把这类”本地 jar 包“安装到本地仓库不就完事了嘛，Maven 肯定能在本地仓库里找到，这样一来我们就可以依旧在 pom.xml 文件里通过 dependency 来依赖这类”本地 jar 包“了。
-
-这里假设我们电脑桌面上已经下载好了一份三方库的”本地 jar 包“——sayhello.jar：
-
-* 我们需要先执行命令把”本地 jar 包“安装到本地仓库
-
-```shell
-// mvn install:install-file -Dfile=${jar包的路径} -DgroupId=${公司域名倒写} -DartifactId=${jar包名} -Dversion=${版本} -Dpackaging=jar
-mvn install:install-file -Dfile=/Users/ineyee/Desktop/sayhello.jar -DgroupId=com.ineyee -DartifactId=sayhello -Dversion=1.0.0 -Dpackaging=jar
-```
-
-* 然后依然直接去 pom.xml 文件里添加依赖就可以了
-
-```XML
-<!-- 某一个依赖（远程仓库没有、本地仓库有） -->
-<dependency>
-  <groupId>com.ineyee</groupId>
-  <artifactId>sayhello</artifactId>
-  <version>1.0.0</version>
-</dependency>
-```
+然后点击 Sync Maven Changes，Maven 就会自动去 Maven 远程仓库（中央仓库、公司私有仓库）下载依赖，并缓存到本地仓库（默认 ~/.m2/repository），我们在项目的 External Libraries 里面就能看到新增的依赖了，这样一来，开发阶段所有的项目就都可以共用本地仓库里的三方库了，只有在打包项目的时候才会把需要的三方库从本地仓库复制一份出来到当前项目的打包产物里，从而大大节省我们电脑的磁盘空间。并且 Maven 还会自动下载依赖的依赖、处理依赖冲突等。
 
 ## 五、本机 Maven 作为项目构建工具
 
-#### 1、打包
+#### 1、构建生命周期（Build Lifecycle）
 
-###### 1.2 普通 Java 项目
+`构建生命周期`，描述了使用 Maven 构建项目的整个过程。Maven 内置了 3 个构建生命周期：
 
-普通 jar 是指不能独立运行的 jar 包，里面就是一些 api 供别人调用；runnable jar 是指能独立运行的 jar 包，里面有 main 函数。
+* `default（默认，重点讲解）`
 
-**打包成普通 jar**
+* `clean（清理，清理掉 target 里的所有产物，如单元测试代码的编译产物、主代码的打包产物等）`
+* site（站点）
 
-**打包成 runnable jar**
+而每个构建生命周期内部又由`阶段（Phase）`组成，阶段从上往下按顺序依次执行。比如 default 构建生命周期内部包含以下关键阶段，当我们执行 mvn package 命令时会从上往下按顺序依次执行 validate、compile、test、package 4 个阶段：
+
+* validate 验证：验证项目是否正确，比如验证 pom.xml 文件里的东西是否正确
+* compile 编译：对项目的主代码和单元测试代码进行编译
+* test 测试：对编译后的单元测试代码进行运行，看看单元测试案例是否全部通过
+* `package 打包`：对编译后的主代码进行打包，输出为可分发的产物，比如 jar 包、war 包、exploded 的文件夹等
+* verify 确认：运行检查以验证产物包是否符合质量标准和集成测试结果
+* `install 安装`：把产物包安装到 Maven 本地仓库（默认 ~/.m2/repository），以便其它本地项目作为依赖使用（install 主要有两个用途：一对于那些三方库的”本地 jar 包“，我们可以通过 install 把”本地 jar 包“安装到本地仓库，这样就可以在 pom.xml 文件里通过依赖来使用”本地 jar 包“了；二对于那些我们自己开发的项目，就算主项目里是通过公司私有仓库来依赖这些项目的，那这些项目在执行 mvn deploy 之前必然会执行一下 mvn install，这样设计的目的就是直接把这些项目缓存到本地仓库，将来主项目里同步依赖时就不用再去远程费劲下载了）
+* `deploy 部署`：把产物包部署到 Maven 远程仓库（中央仓库、公司私有仓库），以便其它项目或开发者作为依赖使用
+
+而每个阶段又可以绑定特定的`插件:目标（Plugin:Goal）`组合来完成该阶段的任务，比如插件 P1 里有两个目标 G1 和 G2， 插件 P2 里有三个目标 G1、G2 和 G3，那么 compile 阶段就可以使用 P1:G1 来完成编译任务，package 阶段就可以组合 P1:G2 和 P2:G1 来完成打包任务，deploy 阶段就可以组合 P2:G2 和 P2:G3 来完成部署任务。比如 compiler 插件里就有三个目标 compile、testCompile、help， 而 compile 阶段就绑定了 compiler:compile 这个插件目标来完成主代码和单元测试代码的编译任务，test 阶段就绑定了 compiler:testCompile 这个插件目标来完成单元测试代码的运行。
+
+#### 2、打包（Package）
+
+> 注意：
+>
+> * 这里使用 mvn package 这种打包方式，是在使用 Maven 这个打包工具打包
+> * 而上一篇使用 Build - Build Artifacts 那种打包方式，是在使用 IDEA 这个 IDE 自带的打包工具打包
+> * 也就是说本质上两种打包方式用的打包工具都不一样，只不过两种打包方式的产物输出目录都是 target
+
+这里演示怎么把一个普通 Java 项目打包成一个 runnable jar（普通 jar 是指不能独立运行的 jar 包，里面就是一些 api 供别人调用；runnable jar 是指能独立运行的 jar 包，里面有 main 函数）。
 
 * 首先我们需要将打包方式设置成 jar
 
@@ -246,6 +258,8 @@ mvn install:install-file -Dfile=/Users/ineyee/Desktop/sayhello.jar -DgroupId=com
 
 #### 3、安装（Install）
 
+这里演示怎么把一个”本地 jar 包“安装到 Maven 本地仓库。
+
 上面四部分 3 小节说依赖的时候，我们其实只说了项目如何依赖远程仓库依赖，而没有说项目如何依赖本地仓库依赖。也就是说实际开发中我们可能会面临这样的问题：并不是所有的依赖都会发布到 Maven 中央仓库或 Maven 公司私有仓库。比如有一个三方库，人家没有把 jar 包发布到 Maven 中央仓库，只提供了直接去人家官网下载 jar 包来使用的方式；又比如我们公司自己的项目打包出来的 jar 包，也没有发布到 Maven 公司私有仓库，只提供了直接使用 jar 包的方式。那我们该怎么在主项目里依赖这类”本地 jar 包“呢？
 
 其实很简单，我们已经知道 Maven 在管理依赖时，其实是先去本地仓库里找有没有依赖的缓存，如果命中的话就直接使用、不会再去远程仓库下载依赖了，所以我们就可以直接把这类”本地 jar 包“安装到本地仓库，让 Maven 在管理依赖时能在本地仓库里命中不就完事了嘛，这样一来我们就可以依旧在 pom.xml 文件里通过 dependency 来依赖这类”本地 jar 包“了。
@@ -270,129 +284,10 @@ mvn install:install-file -Dfile=/Users/ineyee/Desktop/sayhello.jar -DgroupId=com
 </dependency>
 ```
 
-#### 4、发布（Deploy）
+#### 4、部署（Deploy）
 
+jar 包、war 包等格式，部署到中央仓库、公司私有仓库。
 
+#### 5、自动化构建（打包、部署）
 
-
-
-
-
-
-
-
-
-
-
-2. **插件机制**
-
-   
-
-   - Maven 本身功能精简，大部分工作由插件完成。
-
-   - 例如：
-
-     
-
-     - maven-compiler-plugin → 编译源码
-     - maven-surefire-plugin → 运行单元测试
-     - maven-jar-plugin → 打包成 JAR
-     - maven-deploy-plugin → 上传到仓库
-
-     
-
-   
-
-3. **打包与发布**
-
-   
-
-   - JAR/WAR/EAR 等格式打包
-   - 发布到中央仓库/私服
-   - 配合 CI/CD 工具（Jenkins、GitLab CI）实现自动化构建和发布
-
-   
-
-
-
-
-
-------
-
-
-
-
-
-## **四、总结**
-
-
-
-
-
-- **作为包管理工具**：Maven 解决了 JAR 包地狱问题 → 自动下载、传递依赖、管理版本。
-- **作为打包发布工具**：Maven 提供标准化构建生命周期 + 插件体系 → 一条命令完成编译、测试、打包、部署。
-
-
-
-
-
-一句话总结：
-
-👉 **Maven 就是 Java 世界里的 npm + webpack + 发布工具三合一**。
-
-
-
-
-
-**Maven** 本质上是一个 **项目管理和构建工具**，而不是单纯的“创建项目工具”。它的主要功能包括：
-
-
-
-1. **项目结构管理**
-
-   
-
-   - Maven 有一个标准的项目目录结构（src/main/java、src/test/java 等），当你用 Maven 创建项目时，会自动生成这些规范结构。
-   - 所以它可以帮你“初始化项目”，这也是你说的“创建项目”功能的一部分。
-
-   
-
-2. **依赖管理**
-
-   
-
-   - Maven 可以自动下载和管理你项目所需的第三方库（依赖），通过 pom.xml 文件声明依赖即可。
-   - 不用手动去下载 jar 包或管理 classpath。
-
-   
-
-3. **构建和打包**
-
-   - Maven 可以编译代码、运行测试、打包成 jar/war/ear 等格式，并能执行其他自定义任务。
-
-   
-
-4. **生命周期管理**
-
-   
-
-   - Maven 定义了一整套生命周期（compile → test → package → install → deploy），让项目构建流程标准化。
-
-   
-
-
-
-
-
-✅ 总结
-
-
-
-- **Maven 是项目管理+构建工具**。
-- 它可以帮助你快速创建一个标准化的项目，但它的核心价值是 **依赖管理和构建自动化**，不是单纯的“创建项目”。
-
-
-
-
-
-如果你愿意，我可以给你画一张 **Maven 的功能结构图**，让你一眼看懂它的作用。你希望我画吗？
+可使用 CI/CD 工具（Jenkins、GitLab CI）实现自动化构建。

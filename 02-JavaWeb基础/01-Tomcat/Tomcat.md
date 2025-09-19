@@ -135,6 +135,12 @@ bash shutdown.sh
 
 ## 四、本机 Tomcat 部署 JaveWeb 项目的方式
 
+> 注意：
+>
+> * 这里使用 Build - Build Artifacts 这种打包方式，是在使用 IDEA 这个 IDE 自带的打包工具打包
+> * 而下一篇使用 mvn package 那种打包方式，是在使用 Maven 这个打包工具打包
+> * 也就是说本质上两种打包方式用的打包工具都不一样，只不过两种打包方式的产物输出目录都是 target
+
 #### 方式一：把 JavaWeb 项目打包后的文件夹，直接放在 ${TOMCAT_HOME}/webapps 目录下
 
 * Build - Build Artifacts - ${项目名}:war exploded（代表不打包成 war 包，直接把项目以展开的文件夹形式部署到 Tomcat 上去，适用于开发阶段）
@@ -193,10 +199,10 @@ war 包类似于 jar 包，都是压缩文件。war 包是 JavaWeb 项目的包�
 
   ```XML
   优点：产物不需要复制来复制去
-  
-  其实我们通过 IDEA 来启动 Tomcat，Tomcat 就是按这种方式部署 JavaWeb 项目的
-  启动 Tomcat 后，控制台可以看到一个 CATALINA_BASE 的路径，复制并前往这个路径，进入 /conf/Catalina/localhost，就能看到 ${Application context}.xml 文件了，它里面 Context 标签的 docBase 就指向我们项目里 target 目录下的产物文件夹
-  <Context docBase="/Users/yiyi/Desktop/JavaLearning/02-JavaWeb基础/01-Tomcat/hello-tomcat/target/hello-tomcat" />
   ```
 
+* 其实我们通过 IDEA 来启动 Tomcat，Tomcat 就是按这种方式部署 JavaWeb 项目的。启动 Tomcat 后，控制台可以看到一个 CATALINA_BASE 的路径，复制并前往这个路径，进入 /conf/Catalina/localhost，就能看到 ${Application context}.xml 文件了，它里面 Context 标签的 docBase 就指向我们项目里 target 目录下的产物文件夹。`也就是说我们通过 IDEA 来启动 Tomcat，Tomcat 就会自动使用 IDEA 这个 IDE 自带的打包工具打包（我们可以在 Tomcat 11.0.10 - Edit Configurations - Server - Before Launch 里看到 Build - Build Artifacts），然后再自动把产物部署好`
 
+  ```XML
+  <Context docBase="/Users/yiyi/Desktop/JavaLearning/02-JavaWeb基础/01-Tomcat/hello-tomcat/target/hello-tomcat" />
+  ```

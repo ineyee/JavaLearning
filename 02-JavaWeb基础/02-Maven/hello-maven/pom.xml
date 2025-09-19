@@ -31,6 +31,13 @@
             <artifactId>gson</artifactId>
             <version>2.13.2</version>
         </dependency>
+        <!-- 某一个依赖 -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <!-- 属性信息 -->
@@ -73,5 +80,6 @@
         如果不写这个标签，默认是打包成 jar
         如果是个 JavaWeb 项目，那应该打包成 war
     -->
-    <packaging>jar</packaging>
+<!--    <packaging>jar</packaging>-->
+    <packaging>war</packaging>
 </project>
