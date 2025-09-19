@@ -129,21 +129,19 @@ groupId、artifactId、version 这三个东西组合在一起称为一个 Maven 
 
 #### 3、依赖
 
-###### 远程仓库依赖
-
 直接在 pom.xml 文件里的 dependencies 标签下添加相应 Maven 坐标的依赖即可，比如：
 
 ```XML
 <!-- 所有的依赖 -->
 <dependencies>
-  <!-- 某一个依赖（远程仓库有） -->
+  <!-- 某一个依赖 -->
   <dependency>
     <groupId>junit</groupId>
     <artifactId>junit</artifactId>
     <version>3.8.1</version>
     <scope>test</scope>
   </dependency>
-  <!-- 某一个依赖（远程仓库有） -->
+  <!-- 某一个依赖 -->
   <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
@@ -246,7 +244,33 @@ mvn install:install-file -Dfile=/Users/ineyee/Desktop/sayhello.jar -DgroupId=com
 
 * 然后重新打包、重新执行，发现 ok 了
 
-#### 2、发布
+#### 3、安装（Install）
+
+上面四部分 3 小节说依赖的时候，我们其实只说了项目如何依赖远程仓库依赖，而没有说项目如何依赖本地仓库依赖。也就是说实际开发中我们可能会面临这样的问题：并不是所有的依赖都会发布到 Maven 中央仓库或 Maven 公司私有仓库。比如有一个三方库，人家没有把 jar 包发布到 Maven 中央仓库，只提供了直接去人家官网下载 jar 包来使用的方式；又比如我们公司自己的项目打包出来的 jar 包，也没有发布到 Maven 公司私有仓库，只提供了直接使用 jar 包的方式。那我们该怎么在主项目里依赖这类”本地 jar 包“呢？
+
+其实很简单，我们已经知道 Maven 在管理依赖时，其实是先去本地仓库里找有没有依赖的缓存，如果命中的话就直接使用、不会再去远程仓库下载依赖了，所以我们就可以直接把这类”本地 jar 包“安装到本地仓库，让 Maven 在管理依赖时能在本地仓库里命中不就完事了嘛，这样一来我们就可以依旧在 pom.xml 文件里通过 dependency 来依赖这类”本地 jar 包“了。
+
+这里假设我们电脑桌面上已经下载好了一份三方库的”本地 jar 包“——sayhello.jar：
+
+* 我们需要先执行命令把”本地 jar 包“安装到本地仓库
+
+```shell
+// mvn install:install-file -Dfile=${jar包的路径} -DgroupId=${公司域名倒写} -DartifactId=${jar包名} -Dversion=${版本} -Dpackaging=jar
+mvn install:install-file -Dfile=/Users/ineyee/Desktop/sayhello.jar -DgroupId=com.ineyee -DartifactId=sayhello -Dversion=1.0.0 -Dpackaging=jar
+```
+
+* 然后直接去 pom.xml 文件里添加依赖就可以了
+
+```XML
+<!-- 某一个依赖（远程仓库没有、本地仓库有） -->
+<dependency>
+  <groupId>com.ineyee</groupId>
+  <artifactId>sayhello</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+#### 4、发布（Deploy）
 
 
 
@@ -259,32 +283,6 @@ mvn install:install-file -Dfile=/Users/ineyee/Desktop/sayhello.jar -DgroupId=com
 
 
 
-
-
-
-
-
-1. **统一构建生命周期**
-
-   Maven 内置三套生命周期：
-
-   
-
-   - **clean**：清理旧编译文件
-   - **default**：核心构建（compile、test、package、install、deploy）
-   - **site**：生成项目信息网站
-
-   
-
-   例如：
-
-   
-
-   - mvn package → 编译 + 测试 + 打成 JAR/WAR
-   - mvn install → 把构建好的 JAR 安装到本地仓库，供其他项目使用
-   - mvn deploy → 把构建结果上传到远程仓库（如公司 Nexus、Maven Central）
-
-   
 
 2. **插件机制**
 
