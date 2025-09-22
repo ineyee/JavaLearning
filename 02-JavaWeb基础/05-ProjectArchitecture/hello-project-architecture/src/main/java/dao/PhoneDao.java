@@ -1,7 +1,7 @@
-package com.ineyee.hellomysql._03_jdbc.demo.dao;
+package dao;
 
-import com.ineyee.hellomysql._03_jdbc.demo.bean.PhoneBean;
-import com.ineyee.hellomysql._03_jdbc.demo.util.DatabaseUtil;
+import bean.PhoneBean;
+import util.DatabaseUtil;
 
 import java.sql.*;
 import java.util.List;

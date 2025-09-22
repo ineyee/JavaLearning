@@ -1,4 +1,4 @@
-package com.ineyee.hellomysql._03_jdbc.demo.util;
+package util;
 
 import java.sql.*;
 import java.util.ArrayList;
