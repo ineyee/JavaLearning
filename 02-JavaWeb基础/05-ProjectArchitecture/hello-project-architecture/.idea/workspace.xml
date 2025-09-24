@@ -10,8 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e6b393d1-74ea-493d-88a7-7177730f5443" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/01_项目的命名规则与命名规范.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/bean/BaseBean.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../01-Java语言基础/03-面向对象/src/_01_类_对象_成员变量_成员函数/_09_访问权限.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../01-Java语言基础/03-面向对象/src/_01_类_对象_成员变量_成员函数/_09_访问权限.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-Database/hello_mysql/0203_SQL 语句：表操作.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-Database/hello_mysql/0203_SQL 语句：表操作.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/bean/PhoneBean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/bean/PhoneBean.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,28 +57,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "Tomcat Server.Tomcat 11.0.10.executor": "Debug",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/yiyi/Desktop/JavaLearning/02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "MavenSettings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Tomcat Server.Tomcat 11.0.10.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/yiyi/Desktop/JavaLearning/02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src" />
@@ -208,7 +211,9 @@
       <workItem from="1758502767326" duration="385000" />
       <workItem from="1758503161225" duration="256000" />
       <workItem from="1758503428896" duration="5349000" />
-      <workItem from="1758510311857" duration="1012000" />
+      <workItem from="1758510311857" duration="1168000" />
+      <workItem from="1758609105965" duration="141000" />
+      <workItem from="1758609256944" duration="18125000" />
     </task>
     <servers />
   </component>
