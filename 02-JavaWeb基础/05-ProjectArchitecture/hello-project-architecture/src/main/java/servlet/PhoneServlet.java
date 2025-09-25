@@ -63,7 +63,7 @@ public class PhoneServlet extends BaseServlet {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("code", 0);
         responseMap.put("message", "success");
-        responseMap.put("data", phoneBeanlist);
+//        responseMap.put("data", phoneBeanlist);
 
         Gson gson = new Gson();
         String responseJson = gson.toJson(responseMap);

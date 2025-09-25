@@ -10,24 +10,21 @@ import java.util.List;
 public class PhoneDao {
     public List<PhoneBean> getPhoneList() throws SQLException, ClassNotFoundException {
         String selectSql = """
-                SELECT
-                    id,
-                    name,
-                    price,
-                    `desc`,
-                    brand,
-                    score
+                SELECT *
                 FROM t_product
                 WHERE price <= ?;
                 """;
         List<PhoneBean> phoneBeanlist = DatabaseUtil.executeQuery(selectSql, resultSet -> {
+            System.out.println("resultSet = " + resultSet);
             PhoneBean phoneBean = new PhoneBean();
-            phoneBean.setId(resultSet.getInt("id"));
-            phoneBean.setName(resultSet.getString("name"));
-            phoneBean.setDesc(resultSet.getString("desc"));
-            phoneBean.setPrice(resultSet.getDouble("price"));
-            phoneBean.setBrand(resultSet.getString("brand"));
-            phoneBean.setScore(resultSet.getDouble("score"));
+//            phoneBean.setId(resultSet.getInt("id"));
+//            phoneBean.setCreateTime(resultSet.getTimestamp("create_time").toLocalDateTime());
+//            phoneBean.setCreateTime(resultSet.getTimestamp("update_time").toLocalDateTime());
+//            phoneBean.setName(resultSet.getString("name"));
+//            phoneBean.setDesc(resultSet.getString("desc"));
+//            phoneBean.setPrice(resultSet.getDouble("price"));
+//            phoneBean.setBrand(resultSet.getString("brand"));
+//            phoneBean.setScore(resultSet.getDouble("score"));
             return phoneBean;
         }, 6666);
         System.out.println(phoneBeanlist);

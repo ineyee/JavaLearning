@@ -11,6 +11,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// 顶级类只能用 public 或 package-private 修饰
+//     * public：在项目里的任何地方都能访问
+//     * package-private（默认）：在当前包里 + 仅当前包里的子类能访问、子类如果在当前包外是不能访问的
+// 这里的 BaseServlet 肯定不限于仅当前包里的子类能访问，所以用 public 修饰
+//
+// BaseServlet 的使命只是为了抽取所有子类 Servlet 的公共方法，没有实例化的必要，所以定义为抽象类，也无需提供构造方法
+//
 // BaseServlet 里就不用写 @WebServlet(xxx) 注解了，因为它不负责匹配任何具体的请求，只是负责抽取公共的“接口和方法映射”逻辑
 public abstract class BaseServlet extends HttpServlet {
     @Override

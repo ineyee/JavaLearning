@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+// DatabaseUtil 是对数据库驱动和连接池的封装，调用 DatabaseUtil 你就可以获取到原始模型 bean（在 Java 的架构规范里一般不会直接把 rawData 往上抛）
+// 但是这里返回的 bean 是泛型，不是具体的 bean，所以我们一般不把 DatabaseUtil 视作数据层，而仅仅把它视作一个工具类
+// 而把 Dao 才视作数据层，因为 Dao 里才真正履行了数据层的职责：创建 SQL 语句、执行 SQL 语句、获取执行结果、返回执行结果给业务层
 public abstract class _0307_DatabaseUtil {
     // 连接池
     private static DataSource connectionPool;

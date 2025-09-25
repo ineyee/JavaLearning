@@ -1,17 +1,31 @@
 package util;
 
+import com.alibaba.druid.pool.DruidDataSourceFactory;
+
+import javax.sql.DataSource;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-// 这个应该不属于数据层，dao 属于数据层，但是 dao 却返回了能直接使用的数据，这里却返回了原始数据，需要弄明白到底谁是哪层
-// 返回原始数据
-// 虽说返回的是 bean，但没有写死是哪种 bean，也就是说和业务不挂钩，所以可以视作是返回原始数据
+// DatabaseUtil 是对数据库驱动和连接池的封装，调用 DatabaseUtil 你就可以获取到原始模型 bean（在 Java 的架构规范里一般不会直接把 rawData 往上抛）
+// 但是这里返回的 bean 是泛型，不是具体的 bean，所以我们一般不把 DatabaseUtil 视作数据层，而仅仅把它视作一个数据库工具类
+// 而把 Dao 才视作数据层，因为 Dao 里才真正履行了数据层的职责：创建 SQL 语句、执行 SQL 语句、获取执行结果、返回执行结果给业务层
 public abstract class DatabaseUtil {
-    private static final String DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
-    private static final String URL = "jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC";
-    private static final String USER = "root";
-    private static final String PASSWORD = "mysqlroot";
+    // 连接池
+    private static DataSource connectionPool;
+
+    static {
+        try (InputStream is = DatabaseUtil.class.getClassLoader().getResourceAsStream("druid.properties")) {
+            Properties properties = new Properties();
+            properties.load(is);
+            // 用配置文件创建连接池
+            connectionPool = DruidDataSourceFactory.createDataSource(properties);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 执行增、删、改操作
@@ -23,9 +37,8 @@ public abstract class DatabaseUtil {
      * @throws ClassNotFoundException 工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
     public static int executeUpdate(String sql, Object... args) throws SQLException, ClassNotFoundException {
-        Class.forName(DRIVER_CLASS_NAME);
-
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        Connection connection = connectionPool.getConnection();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             for (int i = 0; i < args.length; i++) {
                 // 表的列号下标是从 1 开始的
                 // 无论表里的字段是什么数据类型，这里统一用 setObject 设置
@@ -47,10 +60,9 @@ public abstract class DatabaseUtil {
      * @throws SQLException           工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      * @throws ClassNotFoundException 工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
-    public static <T> List<T> executeQuery(String sql, ResultSetBeanMapper<T> mapper, Object... args) throws SQLException, ClassNotFoundException {
-        Class.forName(DRIVER_CLASS_NAME);
-
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+    public static <T> List<T> executeQuery(String sql, DatabaseUtil.ResultSetBeanMapper<T> mapper, Object... args) throws SQLException, ClassNotFoundException {
+        Connection connection = connectionPool.getConnection();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             for (int i = 0; i < args.length; i++) {
                 // 表的列号下标是从 1 开始的
                 // 无论表里的字段是什么数据类型，这里统一用 setObject 设置
