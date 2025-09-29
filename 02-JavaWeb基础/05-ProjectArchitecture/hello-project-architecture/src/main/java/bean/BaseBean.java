@@ -2,9 +2,11 @@ package bean;
 
 import java.time.LocalDateTime;
 
+// Bean 的字段必须和数据库表里的字段一一对应
+//
 // 顶级类只能用 public 或 package-private 修饰
-//     * public：在项目里的任何地方都能访问
-//     * package-private（默认）：在当前包里 + 仅当前包里的子类能访问、子类如果在当前包外是不能访问的
+//  * public：在项目里的任何地方都能访问
+//  * package-private（默认）：在当前包里 + 仅当前包里的子类能访问、子类如果在当前包外是不能访问的
 // 这里的 BaseBean 肯定不限于仅当前包里的子类能访问，所以用 public 修饰
 //
 // BaseBean 的使命只是为了抽取所有子类 Bean 的公共属性，没有实例化的必要，所以定义为抽象类，也无需提供构造方法

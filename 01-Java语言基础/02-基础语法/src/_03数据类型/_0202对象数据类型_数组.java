@@ -1,7 +1,6 @@
 package _03数据类型;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class _0202对象数据类型_数组 {
 	 */
 	public static void test() {
 		ArrayList<Integer> arrayList = new ArrayList<Integer>();
-		ArrayList<Integer> arrayList1 = new ArrayList<Integer>(Arrays.asList(1, 2, 3));
+		ArrayList<Integer> arrayList1 = new ArrayList<Integer>(List.of(1, 2, 3));
 		System.out.println(arrayList); // []
 		System.out.println(arrayList1); // [1, 2, 3]
 		
@@ -61,7 +60,7 @@ public class _0202对象数据类型_数组 {
 	 * 2、获取数组的长度
 	 */
 	public static void test1() {
-		List<Integer> arrayList = new ArrayList<>(Arrays.asList(1, 2, 3));
+		List<Integer> arrayList = new ArrayList<>(List.of(1, 2, 3));
 		System.out.println(arrayList.size()); // 3
 	}
 	
@@ -70,7 +69,7 @@ public class _0202对象数据类型_数组 {
 	 */
 	public static void test2() {
 		List<Integer> arrayList = new ArrayList<>();
-		List<Integer> arrayList1 = new ArrayList<>(Arrays.asList(1, 2, 3));
+		List<Integer> arrayList1 = new ArrayList<>(List.of(1, 2, 3));
 		System.out.println(arrayList.isEmpty()); // true
 		System.out.println(arrayList1.isEmpty()); // false
 	}
@@ -79,18 +78,18 @@ public class _0202对象数据类型_数组 {
 	 * 4、数组增
 	 */
 	public static void test3() {
-		List<Integer> arrayList = new ArrayList<>(Arrays.asList(1, 2, 3));
+		List<Integer> arrayList = new ArrayList<>(List.of(1, 2, 3));
 		
 		// （1）尾部增
 		arrayList.add(4); // 单增
-		arrayList.addAll(Arrays.asList(5, 6, 7)); // 批量增
+		arrayList.addAll(List.of(5, 6, 7)); // 批量增
 		System.out.println(arrayList); // [1, 2, 3, 4, 5, 6, 7]
 		
 		// （2）头部增、中间增
 		arrayList.add(0, 0); // 单增
-		arrayList.addAll(0, Arrays.asList(-3, -2, -1)); // 批量增
+		arrayList.addAll(0, List.of(-3, -2, -1)); // 批量增
 		arrayList.add(5, 15); // 单增
-		arrayList.addAll(11, Arrays.asList(61, 62, 63)); // 批量增
+		arrayList.addAll(11, List.of(61, 62, 63)); // 批量增
 		System.out.println(arrayList); // [-3, -2, -1, 0, 1, 15, 2, 3, 4, 5, 6, 61, 62, 63, 7]
 	}
 	
@@ -98,7 +97,7 @@ public class _0202对象数据类型_数组 {
 	 * 5、数组删
 	 */
 	public static void test4() {
-		List<Integer> arrayList = new ArrayList<>(Arrays.asList(1, 2, 3));
+		List<Integer> arrayList = new ArrayList<>(List.of(1, 2, 3));
 		
 		// （1）删除某个下标处的元素
 		arrayList.remove(1);
@@ -108,9 +107,9 @@ public class _0202对象数据类型_数组 {
 		arrayList.remove(Integer.valueOf(3));
 		System.out.println(arrayList); // [1]
 		
-		arrayList.addAll(Arrays.asList(2, 3, 4));
+		arrayList.addAll(List.of(2, 3, 4));
 		// （3）批量删除元素
-		arrayList.removeAll(Arrays.asList(2, 4));
+		arrayList.removeAll(List.of(2, 4));
 		System.out.println(arrayList); // [1, 3]
 		
 		// （4）清空数组
@@ -122,7 +121,7 @@ public class _0202对象数据类型_数组 {
 	 * 6、数组改
 	 */
 	public static void test5() {
-		List<Integer> arrayList = new ArrayList<>(Arrays.asList(1, 2, 3));		
+		List<Integer> arrayList = new ArrayList<>(List.of(1, 2, 3));		
 		arrayList.set(1, 222);
 		System.out.println(arrayList); // [1, 222, 3]
 	}
@@ -131,7 +130,7 @@ public class _0202对象数据类型_数组 {
 	 * 7、数组查
 	 */
 	public static void test6() {
-		List<Integer> arrayList = new ArrayList<>(Arrays.asList(1, 2, 3));	
+		List<Integer> arrayList = new ArrayList<>(List.of(1, 2, 3));	
 		
 		// （1）查某个下标处的元素
 		System.out.println(arrayList.get(0)); // 1
@@ -150,7 +149,7 @@ public class _0202对象数据类型_数组 {
 	 * 8、数组的遍历
 	 */
 	public static void test7() {
-		List<Integer> arrayList = new ArrayList<>(Arrays.asList(1, 2, 3));
+		List<Integer> arrayList = new ArrayList<>(List.of(1, 2, 3));
 		
 		// （1）普通for循环遍历法
 		for (int i = 0; i < arrayList.size(); i++) {

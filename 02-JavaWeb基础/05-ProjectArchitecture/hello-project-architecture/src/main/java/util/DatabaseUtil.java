@@ -31,12 +31,14 @@ public abstract class DatabaseUtil {
      * 执行增、删、改操作
      *
      * @param sql  要执行的 SQL 预处理语句
-     * @param args SQL 预处理语句里的参数
-     * @return 影响的数据条数，0 代表没影响任何数据、因为数据库里没匹配到这条数据、但是没抛异常，>0 代表数据库里匹配到了这条数据且操作成功。总之 >0 才可以判定为执行成功
-     * @throws SQLException           工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
-     * @throws ClassNotFoundException 工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     * @param args SQL 预处理语句里的参数，外界需要把 list 通过 toArray() 打散后再传进来、以确保是打散的多个参数而不是作为一个参数整体传进来
+     * @return 影响的数据条数
+     * ① 0 代表没影响任何数据，因为数据库里没匹配到这条数据，但这在 SQL 语句层面是属于执行成功的（SQL 语句如果执行失败的话是直接抛异常，而不是返回 0）
+     * ② >0 代表数据库里匹配到了这条数据且操作成功
+     * ③ 外界业务层面可以认为 >0 时才算执行成功
+     * @throws SQLException 工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
-    public static int executeUpdate(String sql, Object... args) throws SQLException, ClassNotFoundException {
+    public static int executeUpdate(String sql, Object... args) throws SQLException {
         Connection connection = connectionPool.getConnection();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             for (int i = 0; i < args.length; i++) {
@@ -50,68 +52,16 @@ public abstract class DatabaseUtil {
     }
 
     /**
-     * 执行批量增、删、改操作
-     * 注意：批量操作中途某一次操作失败时，会继续执行后续的操作，只是返回值里这次失败的操作对应影响数据的条数为一个负值代表出错
-     *
-     * @param sql       要执行的 SQL 预处理语句
-     * @param batchArgs 这里代表可以传入任意个 Object[] 类型的参数 batchArg，而每一个 batchArg 则是批量操作其中某一次操作对应 SQL 预处理语句里的参数
-     * @return 批量操作每一次操作影响的数据条数所构成的数组，0 代表没影响任何数据、因为数据库里没匹配到这条数据、但是没抛异常，>0 代表数据库里匹配到了这条数据且操作成功，<0 代表数据库里匹配到了这条数据且操作出错抛异常。总之 >0 才可以判定为执行成功
-     * @throws SQLException           工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
-     * @throws ClassNotFoundException 工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
-     */
-    public static int[] executeBatch(String sql, Object[]... batchArgs) throws SQLException, ClassNotFoundException {
-        Connection connection = connectionPool.getConnection();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            int[] results = new int[batchArgs.length];
-
-            for (int rowIndex = 0; rowIndex < batchArgs.length; rowIndex++) {
-                Object[] args = batchArgs[rowIndex];
-                try {
-                    for (int i = 0; i < args.length; i++) {
-                        preparedStatement.setObject(i + 1, args[i]);
-                    }
-                    results[rowIndex] = preparedStatement.executeUpdate();
-                } catch (SQLException e) {
-                    results[rowIndex] = Statement.EXECUTE_FAILED;
-                }
-            }
-
-            return results;
-        }
-    }
-
-    /**
-     * 计算 SQL 语句中参数占位符 ? 的数量
-     *
-     * @param sql SQL语句
-     * @return 参数占位符 ? 的数量
-     */
-    public static int countArgsInSQL(String sql) {
-        if (sql == null || sql.isEmpty()) {
-            return 0;
-        }
-
-        int count = 0;
-        for (char c : sql.toCharArray()) {
-            if (c == '?') {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
      * 执行查询操作
      *
      * @param sql    要执行的 SQL 预处理语句
      * @param mapper resultSet -> bean 回调函数
-     * @param args   SQL 预处理语句里的参数
+     * @param args   SQL 预处理语句里的参数，外界需要把 list 通过 toArray() 打散后再传进来、以确保是打散的多个参数而不是作为一个参数整体传进来
      * @param <T>    XxxBean
      * @return List<XxxBean>
-     * @throws SQLException           工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
-     * @throws ClassNotFoundException 工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     * @throws SQLException 工具类不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
-    public static <T> List<T> executeQuery(String sql, DatabaseUtil.ResultSetBeanMapper<T> mapper, Object... args) throws SQLException, ClassNotFoundException {
+    public static <T> List<T> executeQuery(String sql, DatabaseUtil.ResultSetBeanMapper<T> mapper, Object... args) throws SQLException {
         Connection connection = connectionPool.getConnection();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             for (int i = 0; i < args.length; i++) {

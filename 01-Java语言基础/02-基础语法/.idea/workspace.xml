@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="d2c1d1c7-6f02-409e-ae6a-ea52c9ab64c3" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/servlet/Hh.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/_03数据类型/_0202对象数据类型_数组.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/_03数据类型/_0202对象数据类型_数组.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../02-JavaWeb基础/04-Database/hello_mysql/0203_SQL 语句：表操作.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../02-JavaWeb基础/04-Database/hello_mysql/0203_SQL 语句：表操作.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/bean/BaseBean.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/bean/BaseBean.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/dao/UserDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/dao/UserDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/servlet/UserServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/servlet/UserServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/util/DatabaseUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../02-JavaWeb基础/05-ProjectArchitecture/hello-project-architecture/src/main/java/util/DatabaseUtil.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="33MiSqJUMyN9CQU53f3yTlxQ0kC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/yiyi/Desktop/JavaLearning/01-Java语言基础/02-基础语法",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d2c1d1c7-6f02-409e-ae6a-ea52c9ab64c3" name="Changes" comment="" />
+      <created>1759133344326</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1759133344326</updated>
+      <workItem from="1759133345473" duration="157000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
