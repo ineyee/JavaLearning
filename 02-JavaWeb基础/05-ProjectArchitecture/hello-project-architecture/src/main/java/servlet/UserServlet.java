@@ -1,17 +1,17 @@
 package servlet;
 
 import bean.UserBean;
-import dao.UserDao;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.UserService;
 
 import java.util.List;
 import java.util.Map;
 
 @WebServlet("/user/*")
 public class UserServlet extends BaseServlet {
-    private final UserDao userDao = new UserDao();
+    private final UserService userService = new UserService();
 
     // 当前 Servlet 支持的 GET 方法，即接口的第二层路径名
     @Override
@@ -48,15 +48,15 @@ public class UserServlet extends BaseServlet {
         userBean2.setEmail("wangwu@qq.com");
 
         try {
-            int result = userDao.save(List.of(userBean1, userBean2));
+            Boolean result = userService.save(List.of(userBean, userBean1, userBean2));
 //            int result = userDao.remove(List.of(5));
 //            int result = userDao.update(List.of(9), Map.of("age", "19", "height", "1.99"));
             System.out.println(result);
 
-            UserBean readUserBean = userDao.get(10);
-            System.out.println(readUserBean);
-            List<UserBean> userBeanList = userDao.list(2, 1);
-            System.out.println(userBeanList);
+//            UserBean readUserBean = userDao.get(10);
+//            System.out.println(readUserBean);
+//            List<UserBean> userBeanList = userDao.list(2, 1);
+//            System.out.println(userBeanList);
         } catch (Exception e) {
             e.printStackTrace();
         }
