@@ -2,8 +2,6 @@ package bean;
 
 import java.time.LocalDateTime;
 
-// Bean 的字段必须和数据库表里的字段一一对应
-//
 // 顶级类只能用 public 或 package-private 修饰
 //  * public：在项目里的任何地方都能访问
 //  * package-private（默认）：在当前包里 + 仅当前包里的子类能访问、子类如果在当前包外是不能访问的
