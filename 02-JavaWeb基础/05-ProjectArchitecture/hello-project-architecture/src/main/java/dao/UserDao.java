@@ -117,29 +117,10 @@ public class UserDao {
      * @throws SQLException 数据层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
     public UserBean get(Integer id) throws SQLException {
-        String sql = """
-                SELECT
-                    id,
-                    name,
-                    age,
-                    height,
-                    email,
-                    create_time,
-                    update_time
-                FROM t_user
+        String sql = queryBaseSql() + """
                 WHERE id = ?;
                 """;
-        List<UserBean> userBeanList = DatabaseUtil.executeQuery(sql, resultSet -> {
-            UserBean userBean = new UserBean();
-            userBean.setId(resultSet.getInt("id"));
-            userBean.setName(resultSet.getString("name"));
-            userBean.setAge(resultSet.getInt("age"));
-            userBean.setHeight(resultSet.getDouble("height"));
-            userBean.setEmail(resultSet.getString("email"));
-            userBean.setCreateTime(resultSet.getTimestamp("create_time").toLocalDateTime());
-            userBean.setUpdateTime(resultSet.getTimestamp("update_time").toLocalDateTime());
-            return userBean;
-        }, id);
+        List<UserBean> userBeanList = DatabaseUtil.executeQuery(sql, resultSetBeanMapper(), id);
         return userBeanList.isEmpty() ? null : userBeanList.get(0);
     }
 
@@ -154,7 +135,15 @@ public class UserDao {
      * @throws SQLException 数据层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
     public List<UserBean> list(Integer pageSize, Integer currentPage) throws SQLException {
-        String sql = """
+        String sql = queryBaseSql() + """
+                ORDER BY create_time DESC
+                LIMIT ? OFFSET ?;
+                """;
+        return DatabaseUtil.executeQuery(sql, resultSetBeanMapper(), pageSize, (currentPage - 1) * pageSize);
+    }
+
+    private String queryBaseSql() {
+        return """
                 SELECT
                     id,
                     name,
@@ -164,10 +153,11 @@ public class UserDao {
                     create_time,
                     update_time
                 FROM t_user
-                ORDER BY create_time DESC
-                LIMIT ? OFFSET ?;
                 """;
-        return DatabaseUtil.executeQuery(sql, resultSet -> {
+    }
+
+    private DatabaseUtil.ResultSetBeanMapper<UserBean> resultSetBeanMapper() {
+        return resultSet -> {
             UserBean userBean = new UserBean();
             userBean.setId(resultSet.getInt("id"));
             userBean.setName(resultSet.getString("name"));
@@ -177,7 +167,7 @@ public class UserDao {
             userBean.setCreateTime(resultSet.getTimestamp("create_time").toLocalDateTime());
             userBean.setUpdateTime(resultSet.getTimestamp("update_time").toLocalDateTime());
             return userBean;
-        }, pageSize, (currentPage - 1) * pageSize);
+        };
     }
 
     /**
