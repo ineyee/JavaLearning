@@ -7,6 +7,7 @@ import exception.ServiceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 // 用户模块接口的业务层
 //
@@ -27,7 +28,7 @@ import java.util.List;
 //
 // 注意：业务层绝对不是数据层的马甲层，它有存在的意义，比如同样都是 save 方法，数据层里的 save 就是直接往数据库里写数据
 // 而业务层里的 save 则需要首先判断数据库里存不存在这个用户邮箱，存在的话就跳过，不存在的话再往数据库里写，因为用户邮箱是不允许重复的
-// 也就是说，业务层的一个方法里可能会调用数据层里的多个方法来完成一个业务
+// 也就是说，业务层的一个方法里可能会调用数据层里的多个方法来共同完成一个业务
 public class UserService {
     private final UserDao userDao = new UserDao();
 
@@ -36,21 +37,122 @@ public class UserService {
      *
      * @param userBeanList 用户 bean 列表
      * @return 是否成功
-     * @throws SQLException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     * @throws SQLException     业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
     public Boolean save(List<UserBean> userBeanList) throws SQLException, ServiceException {
-        // 业务规则校验：过滤掉已存在的用户，只保留不存在的用户
-        List<UserBean> newUserBeanList = new ArrayList<>();
-        for (UserBean userBean : userBeanList) {
-            Integer userCount = userDao.countByEmail(userBean.getEmail());
-            if (userCount == 0) {
-                newUserBeanList.add(userBean);
-            }
-        }
-        if (newUserBeanList.isEmpty()) {
-            throw new ServiceException(-100001, "用户均已存在");
+        // 业务规则校验：数据库里不存在才添加，已存在则不添加
+        List<UserBean> nonExistUserBeanList = filterNonExistUserBeanList(userBeanList);
+        if (nonExistUserBeanList.isEmpty()) {
+            throw new ServiceException(-100001, "用户已存在");
         }
 
-        return userDao.save(newUserBeanList) > 0;
+        return userDao.save(nonExistUserBeanList) > 0;
+    }
+
+    /**
+     * 删除用户，支持批量
+     *
+     * @param idList 用户 id 列表
+     * @return 是否成功
+     * @throws SQLException     业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     */
+    public Boolean remove(List<Integer> idList) throws SQLException, ServiceException {
+        // 业务规则校验：数据库里已存在才删除，不存在则不删除
+        List<Integer> existUserBeanList = filterExistUserBeanList(idList);
+        if (existUserBeanList.isEmpty()) {
+            throw new ServiceException(-100002, "用户不存在");
+        }
+
+        return userDao.remove(existUserBeanList) > 0;
+    }
+
+    /**
+     * 更新用户，支持批量
+     *
+     * @param idList         用户 id 列表
+     * @param fieldsToUpdate 要更新的字段
+     * @return 是否成功
+     * @throws SQLException     业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     */
+    public Boolean update(List<Integer> idList, Map<String, Object> fieldsToUpdate) throws SQLException, ServiceException {
+        // 业务规则校验：数据库里已存在才更新，不存在则不更新
+        List<Integer> existUserBeanList = filterExistUserBeanList(idList);
+        if (existUserBeanList.isEmpty()) {
+            throw new ServiceException(-100002, "用户不存在");
+        }
+
+        // 业务规则校验：邮箱是唯一字段，不允许批量修改
+        if (fieldsToUpdate.containsKey("email") && idList.size() > 1) {
+            throw new ServiceException(-100003, "不能批量修改邮箱");
+        }
+
+        // 业务规则校验：如果是修改一个人的邮箱，但新邮箱跟数据库里的某个旧邮箱重复，那不允许
+        if (fieldsToUpdate.containsKey("email") && idList.size() == 1) {
+            Integer userCount = countUserByEmail(fieldsToUpdate.get("email").toString());
+            if (userCount > 0) {
+                throw new ServiceException(-100004, "邮箱已存在");
+            }
+        }
+
+        return userDao.update(existUserBeanList, fieldsToUpdate) > 0;
+    }
+
+    /**
+     * 获取一个用户
+     *
+     * @param id 用户 id
+     * @return 用户 bean
+     * ① null 代表数据库里没有这条数据
+     * ② bean 代表数据库里有这条数据
+     * @throws SQLException 数据层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     */
+    public UserBean get(Integer id) throws SQLException {
+        return userDao.get(id);
+    }
+
+    /**
+     * 分页获取用户列表
+     *
+     * @param pageSize    一页几条数据
+     * @param currentPage 当前第几页
+     * @return 用户 bean 列表
+     * ① [] 代表本次查询没有数据
+     * ② [bean] 代表本次查询有数据
+     * @throws SQLException 数据层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     */
+    public List<UserBean> list(Integer pageSize, Integer currentPage) throws SQLException {
+        return userDao.list(pageSize, currentPage);
+    }
+
+    // 根据邮箱查询用户数量
+    private Integer countUserByEmail(String email) throws SQLException {
+        return userDao.countUserByEmail(email);
+    }
+
+    // 过滤掉数据库里已存在的用户，只保留数据库里不存在的用户
+    private List<UserBean> filterNonExistUserBeanList(List<UserBean> userBeanList) throws SQLException {
+        List<UserBean> nonExistUserBeanList = new ArrayList<>();
+        for (UserBean userBean : userBeanList) {
+            Integer userCount = countUserByEmail(userBean.getEmail());
+            if (userCount == 0) {
+                nonExistUserBeanList.add(userBean);
+            }
+        }
+        return nonExistUserBeanList;
+    }
+
+    // 过滤掉数据库里不存在的用户，只保留数据库里已存在的用户
+    private List<Integer> filterExistUserBeanList(List<Integer> idList) throws SQLException {
+        List<Integer> existUserBeanList = new ArrayList<>();
+        for (Integer id : idList) {
+            UserBean userBean = userDao.get(id);
+            if (userBean != null) {
+                existUserBeanList.add(userBean.getId());
+            }
+        }
+        return existUserBeanList;
     }
 }

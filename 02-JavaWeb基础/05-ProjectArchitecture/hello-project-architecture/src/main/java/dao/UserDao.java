@@ -142,6 +142,7 @@ public class UserDao {
         return DatabaseUtil.executeQuery(sql, resultSetBeanMapper(), pageSize, (currentPage - 1) * pageSize);
     }
 
+    // get 和 list 的公共代码
     private String queryBaseSql() {
         return """
                 SELECT
@@ -156,6 +157,7 @@ public class UserDao {
                 """;
     }
 
+    // get 和 list 的公共代码
     private DatabaseUtil.ResultSetBeanMapper<UserBean> resultSetBeanMapper() {
         return resultSet -> {
             UserBean userBean = new UserBean();
@@ -177,7 +179,7 @@ public class UserDao {
      * @return 用户数量
      * @throws SQLException 数据层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
-    public int countByEmail(String email) throws SQLException {
+    public int countUserByEmail(String email) throws SQLException {
         String sql = """
                 SELECT COUNT(*) AS userCount
                 FROM t_user
