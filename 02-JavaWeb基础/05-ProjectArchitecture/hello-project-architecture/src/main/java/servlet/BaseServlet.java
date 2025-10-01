@@ -1,5 +1,8 @@
 package servlet;
 
+import com.google.gson.Gson;
+import constant.response.CommonResponse;
+import exception.ServiceException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,9 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 // 顶级类只能用 public 或 package-private 修饰
 //     * public：在项目里的任何地方都能访问
@@ -157,5 +158,52 @@ public abstract class BaseServlet extends HttpServlet {
         allMethods.addAll(supportedGetMethods());
         allMethods.addAll(supportedPostMethods());
         return allMethods;
+    }
+
+    /**
+     * 给客户端响应数据
+     *
+     * @param resp 响应对象
+     * @param data 数据
+     */
+    protected void responseData(HttpServletResponse resp, Object data) {
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("code", CommonResponse.SUCCESS.getCode());
+        responseMap.put("message", CommonResponse.SUCCESS.getMessage());
+        responseMap.put("data", data);
+        try {
+            resp.getWriter().write(new Gson().toJson(responseMap));
+        } catch (Exception e) {
+            // 这里是捕获 getWriter() 方法抛出的 Exception，都没法写了所以此时就不应该再给客户端继续返回响应了、避免循环 try-catch，但是我们可以记录下日志
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 给客户端响应错误
+     *
+     * @param resp      响应对象
+     * @param exception 异常对象
+     */
+    protected void responseError(HttpServletResponse resp, Exception exception) {
+        Map<String, Object> responseMap = new HashMap<>();
+        if (exception instanceof ServiceException) {
+            // 这里是业务异常 ServiceException，业务异常各有各的错误码和错误信息，用户在客户端看到错误信息是有提示意义的
+            ServiceException serviceException = (ServiceException) exception;
+            responseMap.put("code", serviceException.getCode());
+            responseMap.put("message", serviceException.getMessage());
+        } else {
+            // 这里是系统异常 Exception，系统异常是没有 code 的，而且系统异常五花八门、我们也不知道它们什么时候会抛出、抛出的错误信息对用户来说也没有提示意义
+            // 所以我们把系统异常的错误码统一为 -100000，错误信息统一为请求失败
+            responseMap.put("code", CommonResponse.REQUEST_ERROR.getCode());
+            responseMap.put("message", CommonResponse.REQUEST_ERROR.getMessage());
+        }
+
+        try {
+            resp.getWriter().write(new Gson().toJson(responseMap));
+        } catch (Exception e) {
+            // 这里是捕获 getWriter() 方法抛出的 Exception，都没法写了所以此时就不应该再给客户端继续返回响应了、避免循环 try-catch，但是我们可以记录下日志
+            e.printStackTrace();
+        }
     }
 }

@@ -1,6 +1,7 @@
 package service;
 
 import bean.UserBean;
+import constant.response.UserResponse;
 import dao.UserDao;
 import exception.ServiceException;
 
@@ -44,7 +45,7 @@ public class UserService {
         // 业务规则校验：数据库里不存在才添加，已存在则不添加
         List<UserBean> nonExistUserBeanList = filterNonExistUserBeanList(userBeanList);
         if (nonExistUserBeanList.isEmpty()) {
-            throw new ServiceException(-100001, "用户已存在");
+            throw new ServiceException(UserResponse.USER_ALREADY_EXIST.getCode(), UserResponse.USER_ALREADY_EXIST.getMessage());
         }
 
         return userDao.save(nonExistUserBeanList) > 0;
@@ -62,7 +63,7 @@ public class UserService {
         // 业务规则校验：数据库里已存在才删除，不存在则不删除
         List<Integer> existUserBeanList = filterExistUserBeanList(idList);
         if (existUserBeanList.isEmpty()) {
-            throw new ServiceException(-100002, "用户不存在");
+            throw new ServiceException(UserResponse.USER_NOT_EXIST.getCode(), UserResponse.USER_NOT_EXIST.getMessage());
         }
 
         return userDao.remove(existUserBeanList) > 0;
@@ -81,19 +82,19 @@ public class UserService {
         // 业务规则校验：数据库里已存在才更新，不存在则不更新
         List<Integer> existUserBeanList = filterExistUserBeanList(idList);
         if (existUserBeanList.isEmpty()) {
-            throw new ServiceException(-100002, "用户不存在");
+            throw new ServiceException(UserResponse.USER_NOT_EXIST.getCode(), UserResponse.USER_NOT_EXIST.getMessage());
         }
 
         // 业务规则校验：邮箱是唯一字段，不允许批量修改
         if (fieldsToUpdate.containsKey("email") && idList.size() > 1) {
-            throw new ServiceException(-100003, "不能批量修改邮箱");
+            throw new ServiceException(UserResponse.CANT_BATCH_UPDATE_EMAIL.getCode(), UserResponse.CANT_BATCH_UPDATE_EMAIL.getMessage());
         }
 
         // 业务规则校验：如果是修改一个人的邮箱，但新邮箱跟数据库里的某个旧邮箱重复，那不允许
         if (fieldsToUpdate.containsKey("email") && idList.size() == 1) {
             Integer userCount = countUserByEmail(fieldsToUpdate.get("email").toString());
             if (userCount > 0) {
-                throw new ServiceException(-100004, "邮箱已存在");
+                throw new ServiceException(UserResponse.EMAIL_ALREADY_EXIST.getCode(), UserResponse.EMAIL_ALREADY_EXIST.getMessage());
             }
         }
 

@@ -1,13 +1,17 @@
 package servlet;
 
 import bean.UserBean;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import constant.response.CommonResponse;
+import exception.ServiceException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.UserService;
 
+import java.io.BufferedReader;
 import java.util.List;
-import java.util.Map;
 
 // 用户模块接口的表现层之控制器层
 //
@@ -31,49 +35,66 @@ public class UserServlet extends BaseServlet {
     // 当前 Servlet 支持的 GET 方法，即接口的第二层路径名
     @Override
     protected List<String> supportedGetMethods() {
-        return List.of("query");
+        return List.of("get", "list");
     }
 
     // 当前 Servlet 支持的 POST 方法，即接口的第二层路径名
     @Override
     protected List<String> supportedPostMethods() {
-        return List.of("saveUser");
+        return List.of("save", "remove", "update");
     }
 
     // 注意：
     // 1、这几个方法名必须跟接口的第二层路径同名，因为我们正是要通过第二层路径来反射出接口对应的方法
     // 2、这几个方法必须定义成 public 才能被上面的 getClass().getMethod(xxx) 方法查找到
-    public void saveUser(HttpServletRequest req, HttpServletResponse resp) {
+    public void save(HttpServletRequest req, HttpServletResponse resp) {
+        // 从请求体里读取 JSON 字符串
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = req.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (Exception e) {
+            responseError(resp, e);
+            return;
+        }
+        String body = sb.toString();
+
+        // 用 JSON 库解析，这里暂时用的是 gson 这个库
+        Gson gson = new Gson();
+        JsonObject json = gson.fromJson(body, JsonObject.class);
+        System.out.println("请求参数：" + json);
+
+        // 对请求参数进行基础有效性校验
+        if (!json.has("name") || json.get("name").isJsonNull()
+                || !json.has("age") || json.get("age").isJsonNull()
+                || !json.has("height") || json.get("height").isJsonNull()
+                || !json.has("email") || json.get("email").isJsonNull()) {
+            responseError(resp, new ServiceException(CommonResponse.PARAM_ERROR.getCode(), CommonResponse.PARAM_ERROR.getMessage()));
+            return;
+        }
+
+        // 创建 UserBean 对象
         UserBean userBean = new UserBean();
-        userBean.setName("张三");
-        userBean.setAge(18);
-        userBean.setHeight(1.88);
-        userBean.setEmail("zhangsan@qq.com");
-
-        UserBean userBean1 = new UserBean();
-        userBean1.setName("李四");
-        userBean1.setAge(19);
-        userBean1.setHeight(1.99);
-        userBean1.setEmail("lisi@qq.com");
-
-        UserBean userBean2 = new UserBean();
-        userBean2.setName("王五");
-        userBean2.setAge(20);
-        userBean2.setHeight(2.00);
-        userBean2.setEmail("wangwu@qq.com");
+        userBean.setName(json.get("name").getAsString());
+        userBean.setAge(json.get("age").getAsInt());
+        userBean.setHeight(json.get("height").getAsDouble());
+        userBean.setEmail(json.get("email").getAsString());
 
         try {
-//            Boolean result = userService.save(List.of(userBean, userBean1, userBean2));
-//            Boolean result = userService.remove(List.of(19, 20));
-//            Boolean result = userService.update(List.of(22), Map.of("email", "lisi1@qq.com"));
-//            System.out.println(result);
-
-            UserBean readUserBean = userService.get(21);
-            System.out.println(readUserBean);
-            List<UserBean> userBeanList = userService.list(2, 2);
-            System.out.println(userBeanList);
+            // 调用业务层 API
+            Boolean ret = userService.save(List.of(userBean));
+            if (ret) {
+                responseData(resp, null);
+                return;
+            } else {
+                responseError(resp, new ServiceException(CommonResponse.REQUEST_ERROR.getCode(), CommonResponse.REQUEST_ERROR.getMessage()));
+                return;
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            responseError(resp, e);
+            return;
         }
     }
 }
