@@ -13,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.UserService;
+import service.UserServiceImpl1;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
@@ -36,7 +37,8 @@ import java.util.Map;
 //   * 调用业务层的 API 时一定要用 try-catch，因为数据层和业务层的异常它们都没处理、都是继续上抛到表现层来统一处理的，catch 到异常时就给客户端响应错误，没有错误时就给客户端响应数据
 @WebServlet("/user/*")
 public class UserServlet extends BaseServlet {
-    private final UserService userService = new UserService();
+    // 这里用的业务层方案是方案一
+    private final UserService userService = new UserServiceImpl1();
 
     // 当前 Servlet 支持的 GET 方法，即接口的第二层路径名
     @Override
