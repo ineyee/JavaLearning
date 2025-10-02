@@ -2,8 +2,12 @@ package servlet;
 
 import bean.UserBean;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import constant.response.CommonResponse;
+import constant.response.UserResponse;
 import exception.ServiceException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +15,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import service.UserService;
 
 import java.io.BufferedReader;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 // 用户模块接口的表现层之控制器层
 //
@@ -63,38 +69,173 @@ public class UserServlet extends BaseServlet {
 
         // 用 JSON 库解析，这里暂时用的是 gson 这个库
         Gson gson = new Gson();
-        JsonObject json = gson.fromJson(body, JsonObject.class);
-        System.out.println("请求参数：" + json);
+        JsonArray jsonArray = gson.fromJson(body, JsonArray.class);
+        System.out.println("请求参数：" + jsonArray);
 
-        // 对请求参数进行基础有效性校验
-        if (!json.has("name") || json.get("name").isJsonNull()
-                || !json.has("age") || json.get("age").isJsonNull()
-                || !json.has("height") || json.get("height").isJsonNull()
-                || !json.has("email") || json.get("email").isJsonNull()) {
-            responseError(resp, new ServiceException(CommonResponse.PARAM_ERROR.getCode(), CommonResponse.PARAM_ERROR.getMessage()));
-            return;
+        List<UserBean> userBeanList = new ArrayList<>();
+        for (JsonElement jsonElement : jsonArray) {
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+            // 对请求参数进行基础有效性校验
+            if (!jsonObject.has("name") || jsonObject.get("name").isJsonNull()
+                    || !jsonObject.has("age") || jsonObject.get("age").isJsonNull()
+                    || !jsonObject.has("height") || jsonObject.get("height").isJsonNull()
+                    || !jsonObject.has("email") || jsonObject.get("email").isJsonNull()) {
+                responseError(resp, new ServiceException(CommonResponse.PARAM_ERROR.getCode(), CommonResponse.PARAM_ERROR.getMessage()));
+                return;
+            }
+
+            // 创建 UserBean 对象
+            UserBean userBean = new UserBean();
+            userBean.setName(jsonObject.get("name").getAsString());
+            userBean.setAge(jsonObject.get("age").getAsInt());
+            userBean.setHeight(jsonObject.get("height").getAsDouble());
+            userBean.setEmail(jsonObject.get("email").getAsString());
+            userBeanList.add(userBean);
         }
-
-        // 创建 UserBean 对象
-        UserBean userBean = new UserBean();
-        userBean.setName(json.get("name").getAsString());
-        userBean.setAge(json.get("age").getAsInt());
-        userBean.setHeight(json.get("height").getAsDouble());
-        userBean.setEmail(json.get("email").getAsString());
 
         try {
             // 调用业务层 API
-            Boolean ret = userService.save(List.of(userBean));
+            Boolean ret = userService.save(userBeanList);
             if (ret) {
                 responseData(resp, null);
-                return;
             } else {
                 responseError(resp, new ServiceException(CommonResponse.REQUEST_ERROR.getCode(), CommonResponse.REQUEST_ERROR.getMessage()));
-                return;
+            }
+        } catch (Exception e) {
+            responseError(resp, e);
+        }
+    }
+
+    public void remove(HttpServletRequest req, HttpServletResponse resp) {
+        // 从请求体里读取 JSON 字符串
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = req.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
             }
         } catch (Exception e) {
             responseError(resp, e);
             return;
+        }
+        String body = sb.toString();
+
+        // 用 JSON 库解析，这里暂时用的是 gson 这个库
+        Gson gson = new Gson();
+        JsonArray jsonArray = gson.fromJson(body, JsonArray.class);
+        System.out.println("请求参数：" + jsonArray);
+
+        // 对请求参数进行基础有效性校验
+        if (jsonArray.isJsonNull()) {
+            responseError(resp, new ServiceException(CommonResponse.PARAM_ERROR.getCode(), CommonResponse.PARAM_ERROR.getMessage()));
+            return;
+        }
+
+        List<Integer> idList = new ArrayList<>();
+        for (JsonElement jsonElement : jsonArray) {
+            Integer id = jsonElement.getAsInt();
+            idList.add(id);
+        }
+
+        try {
+            // 调用业务层 API
+            Boolean ret = userService.remove(idList);
+            if (ret) {
+                responseData(resp, null);
+            } else {
+                responseError(resp, new ServiceException(CommonResponse.REQUEST_ERROR.getCode(), CommonResponse.REQUEST_ERROR.getMessage()));
+            }
+        } catch (Exception e) {
+            responseError(resp, e);
+        }
+    }
+
+    public void update(HttpServletRequest req, HttpServletResponse resp) {
+        // 从请求体里读取 JSON 字符串
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = req.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (Exception e) {
+            responseError(resp, e);
+            return;
+        }
+        String body = sb.toString();
+
+        // 用 JSON 库解析，这里暂时用的是 gson 这个库
+        Gson gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(body, JsonObject.class);
+        System.out.println("请求参数：" + jsonObject);
+
+        // 对请求参数进行基础有效性校验
+        if (jsonObject.isJsonNull()) {
+            responseError(resp, new ServiceException(CommonResponse.PARAM_ERROR.getCode(), CommonResponse.PARAM_ERROR.getMessage()));
+            return;
+        }
+        JsonArray jsonArrayIdList = jsonObject.getAsJsonArray("idList");
+        if (jsonArrayIdList == null) {
+            responseError(resp, new ServiceException(CommonResponse.PARAM_ERROR.getCode(), CommonResponse.PARAM_ERROR.getMessage()));
+            return;
+        }
+        JsonObject jsonObjectFieldsToUpdate = jsonObject.getAsJsonObject("fieldsToUpdate");
+        if (jsonObjectFieldsToUpdate == null) {
+            responseError(resp, new ServiceException(CommonResponse.PARAM_ERROR.getCode(), CommonResponse.PARAM_ERROR.getMessage()));
+            return;
+        }
+
+        List<Integer> idList = new ArrayList<>();
+        for (JsonElement jsonElement : jsonArrayIdList) {
+            Integer id = jsonElement.getAsInt();
+            idList.add(id);
+        }
+
+        Map<String, Object> fieldsToUpdate = gson.fromJson(jsonObjectFieldsToUpdate, new TypeToken<Map<String, Object>>() {
+        }.getType());
+
+        try {
+            // 调用业务层 API
+            Boolean ret = userService.update(idList, fieldsToUpdate);
+            if (ret) {
+                responseData(resp, null);
+            } else {
+                responseError(resp, new ServiceException(CommonResponse.REQUEST_ERROR.getCode(), CommonResponse.REQUEST_ERROR.getMessage()));
+            }
+        } catch (Exception e) {
+            responseError(resp, e);
+        }
+    }
+
+    public void get(HttpServletRequest req, HttpServletResponse resp) {
+        Integer id = Integer.valueOf(req.getParameter("id"));
+        System.out.println("请求参数：" + id);
+
+        try {
+            // 调用业务层 API
+            UserBean userBean = userService.get(id);
+            if (userBean != null) {
+                responseData(resp, userBean);
+            } else {
+                responseError(resp, new ServiceException(UserResponse.USER_NOT_EXIST.getCode(), UserResponse.USER_NOT_EXIST.getMessage()));
+            }
+        } catch (Exception e) {
+            responseError(resp, e);
+        }
+    }
+
+    public void list(HttpServletRequest req, HttpServletResponse resp) {
+        Integer pageSize = Integer.valueOf(req.getParameter("pageSize"));
+        Integer currentPage = Integer.valueOf(req.getParameter("currentPage"));
+        System.out.println("请求参数：" + pageSize + " " + currentPage);
+
+        try {
+            // 调用业务层 API
+            List<UserBean> userBeanList = userService.list(pageSize, currentPage);
+            responseData(resp, userBeanList);
+        } catch (Exception e) {
+            responseError(resp, e);
         }
     }
 }

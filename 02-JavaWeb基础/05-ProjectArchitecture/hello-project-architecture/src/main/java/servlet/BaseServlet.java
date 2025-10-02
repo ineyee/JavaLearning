@@ -1,15 +1,18 @@
 package servlet;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import constant.response.CommonResponse;
 import exception.ServiceException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import util.LocalDateTimeAdapterUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.*;
 
 // 顶级类只能用 public 或 package-private 修饰
@@ -171,8 +174,13 @@ public abstract class BaseServlet extends HttpServlet {
         responseMap.put("code", CommonResponse.SUCCESS.getCode());
         responseMap.put("message", CommonResponse.SUCCESS.getMessage());
         responseMap.put("data", data);
+
         try {
-            resp.getWriter().write(new Gson().toJson(responseMap));
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapterUtil())
+                    .create();
+            String json = gson.toJson(responseMap);
+            resp.getWriter().write(json);
         } catch (Exception e) {
             // 这里是捕获 getWriter() 方法抛出的 Exception，都没法写了所以此时就不应该再给客户端继续返回响应了、避免循环 try-catch，但是我们可以记录下日志
             e.printStackTrace();
