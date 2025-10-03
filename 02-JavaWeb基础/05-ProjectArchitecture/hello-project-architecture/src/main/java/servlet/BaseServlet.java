@@ -64,7 +64,6 @@ public abstract class BaseServlet extends HttpServlet {
         List<String> paths = Arrays.asList(requestURI.split("/")); // 用 / 分割一下
         System.out.println("paths = " + paths); // [, ${Application Context}, ${第一层路径}, ${第二层路径}]
 
-
         String methodName = paths.get(paths.size() - 1); // 按照我们公司内部的规范，第二层路径肯定是 paths 的最后一个元素
         System.out.println("methodName = " + methodName); // ${第二层路径}]
 
