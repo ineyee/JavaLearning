@@ -21,9 +21,13 @@ public class LoginServlet extends HttpServlet {
         //   如果没有，就创建一个新的 session 会话对象来返回，并且在响应本次请求时自动添加响应头“Set-Cookie: JSESSIONID=新 session 会话对象的 id”字段传递给客户端
         HttpSession session = req.getSession();
         // 我们要把什么用户数据存储在 session 会话对象里（也即存储在服务器上 Java 项目内存里），这里我们设置为登录成功后拿到的 userId 及其值
-        // session 过期时间（单位秒）
+        // session 过期时间（单位秒），注意这个只是设置了服务器上 session 会话对象的过期时间，而不是客户端上 cookie 的过期时间
         session.setAttribute("userId", "123456");
         session.setMaxInactiveInterval(30 * 24 * 60 * 60);
+        // 我们需要手动设置客户端上 cookie 的过期时间，否则客户端默认是关闭浏览器就过期
+        Cookie cookie = new Cookie("JSESSIONID", session.getId());
+        cookie.setMaxAge(30 * 24 * 60 * 60);
+        resp.addCookie(cookie);
 
         // 服务端给客户端响应数据
         resp.getWriter().write("登录成功");
