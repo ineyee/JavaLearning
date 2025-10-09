@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--
+        环境，一个环境对应一个数据库
+        开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
+        生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
+    -->
+    <environments default="dev">
+        <!--
+            开发环境
+            开发环境我们访问的是测试数据库，这里假设 db_hello_mysql 就是测试数据库
+        -->
+        <environment id="dev">
+            <!-- 固定为 JDBC，代表采用 JDBC 的事务管理方式 -->
+            <transactionManager type="JDBC"></transactionManager>
+            <!-- 固定为 POOLED，代表采用内置连接池的方式来管理连接 -->
+            <dataSource type="POOLED">
+                <!--
+                    com.mysql.jdbc.Driver：MySQL 数据库驱动库的类名
+
+                    jdbc:mysql://：MySQL 的固定写法
+                    localhost、3306：域名和端口号
+                    db_hello_mysql：数据库的名称
+                    serverTimezone=UTC：推荐设置当前会话时区为零时区，以便 MySQL 能正确处理 DATETIME、TIMESTAMP 字段
+                        因为 DATETIME、TIMESTAMP 字段的默认值是获取服务器所在时区的时间，如服务器 1 部署在东八区，服务器 2 部署在西八区， 那么
+                        用户 1 通过东八区的服务器注册时存储在数据库的 createTime 就是东八区的时间 "2025-06-17 17:59:00"、并且没有携带时区信息
+                        用户 2 通过西八区的服务器注册时存储在数据库的 createTime 就是西八区的时间 "2025-06-17 09:59:00"、并且没有携带时区信息
+                        这样在西八区展示东八区用户的 createTime 就会有问题，因为我们不知道 "2025-06-17 17:59:00" 是东八区的、也没法转换为西八区对应的时间
+                        因此我们统一把 DATETIME、TIMESTAMP 字段都设置成零时区的，各个区在拿到时间后转换成自己时区的时间展示即可
+
+                    root、mysqlroot：数据库的用户名和密码
+                -->
+                <property name="driver" value="com.mysql.jdbc.Driver"></property>
+                <property name="url" value="jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC"></property>
+                <property name="username" value="root"/>
+                <property name="password" value="mysqlroot"/>
+            </dataSource>
+        </environment>
+
+        <!--
+            生产环境
+            生产环境我们访问的是正式数据库，这里假设 db_mysql 就是测试数据库
+        -->
+        <environment id="prod">
+            <!-- 固定为 JDBC，代表采用 JDBC 的事务管理方式 -->
+            <transactionManager type="JDBC"></transactionManager>
+            <!-- 固定为 POOLED，代表采用内置连接池的方式来管理连接 -->
+            <dataSource type="POOLED">
+                <!--
+                    com.mysql.jdbc.Driver：MySQL 数据库驱动库的类名
+
+                    jdbc:mysql://：MySQL 的固定写法
+                    localhost、3306：域名和端口号
+                    db_mysql：数据库的名称
+                    serverTimezone=UTC：推荐设置当前会话时区为零时区，以便 MySQL 能正确处理 DATETIME、TIMESTAMP 字段
+                        因为 DATETIME、TIMESTAMP 字段的默认值是获取服务器所在时区的时间，如服务器 1 部署在东八区，服务器 2 部署在西八区， 那么
+                        用户 1 通过东八区的服务器注册时存储在数据库的 createTime 就是东八区的时间 "2025-06-17 17:59:00"、并且没有携带时区信息
+                        用户 2 通过西八区的服务器注册时存储在数据库的 createTime 就是西八区的时间 "2025-06-17 09:59:00"、并且没有携带时区信息
+                        这样在西八区展示东八区用户的 createTime 就会有问题，因为我们不知道 "2025-06-17 17:59:00" 是东八区的、也没法转换为西八区对应的时间
+                        因此我们统一把 DATETIME、TIMESTAMP 字段都设置成零时区的，各个区在拿到时间后转换成自己时区的时间展示即可
+
+                    root、mysqlroot：数据库的用户名和密码
+                -->
+                <property name="driver" value="com.mysql.jdbc.Driver"></property>
+                <property name="url" value="jdbc:mysql://localhost:3306/db_mysql?serverTimezone=UTC"></property>
+                <property name="username" value="root"/>
+                <property name="password" value="mysqlroot"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 注册数据库表字段转 Java Bean 的映射文件 -->
+    <mappers>
+        <mapper resource="mappers/user.xml"></mapper>
+    </mappers>
+</configuration>
