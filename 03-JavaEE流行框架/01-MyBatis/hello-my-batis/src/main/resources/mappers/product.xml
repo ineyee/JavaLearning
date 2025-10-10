@@ -1,0 +1,42 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    namespace：当前文件的命名空间，可以理解为当前文件里所有 SQL 语句唯一标识的默认前缀，避免当前文件里 SQL 语句的唯一标识和别的文件里 SQL 语句的唯一标识重复
+    一般命名为全类名：公司域名倒写 + dao + 某个模块具体的 Dao（因为这里就相当于是某个模块的数据层了）
+-->
+<mapper namespace="com.ineyee.dao.ProductDao">
+    <!--
+        select 标签里用来写“查”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
+            resultType：从数据库表里查询出来一条一条的数据，会自动转换成 ProductBean 类型的对象
+            parameterType：参数的真实类型，外界传进来时统一是基类 Object
+
+        #{} 和 ${} 都可以用来读取参数值，但是：
+            #{} 类似于预处理 SQL 语句，更加安全高效，所以实际开发中用得多
+            ${} 类似于 SQL 语句，会直接把外界传进来的东西当成字符串替换掉形参，有 SQL 注入的风险，所以实际开发中除非就是需要直接替换 SQL 语句里的字符串，否则不要用
+    -->
+    <select id="get" resultType="bean.ProductBean" parameterType="Integer">
+        -- 因为有外键，所以查询时就是一对多表结构的多表查询
+        SELECT t_product.id,
+               t_product.create_time,
+               t_product.update_time,
+               t_product.name,
+               t_product.price,
+               t_product.desc,
+               -- 只要把 t_user 表里的字段通过取别名的方式都列出来（注意 userBean 必须是 productBean 里对应对象的属性名，后面的属性名也必须是 userBean 里对应的属性名），MyBatis 就能自动封装成 UserBean 对象
+               t_user.id          AS `userBean.id`,
+               t_user.create_time AS `userBean.createTime`,
+               t_user.update_time AS `userBean.updateTime`,
+               t_user.name        AS `userBean.name`,
+               t_user.age         AS `userBean.age`,
+               t_user.height      AS `userBean.height`,
+               t_user.email       AS `userBean.email`
+        FROM t_product
+                 LEFT JOIN t_user
+                           ON t_product.user_id = t_user.id
+        -- id 是参数名，因为外界只传进来一个参数且没有名字，所以这里参数名随便取什么都行，但是为了见名知意，这里取 id
+        -- “# + {}”用来读取参数值
+        WHERE t_product.id = #{id};
+    </select>
+</mapper>

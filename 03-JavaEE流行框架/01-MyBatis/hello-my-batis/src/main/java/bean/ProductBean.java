@@ -47,7 +47,10 @@ public class ProductBean extends BaseBean {
     @Override
     public String toString() {
         return "ProductBean{" +
-                "name='" + name + '\'' +
+                "id='" + getId() + '\'' +
+                ", createTime='" + getCreateTime() + '\'' +
+                ", updateTime='" + getUpdateTime() + '\'' +
+                ", name='" + name + '\'' +
                 ", price=" + price +
                 ", desc='" + desc + '\'' +
                 ", userBean=" + userBean +

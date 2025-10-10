@@ -21,7 +21,7 @@ public class UserTest {
     }
 
     @Test
-    void select() {
+    void list() {
         // 创建一个会话，项目运行期间可以创建多个
         try (SqlSession session = MyBatisUtil.openSession()) {
             // 执行 SQL 语句

@@ -99,5 +99,6 @@
     <!-- 注册数据库表自动转 Java Bean 的映射文件 -->
     <mappers>
         <mapper resource="mappers/user.xml"></mapper>
+        <mapper resource="mappers/product.xml"></mapper>
     </mappers>
 </configuration>
