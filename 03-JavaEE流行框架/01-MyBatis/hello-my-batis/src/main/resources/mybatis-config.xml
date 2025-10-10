@@ -28,6 +28,17 @@
     </settings>
 
     <!--
+        typeAliases，用来给映射文件里的类型取别名，如 parameterType、resultType 这种以 type 结尾的都是类型
+    -->
+    <typeAliases>
+        <!--
+            type="bean.UserBean"：原类型名，全类名
+            alias="UserBean"：别名，类名一般用大驼峰
+        -->
+        <typeAlias type="bean.UserBean" alias="UserBean"/>
+    </typeAliases>
+
+    <!--
         环境，一个环境对应一个数据库
         开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
         生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库

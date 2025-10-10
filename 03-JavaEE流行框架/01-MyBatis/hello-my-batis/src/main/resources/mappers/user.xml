@@ -16,7 +16,7 @@
             #{} 类似于预处理 SQL 语句，更加安全高效，所以实际开发中用得多
             ${} 类似于 SQL 语句，会直接把外界传进来的东西当成字符串替换掉形参，有 SQL 注入的风险，所以实际开发中除非就是需要直接替换 SQL 语句里的字符串，否则不要用
     -->
-    <insert id="save" parameterType="bean.UserBean">
+    <insert id="save" parameterType="UserBean">
         -- 往数据库里插入数据时，建议 SQL 语句里显式写全表里的所有字段
         -- 这样外界传进来的 bean 如果全部属性都有值，那就完全匹配
         -- 如果有的可选属性没值，那 MyBatis 就会自动用 null 填充，最终数据库里会是该可选字段的默认值或 null
@@ -37,7 +37,7 @@
         -- order="AFTER"：代表在插入语句后执行回填
         -- keyProperty：要回填的属性名，即 bean 里的属性名（多个属性名之间用逗号隔开，注意不能有空格）
         -- resultType：bean 的类型
-        <selectKey order="AFTER" keyProperty="id,createTime,updateTime" resultType="bean.UserBean">
+        <selectKey order="AFTER" keyProperty="id,createTime,updateTime" resultType="UserBean">
             SELECT
             -- 别名要跟 keyProperty 里的一致
             id AS id,
