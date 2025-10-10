@@ -49,6 +49,29 @@
         </selectKey>
     </insert>
 
+    <!-- update 标签里用来写“改”的 SQL 语句 -->
+    <update id="update" parameterType="bean.UserBean">
+        -- 这里得用到动态 SQL 语句，来实现客户端传了 bean 的什么字段过来才更新什么字段
+        UPDATE t_user
+        -- set 标签：自动处理 SET 关键字，并删掉最后的逗号和空格
+        <set>
+            -- if 标签：test 属性用来进行条件判断，条件满足才包含标签内的 SQL 片段
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="height != null">
+                height = #{height},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
     <!-- select 标签里用来写“查”的 SQL 语句 -->
     <select id="get" parameterType="Integer" resultType="bean.UserBean">
         SELECT id,
