@@ -11,10 +11,10 @@ public class UserBean extends BaseBean {
     public UserBean() {
     }
 
-    private String name;
-    private Integer age;
-    private Double height;
-    private String email;
+    private String name; // 必传
+    private Integer age; // 可选
+    private Double height; // 可选
+    private String email; // 必传
 
     public String getName() {
         return name;

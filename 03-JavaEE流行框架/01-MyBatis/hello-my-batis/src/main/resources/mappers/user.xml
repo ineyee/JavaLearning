@@ -7,16 +7,50 @@
 -->
 <mapper namespace="com.ineyee.dao.UserDao">
     <!--
-        select 标签里用来写“查”的 SQL 语句
+        insert 标签里用来写“增”的 SQL 语句
             id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
-            resultType：从数据库表里查询出来一条一条的数据，会自动转换成 UserBean 类型的对象
             parameterType：参数的真实类型，外界传进来时统一是基类 Object
+            resultType：从数据库表里查询出来一条一条的数据，会自动转换成 UserBean 类型的对象
 
         #{} 和 ${} 都可以用来读取参数值，但是：
             #{} 类似于预处理 SQL 语句，更加安全高效，所以实际开发中用得多
             ${} 类似于 SQL 语句，会直接把外界传进来的东西当成字符串替换掉形参，有 SQL 注入的风险，所以实际开发中除非就是需要直接替换 SQL 语句里的字符串，否则不要用
     -->
-    <select id="get" resultType="bean.UserBean" parameterType="Integer">
+    <insert id="save" parameterType="bean.UserBean">
+        -- 往数据库里插入数据时，建议 SQL 语句里显式写全表里的所有字段
+        -- 这样外界传进来的 bean 如果全部属性都有值，那就完全匹配
+        -- 如果有的可选属性没值，那 MyBatis 就会自动用 null 填充，最终数据库里会是该可选字段的默认值或 null
+        INSERT INTO t_user (name,
+        age,
+        height,
+        email)
+        -- name、age、height、email 是参数名，因为外界传进来一个 bean，所以参数名只要和 bean 中的属性名一一对应，就能顺利匹配到参数值
+        -- “# + {}”用来读取参数值
+        VALUES (#{name},
+        #{age},
+        #{height},
+        #{email});
+
+        -- 外界不是传进来一个 bean 来保存嘛，实际开发中我们一般都是在插入成功后直接给客户端返回 bean 的 id 或完整 bean
+        -- 这里 MyBatis 提供了一个自动回填的功能，可以在插入成功后自动把新插入数据的某些字段回填到传进来的 bean 对象中
+        -- 这样外界就可以直接拿着传进来的那个 bean 对象返回给客户端了，就不用再去数据库查询一遍了
+        -- order="AFTER"：代表在插入语句后执行回填
+        -- keyProperty：要回填的属性名，即 bean 里的属性名（多个属性名之间用逗号隔开，注意不能有空格）
+        -- resultType：bean 的类型
+        <selectKey order="AFTER" keyProperty="id,createTime,updateTime" resultType="bean.UserBean">
+            SELECT
+            -- 别名要跟 keyProperty 里的一致
+            id AS id,
+            create_time AS createTime,
+            update_time AS updateTime
+            FROM t_user
+            -- LAST_INSERT_ID()：返回的是刚插入的记录的 id
+            WHERE id = LAST_INSERT_ID();
+        </selectKey>
+    </insert>
+
+    <!-- select 标签里用来写“查”的 SQL 语句 -->
+    <select id="get" parameterType="Integer" resultType="bean.UserBean">
         SELECT id,
                name,
                age,
@@ -29,7 +63,7 @@
         -- “# + {}”用来读取参数值
         WHERE id = #{id};
     </select>
-    <select id="list" resultType="bean.UserBean" parameterType="Map">
+    <select id="list" parameterType="Map" resultType="bean.UserBean">
         SELECT id,
                name,
                age,

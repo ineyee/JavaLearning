@@ -9,14 +9,14 @@
     <!--
         select 标签里用来写“查”的 SQL 语句
             id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
-            resultType：从数据库表里查询出来一条一条的数据，会自动转换成 ProductBean 类型的对象
             parameterType：参数的真实类型，外界传进来时统一是基类 Object
+            resultType：从数据库表里查询出来一条一条的数据，会自动转换成 ProductBean 类型的对象
 
         #{} 和 ${} 都可以用来读取参数值，但是：
             #{} 类似于预处理 SQL 语句，更加安全高效，所以实际开发中用得多
             ${} 类似于 SQL 语句，会直接把外界传进来的东西当成字符串替换掉形参，有 SQL 注入的风险，所以实际开发中除非就是需要直接替换 SQL 语句里的字符串，否则不要用
     -->
-    <select id="get" resultType="bean.ProductBean" parameterType="Integer">
+    <select id="get" parameterType="Integer" resultType="bean.ProductBean">
         -- 因为有外键，所以查询时就是一对多表结构的多表查询
         SELECT t_product.id,
                t_product.create_time,
