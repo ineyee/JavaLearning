@@ -4,6 +4,30 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <!--
+        configuration 标签里的内容必须按下面的顺序编写：
+            1、properties (可选)
+            2、settings (可选)
+            3、typeAliases (可选)
+            4、typeHandlers (可选)
+            5、objectFactory (可选)
+            6、objectWrapperFactory (可选)
+            7、reflectorFactory (可选)
+            8、plugins (可选)
+            9、environments (可选)
+            10、databaseIdProvider (可选)
+            11、mappers (可选)
+    -->
+
+    <!-- 其它设置 -->
+    <settings>
+        <!--
+            是否开启驼峰命名自动映射，即数据库表自动转 Java Bean 时是否从经典数据库列名 create_time 映射到经典 Java 属性名 createTime
+            默认 false
+        -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <!--
         环境，一个环境对应一个数据库
         开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
         生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
@@ -72,7 +96,7 @@
         </environment>
     </environments>
 
-    <!-- 注册数据库表字段转 Java Bean 的映射文件 -->
+    <!-- 注册数据库表自动转 Java Bean 的映射文件 -->
     <mappers>
         <mapper resource="mappers/user.xml"></mapper>
     </mappers>

@@ -51,7 +51,10 @@ public class UserBean extends BaseBean {
     @Override
     public String toString() {
         return "UserBean{" +
-                "name='" + name + '\'' +
+                "id='" + getId() + '\'' +
+                ", createTime='" + getCreateTime() + '\'' +
+                ", updateTime='" + getUpdateTime() + '\'' +
+                ", name='" + name + '\'' +
                 ", age=" + age +
                 ", height=" + height +
                 ", email='" + email + '\'' +

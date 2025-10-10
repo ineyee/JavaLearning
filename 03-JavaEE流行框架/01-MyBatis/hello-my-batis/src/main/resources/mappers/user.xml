@@ -2,17 +2,46 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--
-    namespace：当前文件的命名空间，可以理解为当前文件里所有 SQL 语句的默认前缀，避免当前文件里 SQL 语句的唯一标识和别的文件里 SQL 语句的唯一标识重复
-    一般命名为：公司域名倒写 + dao + 某个模块具体的 Dao（因为这里就相当于是某个模块的数据层了）
+    namespace：当前文件的命名空间，可以理解为当前文件里所有 SQL 语句唯一标识的默认前缀，避免当前文件里 SQL 语句的唯一标识和别的文件里 SQL 语句的唯一标识重复
+    一般命名为全类名：公司域名倒写 + dao + 某个模块具体的 Dao（因为这里就相当于是某个模块的数据层了）
 -->
 <mapper namespace="com.ineyee.dao.UserDao">
     <!--
         select 标签里用来写“查”的 SQL 语句
             id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
             resultType：从数据库表里查询出来一条一条的数据，会自动转换成 UserBean 类型的对象
+            parameterType：参数的真实类型，外界传进来时统一是基类 Object
+
+        #{} 和 ${} 都可以用来读取参数值，但是：
+            #{} 类似于预处理 SQL 语句，更加安全高效，所以实际开发中用得多
+            ${} 类似于 SQL 语句，会直接把外界传进来的东西当成字符串替换掉形参，有 SQL 注入的风险，所以实际开发中除非就是需要直接替换 SQL 语句里的字符串，否则不要用
     -->
-    <select id="list" resultType="bean.UserBean">
-        SELECT *
-        FROM t_user;
+    <select id="get" resultType="bean.UserBean" parameterType="Integer">
+        SELECT id,
+               name,
+               age,
+               height,
+               email,
+               create_time,
+               update_time
+        FROM t_user
+        -- id 是参数名，因为外界只传进来一个参数且没有名字，所以这里参数名随便取什么都行，但是为了见名知意，这里取 id
+        -- “# + {}”用来读取参数值
+        WHERE id = #{id};
+    </select>
+    <select id="list" resultType="bean.UserBean" parameterType="Map">
+        SELECT id,
+               name,
+               age,
+               height,
+               email,
+               create_time,
+               update_time
+        FROM t_user
+        -- limit、offset 是参数名，因为外界传进来一个 Map，所以参数名只要和 Map 中的 key 一一对应，就能顺利匹配到参数值
+        -- “# + {}”用来读取参数值
+        ORDER BY create_time DESC
+            LIMIT #{limit}
+        OFFSET #{offset};
     </select>
 </mapper>
