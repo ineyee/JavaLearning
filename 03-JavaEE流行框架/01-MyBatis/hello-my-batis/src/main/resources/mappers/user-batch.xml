@@ -8,7 +8,7 @@
         INSERT INTO t_user (name, age, height, email)
         VALUES
         -- foreach 标签：用来遍历外界传进来的数组
-        -- collection 属性：外界传进来数组的名字，这里我们取名为 list
+        -- collection 属性：外界传进来的如果是 List，则 collection 值固定为 list；如果是数组，则 collection 值固定为 array
         -- item 属性：数组中的每一个元素，这里我们取名为 userBean
         -- separator 属性：(), (), () 每一组 VALUE 之间的分隔符，固定为 ,
         <foreach collection="list" item="userBean" separator=",">
@@ -23,7 +23,7 @@
         DELETE FROM t_user
         WHERE id IN
         -- foreach 标签：用来遍历外界传进来的数组
-        -- collection 属性：外界传进来数组的名字，这里我们取名为 list
+        -- collection 属性：外界传进来的如果是 List，则 collection 值固定为 list；如果是数组，则 collection 值固定为 array
         -- item 属性：数组中的每一个元素，这里我们取名为 id
         -- open 属性：foreach 循环开始时，集合不为空时，拼接 WHERE IN () 小括号的前括号
         -- close 属性：foreach 循环结束时，集合不为空时，拼接 WHERE IN () 小括号的后括号
