@@ -88,7 +88,10 @@
         INSERT INTO t_user (name, age, height, email)
         VALUES
         -- foreach 标签：用来遍历外界传进来的 List 或 Array
-        -- collection 属性：外界传进来的如果是 List，则 collection 值固定为 list；如果是 Array，则 collection 值固定为 array
+        -- collection 属性：
+        -- 外界传进来的如果是 List，则 collection 值固定为 list
+        -- 外界传进来的如果是 Array，则 collection 值固定为 array
+        -- 外界传进来的如果是 Map，则 collection 值固定为 Map 里数组字段的 key
         -- item 属性：数组中的每一个元素，这里我们取名为 userBean
         -- separator 属性：(), (), () 每一组 VALUE 之间的分隔符，固定为 ,
         <foreach collection="list" item="userBean" separator=",">
@@ -113,7 +116,10 @@
         DELETE FROM t_user
         WHERE id IN
         -- foreach 标签：用来遍历外界传进来的 List 或 Array
-        -- collection 属性：外界传进来的如果是 List，则 collection 值固定为 list；如果是 Array，则 collection 值固定为 array
+        -- collection 属性：
+        -- 外界传进来的如果是 List，则 collection 值固定为 list
+        -- 外界传进来的如果是 Array，则 collection 值固定为 array
+        -- 外界传进来的如果是 Map，则 collection 值固定为 Map 里数组字段的 key
         -- item 属性：数组中的每一个元素，这里我们取名为 id
         -- open 属性：foreach 循环开始时，集合不为空时，拼接 WHERE IN () 小括号的前括号
         -- close 属性：foreach 循环结束时，集合不为空时，拼接 WHERE IN () 小括号的后括号
@@ -124,9 +130,15 @@
     </delete>
 
 
-    <!-- update 标签里用来写“改”的 SQL 语句 -->
+    <!--
+        update 标签里用来写“改”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
+            parameterType：给 SQL 语句提供参数的入参真实类型，外界传进来时统一是基类 Object
+            resultType 已经固定死了是 Integer，所以这里不需要再手动指定
+    -->
     <update id="update" parameterType="Map">
-        -- 这里得用到动态 SQL 语句，来实现客户端传了什么字段过来才更新什么字段，因为字段不是必传的
+        -- 更新数据库里的字段时，建议用动态 SQL
+        -- 这样就可以实现客户端传了什么字段过来才更新什么字段，因为有的字段不是必传的
         UPDATE t_user
         -- set 标签：自动构建 SET 子句部分及其参数，并删掉最后的逗号和空格
         <set>
@@ -145,5 +157,36 @@
             </if>
         </set>
         WHERE id = #{id};
+    </update>
+
+    <update id="updateBatch" parameterType="Map">
+        UPDATE t_user
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="height != null">
+                height = #{height},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+        </set>
+        WHERE id IN
+        -- foreach 标签：用来遍历外界传进来的 List 或 Array
+        -- collection 属性：
+        -- 外界传进来的如果是 List，则 collection 值固定为 list
+        -- 外界传进来的如果是 Array，则 collection 值固定为 array
+        -- 外界传进来的如果是 Map，则 collection 值固定为 Map 里数组字段的 key
+        -- item 属性：数组中的每一个元素，这里我们取名为 id
+        -- open 属性：foreach 循环开始时，集合不为空时，拼接 WHERE IN () 小括号的前括号
+        -- close 属性：foreach 循环结束时，集合不为空时，拼接 WHERE IN () 小括号的后括号
+        -- separator 属性：(1, 2, 3) 每一个 id 之间的分隔符，固定为 ,
+        <foreach collection="idList" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </update>
 </mapper>

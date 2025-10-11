@@ -50,7 +50,7 @@ public class UserTest {
     }
 
 
-    // 保存成功一般是给客户端返回刚保存成功的那条完整数据 data=bean，这样客户端就不用再查询一遍了
+    // 保存成功一般是给客户端返回刚保存成功的哪条完整数据 data=bean，这样客户端就不用再查询一遍了
     // 保存失败一般是给客户端返回 data=null
     @Test
     void save() {
@@ -79,7 +79,7 @@ public class UserTest {
         }
     }
 
-    // 批量保存成功一般是给客户端返回刚保存成功那批数据的 id data = [bean.id]，客户端可以根据 id 数组再手动查询一次数据库拿到完整数据
+    // 批量保存成功一般是给客户端返回刚保存成功哪批数据的 id data = [bean.id]，客户端可以根据 id 数组再手动查询一次数据库拿到完整数据
     // 批量保存失败一般是给客户端返回 data=null
     @Test
     void saveBatch() {
@@ -111,7 +111,7 @@ public class UserTest {
     }
 
 
-    // 删除成功一般是给客户端返回成功信息、因为客户端本来就知道删除的是那条数据，删除失败一般是给客户端返回失败信息
+    // 删除成功一般是给客户端返回成功信息、因为客户端本来就知道删除的是哪条数据，删除失败一般是给客户端返回失败信息
     @Test
     void remove() {
         // 创建一个会话，项目运行期间可以创建多个
@@ -133,7 +133,7 @@ public class UserTest {
         }
     }
 
-    // 批量删除成功一般是给客户端返回成功信息、因为客户端本来就知道删除的是那批数据，批量删除失败一般是给客户端返回失败信息
+    // 批量删除成功一般是给客户端返回成功信息、因为客户端本来就知道删除的是哪批数据，批量删除失败一般是给客户端返回失败信息
     @Test
     void removeBatch() {
         try (SqlSession session = MyBatisUtil.openSession()) {
@@ -151,7 +151,7 @@ public class UserTest {
     }
 
 
-    // 更新成功，一般是给客户端返回成功或失败的信息即可，客户端根据返回结果决定要不要更新内存数据就行
+    // 更新成功一般是给客户端返回成功信息、因为客户端本来就知道更新的是哪条数据、哪些字段，更新失败一般是给客户端返回失败信息
     @Test
     void update() {
         // 创建一个会话，项目运行期间可以创建多个
@@ -159,15 +159,40 @@ public class UserTest {
             // 执行 SQL 语句
             // session.update(statement, parameter)：用来更新数据，成功则返回影响数据条数，失败则返回 0，出错则抛异常
             //   statement（String）：SQL 语句的命名空间.SQL 语句的唯一标识
-            //   parameter（Object）：SQL 语句的参数，当参数个数为多个时，可以搞成 bean 或 Map 把参数传进去（value 值在外界算好再传进去，里面只能读取、不能进行运算）
+            //   parameter（Object）：SQL 语句的参数，当 SQL 语句的参数个数为多个时，可以把多个参数包装进一个 Bean 或 Map 传进去（value 值一定要在外界算好再传进去，里面只能读取，不能进行运算）
             int ret = session.update("dao.UserDao.update", Map.of(
-                    "id", 31,
+                    "id", 44,
                     "name", "James"
             ));
             if (ret > 0) {
                 System.out.println("更新成功");
             } else {
                 System.out.println("更新失败");
+            }
+
+            // MyBatis 默认开启了事务，关闭了自动提交
+            // 所以针对“增删改”操作，我们需要手动提交事务，“查”操作不影响数据库，不需要提交事务
+            session.commit();
+        }
+    }
+
+    // 批量更新成功一般是给客户端返回成功信息、因为客户端本来就知道更新的是哪条数据、哪些字段，批量更新失败一般是给客户端返回失败信息
+    @Test
+    void updateBatch() {
+        // 创建一个会话，项目运行期间可以创建多个
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            // 执行 SQL 语句
+            // session.update(statement, parameter)：用来更新数据，成功则返回影响数据条数，失败则返回 0，出错则抛异常
+            //   statement（String）：SQL 语句的命名空间.SQL 语句的唯一标识
+            //   parameter（Object）：SQL 语句的参数，当 SQL 语句的参数个数为多个时，可以把多个参数包装进一个 Bean 或 Map 传进去（value 值一定要在外界算好再传进去，里面只能读取，不能进行运算）
+            int ret = session.update("dao.UserDao.updateBatch", Map.of(
+                    "idList", List.of(43, 44, 45),
+                    "height", 2.03
+            ));
+            if (ret > 0) {
+                System.out.println("批量更新成功");
+            } else {
+                System.out.println("批量更新失败");
             }
 
             // MyBatis 默认开启了事务，关闭了自动提交
