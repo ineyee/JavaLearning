@@ -2,22 +2,21 @@
 <!DOCTYPE configuration
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--
+    configuration 标签里的内容必须按下面的顺序编写：
+        1、properties (可选)
+        2、settings (可选)
+        3、typeAliases (可选)
+        4、typeHandlers (可选)
+        5、objectFactory (可选)
+        6、objectWrapperFactory (可选)
+        7、reflectorFactory (可选)
+        8、plugins (可选)
+        9、environments (可选)
+        10、databaseIdProvider (可选)
+        11、mappers (可选)
+-->
 <configuration>
-    <!--
-        configuration 标签里的内容必须按下面的顺序编写：
-            1、properties (可选)
-            2、settings (可选)
-            3、typeAliases (可选)
-            4、typeHandlers (可选)
-            5、objectFactory (可选)
-            6、objectWrapperFactory (可选)
-            7、reflectorFactory (可选)
-            8、plugins (可选)
-            9、environments (可选)
-            10、databaseIdProvider (可选)
-            11、mappers (可选)
-    -->
-
     <!-- 其它设置 -->
     <settings>
         <!--
@@ -27,15 +26,17 @@
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
 
+
     <!--
-        typeAliases，用来给 xml 文件里的类型取别名，如 type、parameterType、resultType 这种以 type 结尾的都是类型
+        typeAliases，用来给 xml 文件里的类型取别名，如 type、parameterType、resultType 这种以 type 结尾的属性都是接收一个类型
+        包名.类名，全类名，比较长；我们可以给全类名取个别名，短类名，比较短，写起来更方便；当然如果你偏好于写全类名，那也可以不定义别名
     -->
     <typeAliases>
-        <typeAlias type="common.DruidDataSourceFactory" alias="Druid"/>
         <!--
-            type="bean.UserBean"：原类型名，全类名
-            alias="UserBean"：别名，类名一般用大驼峰
+            type 属性：包名.类名，全类名
+            alias 属性：别名，短类名，类名一般用大驼峰
         -->
+        <typeAlias type="common.DruidDataSourceFactory" alias="Druid"/>
         <typeAlias type="bean.UserBean" alias="UserBean"/>
     </typeAliases>
 
@@ -45,10 +46,7 @@
         生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
     -->
     <environments default="dev">
-        <!--
-            开发环境
-            开发环境我们访问的是测试数据库，这里假设 db_hello_mysql 就是测试数据库
-        -->
+        <!-- 开发环境，开发环境我们访问的是测试数据库，这里假设 db_hello_mysql 就是测试数据库 -->
         <environment id="dev">
             <!-- 固定为 JDBC，代表采用 JDBC 的事务管理方式 -->
             <transactionManager type="JDBC"/>
@@ -80,13 +78,10 @@
             </dataSource>
         </environment>
 
-        <!--
-            生产环境
-            生产环境我们访问的是正式数据库，这里假设 db_mysql 就是测试数据库
-        -->
+        <!-- 生产环境，生产环境我们访问的是正式数据库，这里假设 db_mysql 就是正式数据库 -->
         <environment id="prod">
             <!-- 固定为 JDBC，代表采用 JDBC 的事务管理方式 -->
-            <transactionManager type="JDBC"></transactionManager>
+            <transactionManager type="JDBC"/>
             <!-- 采用 Druid 三方连接池来管理连接 -->
             <dataSource type="Druid">
                 <!--
@@ -94,7 +89,7 @@
 
                     jdbc:mysql://：MySQL 的固定写法
                     localhost、3306：域名和端口号
-                    db_hello_mysql：数据库的名称
+                    db_mysql：数据库的名称
                     serverTimezone=UTC：推荐设置当前会话时区为零时区，以便 MySQL 能正确处理 DATETIME、TIMESTAMP 字段
                         因为 DATETIME、TIMESTAMP 字段的默认值是获取服务器所在时区的时间，如服务器 1 部署在东八区，服务器 2 部署在西八区， 那么
                         用户 1 通过东八区的服务器注册时存储在数据库的 createTime 就是东八区的时间 "2025-06-17 17:59:00"、并且没有携带时区信息
@@ -107,7 +102,7 @@
                     initialSize、maxActive：初始化创建几条连接、最大连接数
                 -->
                 <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/db_mysql?serverTimezone=UTC"/>
                 <property name="username" value="root"/>
                 <property name="password" value="mysqlroot"/>
                 <property name="initialSize" value="5"/>
@@ -118,8 +113,8 @@
 
     <!-- 注册数据库表自动转 Java Bean 的映射文件 -->
     <mappers>
-        <mapper resource="mappers/user.xml"></mapper>
-        <mapper resource="mappers/user-batch.xml"></mapper>
-        <mapper resource="mappers/product.xml"></mapper>
+        <mapper resource="mappers/user.xml"/>
+        <mapper resource="mappers/user-batch.xml"/>
+        <mapper resource="mappers/product.xml"/>
     </mappers>
 </configuration>
