@@ -97,12 +97,32 @@
     </insert>
 
 
-    <!-- delete 标签里用来写“删”的 SQL 语句 -->
+    <!--
+        delete 标签里用来写“删”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
+            parameterType：给 SQL 语句提供参数的入参真实类型，外界传进来时统一是基类 Object
+            resultType 已经固定死了是 Integer，所以这里不需要再手动指定
+    -->
     <delete id="remove" parameterType="Integer">
         DELETE
         FROM t_user
         WHERE id = #{id};
     </delete>
+
+    <delete id="removeBatch" parameterType="List">
+        DELETE FROM t_user
+        WHERE id IN
+        -- foreach 标签：用来遍历外界传进来的 List 或 Array
+        -- collection 属性：外界传进来的如果是 List，则 collection 值固定为 list；如果是 Array，则 collection 值固定为 array
+        -- item 属性：数组中的每一个元素，这里我们取名为 id
+        -- open 属性：foreach 循环开始时，集合不为空时，拼接 WHERE IN () 小括号的前括号
+        -- close 属性：foreach 循环结束时，集合不为空时，拼接 WHERE IN () 小括号的后括号
+        -- separator 属性：(1, 2, 3) 每一个 id 之间的分隔符，固定为 ,
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 
     <!-- update 标签里用来写“改”的 SQL 语句 -->
     <update id="update" parameterType="Map">

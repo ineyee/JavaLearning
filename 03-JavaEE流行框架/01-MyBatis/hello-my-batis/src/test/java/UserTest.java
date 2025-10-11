@@ -111,7 +111,7 @@ public class UserTest {
     }
 
 
-    // 删除成功，一般是给客户端返回成功或失败的信息即可，客户端根据返回结果决定要不要更新内存数据就行
+    // 删除成功一般是给客户端返回成功信息、因为客户端本来就知道删除的是那条数据，删除失败一般是给客户端返回失败信息
     @Test
     void remove() {
         // 创建一个会话，项目运行期间可以创建多个
@@ -119,8 +119,8 @@ public class UserTest {
             // 执行 SQL 语句
             // session.delete(statement, parameter)：用来删除数据，成功则返回影响数据条数，失败则返回 0，出错则抛异常
             //   statement（String）：SQL 语句的命名空间.SQL 语句的唯一标识
-            //   parameter（Object）：SQL 语句的参数，当参数个数为一个时，直接把参数值传进去就可以了
-            int ret = session.delete("dao.UserDao.remove", 31);
+            //   parameter（Object）：SQL 语句的参数，当 SQL 语句的参数个数为一个时，直接把参数值传进去就可以了
+            int ret = session.delete("dao.UserDao.remove", 38);
             if (ret > 0) {
                 System.out.println("删除成功");
             } else {
@@ -132,6 +132,24 @@ public class UserTest {
             session.commit();
         }
     }
+
+    // 批量删除成功一般是给客户端返回成功信息、因为客户端本来就知道删除的是那批数据，批量删除失败一般是给客户端返回失败信息
+    @Test
+    void removeBatch() {
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            List<Integer> idList = List.of(38, 41, 42);
+
+            int ret = session.delete("dao.UserDao.removeBatch", idList);
+            if (ret > 0) {
+                System.out.println("批量删除成功");
+            } else {
+                System.out.println("批量删除失败");
+            }
+
+            session.commit();
+        }
+    }
+
 
     // 更新成功，一般是给客户端返回成功或失败的信息即可，客户端根据返回结果决定要不要更新内存数据就行
     @Test
