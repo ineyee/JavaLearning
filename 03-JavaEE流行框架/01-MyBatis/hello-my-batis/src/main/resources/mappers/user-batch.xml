@@ -3,22 +3,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ineyee.dao.UserBatchDao">
-    <insert id="saveBatch" parameterType="List">
-        -- 批量插入无法自动回填数据库里的字段，所以可以在批量插入成功后手动查询一次数据库
-        INSERT INTO t_user (name, age, height, email)
-        VALUES
-        -- foreach 标签：用来遍历外界传进来的数组
-        -- collection 属性：外界传进来的如果是 List，则 collection 值固定为 list；如果是数组，则 collection 值固定为 array
-        -- item 属性：数组中的每一个元素，这里我们取名为 userBean
-        -- separator 属性：(), (), () 每一组 VALUE 之间的分隔符，固定为 ,
-        <foreach collection="list" item="userBean" separator=",">
-            (#{userBean.name},
-            #{userBean.age},
-            #{userBean.height},
-            #{userBean.email})
-        </foreach>
-    </insert>
-
     <delete id="removeBatch" parameterType="List">
         DELETE FROM t_user
         WHERE id IN

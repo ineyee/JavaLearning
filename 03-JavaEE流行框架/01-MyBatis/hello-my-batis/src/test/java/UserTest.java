@@ -5,9 +5,10 @@ import util.MyBatisUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class UserTest {
-    // 查询成功给客户端返回 data=bean，查询失败给客户端返回 data=null
+    // 查询成功一般是给客户端返回 data=bean，查询失败一般是给客户端返回 data=null
     @Test
     void get() {
         // 创建一个会话，项目运行期间可以创建多个
@@ -25,7 +26,7 @@ public class UserTest {
         }
     }
 
-    // 查询成功给客户端返回 data=[bean]，查询失败给客户端返回 data=[]
+    // 查询成功一般是给客户端返回 data=[bean]，查询失败一般是给客户端返回 data=[]
     @Test
     void list() {
         // 创建一个会话，项目运行期间可以创建多个
@@ -49,7 +50,8 @@ public class UserTest {
     }
 
 
-    // 保存成功，一般是给客户端返回保存成功那条数据的完整数据，这样就不用客户端再查询一遍了
+    // 保存成功一般是给客户端返回刚保存成功的那条完整数据 data=bean，这样客户端就不用再查询一遍了
+    // 保存失败一般是给客户端返回 data=null
     @Test
     void save() {
         // 创建一个会话，项目运行期间可以创建多个
@@ -57,20 +59,12 @@ public class UserTest {
             // 执行 SQL 语句
             // session.insert(statement, parameter)：用来插入数据，成功则返回影响的数据条数，失败则返回 0，出错则抛异常
             //   statement（String）：SQL 语句的命名空间.SQL 语句的唯一标识
-            //   parameter（Object）：SQL 语句的参数，当参数个数为一个时，直接把参数值传进去就可以了
-
-            // 这个 userBean 演示全部属性都有值
-//            UserBean userBean = new UserBean();
-//            userBean.setName("Kobe");
-//            userBean.setAge(41);
-//            userBean.setHeight(1.98);
-//            userBean.setEmail("kobe@gmail.com");
-
-            // 这个 userBean 演示有的可选属性没值
+            //   parameter（Object）：SQL 语句的参数，当 SQL 语句的参数个数为多个时，可以把多个参数包装进一个 Bean 或 Map 传进去（value 值一定要在外界算好再传进去，里面只能读取，不能进行运算）
             UserBean userBean = new UserBean();
-            userBean.setName("James");
-            userBean.setHeight(2.03);
-            userBean.setEmail("james@gmail.com");
+            userBean.setName("Kobe");
+            userBean.setAge(41);
+            userBean.setHeight(1.98);
+            userBean.setEmail("kobe" + new Random().nextInt(1000) + "@gmail.com");
 
             int ret = session.insert("dao.UserDao.save", userBean);
             if (ret > 0) {
@@ -84,6 +78,38 @@ public class UserTest {
             session.commit();
         }
     }
+
+    // 批量保存成功一般是给客户端返回刚保存成功那批数据的 id data = [bean.id]，客户端可以根据 id 数组再手动查询一次数据库拿到完整数据
+    // 批量保存失败一般是给客户端返回 data=null
+    @Test
+    void saveBatch() {
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            // 这个 userBean 演示全部属性都有值
+            UserBean userBean1 = new UserBean();
+            userBean1.setName("Kobe");
+            userBean1.setAge(41);
+            userBean1.setHeight(1.98);
+            userBean1.setEmail("kobe" + new Random().nextInt(1000) + "@gmail.com");
+
+            // 这个 userBean 演示有的可选属性没值
+            UserBean userBean2 = new UserBean();
+            userBean2.setName("James");
+            userBean2.setEmail("james" + new Random().nextInt(1000) + "@gmail.com");
+
+            List<UserBean> userBeanList = List.of(userBean1, userBean2);
+
+            int ret = session.insert("dao.UserDao.saveBatch", userBeanList);
+            if (ret > 0) {
+                List<Integer> newIdList = userBeanList.stream().map(UserBean::getId).toList();
+                System.out.println("批量保存成功：" + newIdList);
+            } else {
+                System.out.println("批量保存失败");
+            }
+
+            session.commit();
+        }
+    }
+
 
     // 删除成功，一般是给客户端返回成功或失败的信息即可，客户端根据返回结果决定要不要更新内存数据就行
     @Test

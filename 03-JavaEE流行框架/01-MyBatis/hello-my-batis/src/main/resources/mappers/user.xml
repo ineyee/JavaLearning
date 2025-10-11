@@ -28,6 +28,7 @@
         --   $ {} 类似于 SQL 语句，会直接把外界传进来的东西当成字符串替换掉形参，有 SQL 注入的风险，所以实际开发中除非就是需要直接替换 SQL 语句里的字符串，否则不要用
         WHERE id = #{id};
     </select>
+
     <select id="list" parameterType="Map" resultType="UserBean">
         SELECT id,
                name,
@@ -44,27 +45,27 @@
     </select>
 
 
-    <!-- insert 标签里用来写“增”的 SQL 语句 -->
+    <!--
+        insert 标签里用来写“增”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
+            parameterType：给 SQL 语句提供参数的入参真实类型，外界传进来时统一是基类 Object
+            resultType 已经固定死了是 Integer，所以这里不需要再手动指定
+    -->
     <insert id="save" parameterType="UserBean">
-        -- 往数据库里插入数据时，建议 SQL 语句里显式写全表里的所有字段
-        -- 这样外界传进来的 bean 如果全部属性都有值，那就完全匹配
-        -- 如果有的可选属性没值，那 MyBatis 就会自动用 null 填充，最终数据库里会是该可选字段的默认值或 null
-        INSERT INTO t_user (name,
-        age,
-        height,
-        email)
-        -- name、age、height、email 是参数名，因为外界传进来一个 bean，所以参数名只要和 bean 中的属性名一一对应，就能顺利匹配到参数值
-        -- “# + {}”用来读取参数值
-        VALUES (#{name},
-        #{age},
-        #{height},
-        #{email});
+        -- 往数据库里写入数据时，建议 SQL 语句里显式写全表里的所有字段，不要只写一部分
+        -- 这样外界传进来的 bean 对象如果全部属性都有值，那刚好完全匹配
+        -- 如果有的可选属性没值，那 MyBatis 就会自动用 null 给属性赋值，因此最终数据库里对应的字段会存储为 null 或该可选字段的默认值
+        INSERT INTO t_user (name, age, height, email)
+        -- name、age、height、email 是参数名，因为外界传进来一个 bean 对象，所以参数名只要和 bean 对象中的属性名一一对应，就能顺利匹配到参数值
+        VALUES (#{name}, #{age}, #{height}, #{email});
 
-        -- 外界不是传进来一个 bean 来保存嘛，实际开发中我们一般都是在插入成功后直接给客户端返回 bean 的 id 或完整 bean
-        -- 这里 MyBatis 提供了一个自动回填的功能，可以在插入成功后自动把新插入数据的某些字段回填到传进来的 bean 对象中
+        -- 外界不是传进来一个 bean 对象来保存嘛
+        -- 实际开发中我们一般都是在保存成功后直接给客户端返回刚保存成功的那条完整数据 data=bean，这样客户端就不用再查询一遍了
+        -- 但是外界传进来的那个 bean 对象肯定是还没有 id、createTime、updateTime 这些属性值的
+        -- 而 MyBatis 就提供了一个自动回填的功能，可以在插入数据成功后自动把新插入数据的某些字段回填到传进来的 bean 对象中
         -- 这样外界就可以直接拿着传进来的那个 bean 对象返回给客户端了，就不用再去数据库查询一遍了
-        -- order="AFTER"：代表在插入语句后执行回填
-        -- keyProperty：要回填的属性名，即 bean 里的属性名（多个属性名之间用逗号隔开，注意不能有空格）
+        -- order="AFTER"：代表在插入语句执行完毕后执行回填
+        -- keyProperty：要回填的属性名，即 bean 对象里的属性名（多个属性名之间用逗号隔开，不能有空格）
         -- resultType：bean 的类型
         <selectKey order="AFTER" keyProperty="id,createTime,updateTime" resultType="UserBean">
             SELECT
@@ -77,6 +78,24 @@
             WHERE id = LAST_INSERT_ID();
         </selectKey>
     </insert>
+
+    <!--
+        批量插入不能使用 selectKey 自动回填多个字段
+        只能使用 useGeneratedKeys（true 代表使用数据库里的主键自动回填） 和 keyProperty（主键在 bean 里对应的属性名） 自动回填主键
+        也就是说在批量插入成功后，服务端顶多给客户端返回插入成功那批数据的 id，其它的没法再返回了，客户端可以根据 id 数组再手动查询一次数据库拿到完整数据
+    -->
+    <insert id="saveBatch" parameterType="List" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_user (name, age, height, email)
+        VALUES
+        -- foreach 标签：用来遍历外界传进来的 List 或 Array
+        -- collection 属性：外界传进来的如果是 List，则 collection 值固定为 list；如果是 Array，则 collection 值固定为 array
+        -- item 属性：数组中的每一个元素，这里我们取名为 userBean
+        -- separator 属性：(), (), () 每一组 VALUE 之间的分隔符，固定为 ,
+        <foreach collection="list" item="userBean" separator=",">
+            (#{userBean.name}, #{userBean.age}, #{userBean.height}, #{userBean.email})
+        </foreach>
+    </insert>
+
 
     <!-- delete 标签里用来写“删”的 SQL 语句 -->
     <delete id="remove" parameterType="Integer">
