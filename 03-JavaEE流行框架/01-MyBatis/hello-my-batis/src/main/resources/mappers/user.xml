@@ -29,6 +29,7 @@
         WHERE id = #{id};
     </select>
 
+    <!-- 使用 SQL 语句实现分页查询的话，得自己写 LIMIT OFFSET -->
     <select id="list" parameterType="Map" resultType="UserBean">
         SELECT id,
                name,
@@ -38,10 +39,26 @@
                create_time,
                update_time
         FROM t_user
-        -- limit、offset 是参数名，因为外界传进来一个 Map，所以参数名只要和 Map 中的 key 一一对应，就能顺利匹配到参数值
         ORDER BY create_time DESC
+                 -- limit、offset 是参数名，因为外界传进来一个 Map，所以参数名只要和 Map 中的 key 一一对应，就能顺利匹配到参数值
             LIMIT #{limit}
         OFFSET #{offset};
+    </select>
+
+    <!--
+        使用 PageHelper 实现分页查询的话，SQL 语句里就不用再写 LIMIT OFFSET 了，PageHelper 会自动帮我们拼接上去
+        但是注意 SQL 语句的结尾不能写分号，否则 PageHelper 帮我们自动拼接的部分就不生效了
+    -->
+    <select id="listPageHelper" parameterType="Map" resultType="UserBean">
+        SELECT id,
+               name,
+               age,
+               height,
+               email,
+               create_time,
+               update_time
+        FROM t_user
+        ORDER BY create_time DESC
     </select>
 
 

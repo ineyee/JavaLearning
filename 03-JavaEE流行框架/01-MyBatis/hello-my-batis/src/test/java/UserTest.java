@@ -1,4 +1,5 @@
 import bean.UserBean;
+import com.github.pagehelper.PageHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.jupiter.api.Test;
 import util.MyBatisUtil;
@@ -41,6 +42,27 @@ public class UserTest {
                     "limit", pageSize,
                     "offset", (currentPage - 1) * pageSize
             ));
+            if (!userBeanList.isEmpty()) {
+                System.out.println("查询成功：" + userBeanList);
+            } else {
+                System.out.println("查询失败");
+            }
+        }
+    }
+
+    // 查询成功一般是给客户端返回 data=[bean]，查询失败一般是给客户端返回 data=[]
+    @Test
+    void listPageHelper() {
+        // 创建一个会话，项目运行期间可以创建多个
+        try (SqlSession session = MyBatisUtil.openSession()) {
+            // 执行 SQL 语句
+            // session.selectList(statement, parameter)：用来查询多条数据，查到则返回 [bean]，查不到则返回 []
+            //   statement（String）：SQL 语句的命名空间.SQL 语句的唯一标识
+            //   parameter（Object）：SQL 语句的参数，没有参数的话就不用传
+            Integer pageNum = 1; // 当前页码，从 1 开始
+            Integer pageSize = 2; // 每页显示多少条数据
+            PageHelper.startPage(pageNum, pageSize);
+            List<UserBean> userBeanList = session.selectList("dao.UserDao.listPageHelper");
             if (!userBeanList.isEmpty()) {
                 System.out.println("查询成功：" + userBeanList);
             } else {

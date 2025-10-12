@@ -40,6 +40,19 @@
         <typeAlias type="bean.UserBean" alias="UserBean"/>
     </typeAliases>
 
+    <!-- 插件 -->
+    <plugins>
+        <!-- 拦截器设置为 PageHelper 的 PageInterceptor -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!--
+                reasonable 设置为 true，代表使分页查询合理化：
+                    当 pageNum <= 0 时，自动返回第一页的数据
+                    当 pageNum > totalPage 时，自动返回最后一页的数据
+            -->
+            <property name="reasonable" value="true"/>
+        </plugin>
+    </plugins>
+
     <!--
         环境，一个环境对应一个数据库
         开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
