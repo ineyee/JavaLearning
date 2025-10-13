@@ -1,49 +1,45 @@
 ## 一、单表查询
 
-比如我们设计了如下歌曲表：
+比如我们设计了如下产品表：
 
-| id（主键） |   name   |       cover        |
-| :--------: | :------: | :----------------: |
-|     1      |  七里香  | https://七里香.jpg |
-|     2      |   屋顶   |  https://屋顶.jpg  |
-|     3      | 风吹麦浪 |         ''         |
-|     4      |    画    |   https://画.jpg   |
-|     5      |   成都   |  https://成都.jpg  |
+| id（主键） |    name     |   cover    | price |
+| :--------: | :---------: | :--------: | :---: |
+|     1      |   iPhoneX   | 初代全面屏 | 8888  |
+|     2      | 华为 Mate70 |   很厉害   | 6666  |
+|     3      |   小米 10   |  也很厉害  | 4444  |
 
 创建表：
 
 ```SQL
-CREATE TABLE IF NOT EXISTS `t_song` (
-  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-  `name` VARCHAR(100) NOT NULL,
-  `cover` VARCHAR(100) DEFAULT('')
+CREATE TABLE IF NOT EXISTS t_product (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL UNIQUE,	
+  `desc` VARCHAR(100) DEFAULT(""),	
+	price DOUBLE NOT NULL
 );
 ```
 
-给歌曲表中插入数据：
+给产品表中插入数据：
 
 ```SQL
-INSERT INTO `t_song` (`name`, `cover`) VALUES ('七里香', 'https://七里香.jpg');
-INSERT INTO `t_song` (`name`, `cover`) VALUES ('屋顶', 'https://屋顶.jpg');
-INSERT INTO `t_song` (`name`, `cover`) VALUES ('风吹麦浪', '');
-INSERT INTO `t_song` (`name`, `cover`) VALUES ('画', 'https://画.jpg');
-INSERT INTO `t_song` (`name`, `cover`) VALUES ('成都', 'https://成都.jpg');
+INSERT INTO t_product (name, `desc`, price)
+VALUES ('iPhoneX', '初代全面屏', 8888), ('华为 Mate70', '很厉害', 6666), ('小米 10', '也很厉害', 4444);
 ```
 
 查询：
 
 ```SQL
-SELECT * FROM `t_song` WHERE `cover` != '';
+SELECT *
+FROM t_product
+WHERE price >= 6666;
 ```
 
 查询结果：
 
-| id（主键） |  name  |       cover        |
-| :--------: | :----: | :----------------: |
-|     1      | 七里香 | https://七里香.jpg |
-|     2      |  屋顶  |  https://屋顶.jpg  |
-|     4      |   画   |   https://画.jpg   |
-|     5      |  成都  |  https://成都.jpg  |
+| id（主键） |    name     |   cover    | price |
+| :--------: | :---------: | :--------: | :---: |
+|     1      |   iPhoneX   | 初代全面屏 | 8888  |
+|     2      | 华为 Mate70 |   很厉害   | 6666  |
 
 当我们在代码里通过数据库驱动执行查询时，数据库驱动其实默认就会把查询出来的一条一条的结果搞成一个数组，然后每一条数据是一个 map、作为数组的元素，也就是说数据库驱动会把上面的查询结果搞成一个 JSON 返回给我们，我们可以顺势拿着这个 JSON 返回给客户端，这正是我们期望的现象，单表查询时默认就是这样的：
 
@@ -51,32 +47,20 @@ SELECT * FROM `t_song` WHERE `cover` != '';
 [
   {
     "id": 1,
-    "name": "七里香",
-    "cover": "https://七里香.jpg"
+    "name": "iPhoneX",
+    "desc": "初代全面屏",
+    "price": 8888
   },
   {
     "id": 2,
-    "name": "屋顶",
-    "cover": "https://屋顶.jpg"
-  },
-  {
-    "id": 4,
-    "name": "画",
-    "cover": "https://画.jpg"
-  },
-  {
-    "id": 5,
-    "name": "成都",
-    "cover": "https://成都.jpg"
+    "name": "华为 Mate70",
+    "desc": "很厉害",
+    "price": 6666
   }
 ]
 ```
 
-## 二、一对多表结构的查询
-
-- 第一步（几张表）：我们有歌手和歌曲两个对象，所以需要创建歌手表和歌曲表两张表
-- 第二步（主表从表）：一个歌手可能有多首歌曲，所以歌手表是一方、主表，歌曲表是多方、从表、外键都是在从表里，先创建主表后创建从表
-- 第三步（一对多多对多）：这个 demo 里我们设计一首歌曲只属于一个歌手（如独唱），所以这里适合用一对多结构，直接在从表里添加外键就行了
+## 二、一对一和一对多表结构的查询
 
 比如我们设计了如下歌手表（主表）和歌曲表（从表、外键都是在从表里）:
 
@@ -86,81 +70,79 @@ SELECT * FROM `t_song` WHERE `cover` != '';
 |     2      |  李健  | 男  |
 |     3      | 梁静茹 | 女  |
 
-| id（主键） |    name    |       cover        | singerId（外键） |
-| :--------: | :--------: | :----------------: | :--------------: |
-|     1      |   七里香   | https://七里香.jpg |        1         |
-|     2      |    晴天    |  https://晴天.jpg  |        1         |
-|     3      | 贝加尔湖畔 |         ''         |        2         |
-|     4      |     画     |   https://画.jpg   |       NULL       |
-|     5      |    成都    |  https://成都.jpg  |       NULL       |
+| id（主键） |    name    |       cover        | singer_id（外键） |
+| :--------: | :--------: | :----------------: | :---------------: |
+|     1      |   七里香   | https://七里香.jpg |         1         |
+|     2      |    晴天    |  https://晴天.jpg  |         1         |
+|     3      | 贝加尔湖畔 |         ''         |         2         |
+|     4      |     画     |   https://画.jpg   |       NULL        |
+|     5      |    成都    |  https://成都.jpg  |       NULL        |
 
 创建表（先创建主表后创建从表）：
 
 ```SQL
-CREATE TABLE IF NOT EXISTS `t_singer` (
-  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-  `name` VARCHAR(100) NOT NULL,
-  `sex` VARCHAR(100) DEFAULT('')
+CREATE TABLE IF NOT EXISTS t_singer (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  sex VARCHAR(100) DEFAULT('')
 );
 ```
 
 ```SQL
-CREATE TABLE IF NOT EXISTS `t_song` (
-  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-  `name` VARCHAR(100) NOT NULL,
-  `cover` VARCHAR(100) DEFAULT(''),
-  
+CREATE TABLE IF NOT EXISTS t_song (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  cover VARCHAR(100) DEFAULT(''),
+	
   -- 外键字段，必须与 t_singer.id 类型一致
-  `singerId` BIGINT,
+  singer_id BIGINT,
   -- 在 CREATE 语句的最后添加一个外键约束，含义为：
-  -- 当前表中的外键 `singerId`，引用的是 `t_singer` 表中的 `id`
-  -- ON UPDATE 和 ON DELETE 是指当我们删除或修改 t_singer.id 时，t_song 应该做出什么反应，默认情况下是这个值是 RESTRICT —— 即如果某个字段被外键关联着、那么在删除或修改这个字段时直接报错、也就是说不允许删除或修改；我们通常会手动设置为 CASCADE —— 即允许删除或修改这个字段、并且如果是删除这个字段那就跟随删除另外一张表里的数据、如果是修改这个字段那就跟随修改另外一张表里的数据
-  FOREIGN KEY (`singerId`) REFERENCES `t_singer`(`id`) ON UPDATE CASCADE ON DELETE CASCADE
+  -- 当前表中的外键 singer_id，引用的是 t_singer 表中的 id
+  -- ON UPDATE 和 ON DELETE 是指当我们修改或删除 t_singer.id 时，t_song 应该做出什么反应，默认情况下这个值是 RESTRICT —— 即如果某个字段被外键关联着、那么在修改或删除这个字段时直接报错、也就是说不允许删除或修改；我们通常会手动设置为 CASCADE —— 即允许修改或删除这个字段、并且如果是修改这个字段那就跟随修改另外一张表里的数据、如果是删除这个字段那就跟随删除另外一张表里的数据
+  FOREIGN KEY (singer_id) REFERENCES t_singer(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 ```
 
 给表中插入数据：
 
 ```SQL
-INSERT INTO `t_singer` (`name`, `sex`) VALUES ('周杰伦', '');
-INSERT INTO `t_singer` (`name`, `sex`) VALUES ('李健', '男');
-INSERT INTO `t_singer` (`name`, `sex`) VALUES ('梁静茹', '女');
+INSERT INTO t_singer (name, sex)
+VALUES ('周杰伦', ''), ('李健', '男'), ('梁静茹', '女');
 ```
 
 ```SQL
-INSERT INTO `t_song` (`name`, `cover`, `singerId`) VALUES ('七里香', 'https://七里香.jpg', 1);
-INSERT INTO `t_song` (`name`, `cover`, `singerId`) VALUES ('晴天', 'https://晴天.jpg', 1);
-INSERT INTO `t_song` (`name`, `cover`, `singerId`) VALUES ('风吹麦浪', '', 2);
-INSERT INTO `t_song` (`name`, `cover`, `singerId`) VALUES ('画', 'https://画.jpg', NULL);
-INSERT INTO `t_song` (`name`, `cover`, `singerId`) VALUES ('成都', 'https://成都.jpg', NULL);
+INSERT INTO t_song (name, cover, singer_id)
+VALUES ('七里香', 'https://七里香.jpg', 1), ('晴天', 'https://晴天.jpg', 1), ('风吹麦浪', '', 2), ('画', 'https://画.jpg', NULL), ('成都', 'https://成都.jpg', NULL);
 ```
 
 查询（`默认的查询语句`）：
 
 ```SQL
 SELECT
--- 这里是在给从表和主表的字段取别名，避免查询结果里的字段名冲突
-  `t_song`.`id` AS `songId`,
-  `t_song`.`name` AS `songName`,
-  `t_song`.`cover` AS `songCover`,
-  `t_singer`.`id` AS `singerId`,
-  `t_singer`.`name` AS `singerName`,
-  `t_singer`.`sex` AS `singerSex`
--- `t_song`是从表
-FROM `t_song`
--- `t_singer`是主表，从表.外键 = 主表.主键
-LEFT JOIN `t_singer` ON `t_song`.`singerId` = `t_singer`.`id`;
+	-- 这里是在给表1和表2的字段取别名，避免查询结果里的字段名冲突
+	-- t_song 的字段对应 FROM t_song，代表是从 t_song 里的查询
+  t_song.id AS song_id,
+  t_song.name AS song_name,
+  t_song.cover AS song_cover,
+	-- t_singer 的字段对应 LEFT JOIN t_singer，代表是从 t_singer 里的查询
+  t_singer.id AS singer_id,
+  t_singer.name AS singer_name,
+  t_singer.sex AS singer_sex
+-- t_song 是表1
+FROM t_song
+-- t_singer 是表2，表1.外键 = 表2.主键
+LEFT JOIN t_singer ON t_song.singer_id = t_singer.id;
 ```
 
 查询结果（`默认的查询语句会把两张表的数据组合起来，平铺成一张表返回给我们`）：
 
-| songId | songName |     songCover      | singerId | singerName | singerSex |
-| :----: | :------: | :----------------: | :------: | :--------: | :-------: |
-|   1    |  七里香  | https://七里香.jpg |    1     |   周杰伦   |           |
-|   2    |   屋顶   |  https://屋顶.jpg  |    1     |   周杰伦   |           |
-|   3    | 风吹麦浪 |                    |    2     |    李健    |    男     |
-|   4    |    画    |   https://画.jpg   |   NULL   |    NULL    |   NULL    |
-|   5    |   成都   |  https://成都.jpg  |   NULL   |    NULL    |   NULL    |
+| song_id | song_name |     song_cover     | singer_id | singer_name | singer_sex |
+| :-----: | :-------: | :----------------: | :-------: | :---------: | :--------: |
+|    1    |  七里香   | https://七里香.jpg |     1     |   周杰伦    |            |
+|    2    |   屋顶    |  https://屋顶.jpg  |     1     |   周杰伦    |            |
+|    3    | 风吹麦浪  |                    |     2     |    李健     |     男     |
+|    4    |    画     |   https://画.jpg   |   NULL    |    NULL     |    NULL    |
+|    5    |   成都    |  https://成都.jpg  |   NULL    |    NULL     |    NULL    |
 
 当我们在代码里通过数据库驱动执行查询时，数据库驱动默认会把上面的查询结果搞成一个 JSON 返回给我们：
 
@@ -270,24 +252,24 @@ LEFT JOIN `t_singer` ON `t_song`.`singerId` = `t_singer`.`id`;
 
 我们期望的 JSON 就反过来要求查询结果应该是这样一张表：
 
-| songId | songName |     songCover      |                 singer                  |
-| :----: | :------: | :----------------: | :-------------------------------------: |
-|   1    |  七里香  | https://七里香.jpg | {"id": 1, "name": "周杰伦", "sex": ""}  |
-|   2    |   屋顶   |  https://屋顶.jpg  | {"id": 1, "name": "周杰伦", "sex": ""}  |
-|   3    | 风吹麦浪 |                    | {"id": 2, "name": "李健", "sex": "男"}  |
-|   4    |    画    |   https://画.jpg   | {"id": null, "name": null, "sex": null} |
-|   5    |   成都   |  https://成都.jpg  | {"id": null, "name": null, "sex": null} |
+| song_id | song_name |     song_cover     |                 singer                  |
+| :-----: | :-------: | :----------------: | :-------------------------------------: |
+|    1    |  七里香   | https://七里香.jpg | {"id": 1, "name": "周杰伦", "sex": ""}  |
+|    2    |   屋顶    |  https://屋顶.jpg  | {"id": 1, "name": "周杰伦", "sex": ""}  |
+|    3    | 风吹麦浪  |                    | {"id": 2, "name": "李健", "sex": "男"}  |
+|    4    |    画     |   https://画.jpg   | {"id": null, "name": null, "sex": null} |
+|    5    |   成都    |  https://成都.jpg  | {"id": null, "name": null, "sex": null} |
 
 而要想实现这样的查询结果，就不能用默认的查询语句了，得用一下 `JSON_OBJECT 这个聚合函数——用来把查询到的数据搞成一个 map`：
 
 ```SQL
 SELECT
-  -- t_song 的字段对应 FROM `t_song`，代表是从 t_song 里的查询
-	-- 这里是在给从表的字段取别名
-  `t_song`.`id` AS `songId`,
-  `t_song`.`name` AS `songName`,
-  `t_song`.`cover` AS `songCover`,
-  -- t_singer 的字段对应 LEFT JOIN `t_singer`，代表是从 t_singer 里的查询
+	-- 这里是在给表1和表2的字段取别名，避免查询结果里的字段名冲突
+	-- t_song 的字段对应 FROM t_song，代表是从 t_song 里的查询
+  t_song.id AS song_id,
+  t_song.name AS song_name,
+  t_song.cover AS song_cover,
+  -- t_singer 的字段对应 LEFT JOIN t_singer，代表是从 t_singer 里的查询
   -- 这里就是在把主表里的字段搞成一个对象，而不再是平铺
   -- 格式：JSON_OBJECT(
   --        '对象的自定义属性名1', 表里对应字段1的值,
@@ -296,21 +278,17 @@ SELECT
   --        ...
   --      ) AS '对象的 key'
   JSON_OBJECT(
-    'id', `t_singer`.`id`,
-    'name', `t_singer`.`name`,
-    'sex', `t_singer`.`sex`
+    'id', t_singer.id,
+    'name', t_singer.name,
+    'sex', t_singer.sex
   ) AS 'singer'
--- `t_song`是从表
-FROM `t_song`
--- `t_singer`是主表，从表.外键 = 主表.主键
-LEFT JOIN `t_singer` ON `t_song`.`singerId` = `t_singer`.`id`;
+-- t_song 是表1
+FROM t_song
+-- t_singer 是表2，表1.外键 = 表2.主键
+LEFT JOIN t_singer ON t_song.singer_id = t_singer.id;
 ```
 
 ## 三、多对多表结构的查询
-
-- 第一步（几张表）：我们有歌手和歌曲两个对象，所以需要创建歌手表和歌曲表两张表
-- 第二步（主表从表）：一个歌手可能有多首歌曲，所以歌手表是一方、主表，歌曲表是多方、从表、外键都是在从表里，先创建主表后创建从表
-- 第三步（一对多多对多）：这个 demo 里我们设计一首歌曲可以属于多个歌手（如合唱），所以这里适合用多对多结构，所以要引入中间表（中间表其实就是从表、外键都是在从表里，另外两个表都是主表），在中间表里添加外键
 
 比如我们设计了如下歌手表（主表 1）、歌曲表（主表 2）和中间表（外键都是在中间表里，中间表包含两个外键，分别指向主表 1 和主表 2 的主键）:
 
