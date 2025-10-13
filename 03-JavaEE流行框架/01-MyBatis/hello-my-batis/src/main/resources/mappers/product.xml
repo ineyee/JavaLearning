@@ -1,7 +1,24 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="dao.ProductDao">
+    <insert id="save" parameterType="bean.ProductBean">
+        INSERT INTO t_product (name, `desc`, price, brand, score, user_id)
+        -- 外界传进来一个 product 对象，所以参数名只要和 bean 对象中的属性名一一对应，就能顺利匹配到参数值
+        -- 存在对象嵌套时，直接使用嵌套对象的属性即可，MyBatis 就能自动去读取嵌套的 UserBean 对象
+        VALUES (#{name}, #{desc}, #{price}, #{brand}, #{score}, #{userBean.id});
+
+        <selectKey order="AFTER" keyProperty="id,createTime,updateTime" resultType="bean.ProductBean">
+            SELECT
+            id AS id,
+            create_time AS createTime,
+            update_time AS updateTime
+            FROM t_product
+            WHERE id = LAST_INSERT_ID();
+        </selectKey>
+    </insert>
+
     <select id="get" parameterType="Integer" resultType="bean.ProductBean">
         -- 因为有外键，所以查询时就是一对多表结构的多表查询
         SELECT t_product.id,

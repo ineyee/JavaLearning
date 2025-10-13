@@ -7,6 +7,8 @@ public class ProductBean extends BaseBean {
     private String name; // 必传
     private Double price; // 必传
     private String desc; // 可选
+    private Integer brand; // 可选
+    private Double score; // 可选
     // t_product 表里是通过外键 user_id 引用 t_user 表的
     // 那么按照“Bean 的字段必须和数据库表里的字段一一对应”的说法，这里应该定义成 Integer userId; 才对
     // 但实际上，在 Java 代码里我们一般不定义成外键属性，而是直接定义成对象，这样可以使得 Java 代码更加面向对象
@@ -36,6 +38,22 @@ public class ProductBean extends BaseBean {
         this.desc = desc;
     }
 
+    public Integer getBrand() {
+        return brand;
+    }
+
+    public void setBrand(Integer brand) {
+        this.brand = brand;
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
     public UserBean getUserBean() {
         return userBean;
     }
@@ -50,9 +68,11 @@ public class ProductBean extends BaseBean {
                 "id='" + getId() + '\'' +
                 ", createTime='" + getCreateTime() + '\'' +
                 ", updateTime='" + getUpdateTime() + '\'' +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", price=" + price +
                 ", desc='" + desc + '\'' +
+                ", brand=" + brand +
+                ", score=" + score +
                 ", userBean=" + userBean +
                 '}';
     }
