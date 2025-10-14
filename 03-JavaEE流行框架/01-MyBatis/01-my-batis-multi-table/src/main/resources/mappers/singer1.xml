@@ -1,6 +1,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 演示一对一关系 -->
 <mapper namespace="dao.singerDao1">
     <!-- 方式一：特殊 SQL 语句 + resultType -->
     <select id="list1" resultType="bean.SingerBean1">
