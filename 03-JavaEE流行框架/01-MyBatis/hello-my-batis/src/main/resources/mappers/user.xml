@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--
     namespace，当前文件的命名空间，可以理解为当前文件里所有 SQL 语句唯一标识的默认前缀，避免当前文件里 SQL 语句的唯一标识和别的文件里 SQL 语句的唯一标识重复
-    TODO：一般命名为全类名 = dao + 某个模块具体的 Dao（因为这里就相当于是某个模块的数据层了）
+    必须命名为对应 dao 接口的全类名，因为这个 xml 文件会被做为对应 dao 接口的实现即数据层。如果名字不匹配的话，MyBatis 无法自动将当前文件做为对应接口的实现
 -->
 <mapper namespace="dao.UserDao">
     <!--

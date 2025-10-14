@@ -127,6 +127,5 @@
     <!-- 注册数据库表自动转 Java Bean 的映射文件 -->
     <mappers>
         <mapper resource="mappers/user.xml"/>
-        <mapper resource="mappers/product.xml"/>
     </mappers>
 </configuration>
