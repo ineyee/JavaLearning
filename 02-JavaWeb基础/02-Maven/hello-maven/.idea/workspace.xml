@@ -10,16 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cb241ac-5856-44cf-b89e-f93de3a70f0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/AddressBean.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/PersonBean.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/02-Maven.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../05-ProjectArchitecture/hello-project-architecture/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../05-ProjectArchitecture/hello-project-architecture/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../03-JavaEE流行框架/01-MyBatis/01-my-batis-multi-table/src/main/resources/mybatis-config.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../03-JavaEE流行框架/01-MyBatis/01-my-batis-multi-table/src/main/resources/mybatis-config.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../03-JavaEE流行框架/01-MyBatis/01-my-batis-multi-table/src/test/java/SongTest2.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../03-JavaEE流行框架/01-MyBatis/01-my-batis-multi-table/src/test/java/SongTest2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -232,6 +224,7 @@
       <workItem from="1758240461589" duration="18722000" />
       <workItem from="1758706202994" duration="951000" />
       <workItem from="1758707168693" duration="1291000" />
+      <workItem from="1760427559991" duration="7000" />
     </task>
     <servers />
   </component>

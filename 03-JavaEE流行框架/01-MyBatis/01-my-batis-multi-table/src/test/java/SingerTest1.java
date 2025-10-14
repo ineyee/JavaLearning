@@ -1,5 +1,5 @@
 import bean.SingerBean1;
-import common.util.MyBatisUtil;
+import util.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +30,7 @@ public class SingerTest1 {
         }
     }
 
+    // 保存歌手成功的话，只需要给客户端返回保存成功的歌手的完整信息即可，客户端拿到这个结果后就知道该怎么刷新数据和 UI 了
     @Test
     void save() {
         try (SqlSession session = MyBatisUtil.openSession()) {

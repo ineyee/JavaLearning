@@ -86,29 +86,6 @@
                  LEFT JOIN t_song ON t_singer.id = t_song.singer_id;
     </select>
 
-    <!-- 这里就在共用 resultMap -->
-    <select id="get" parameterType="Integer" resultMap="rmSinger1">
-        SELECT
-            -- 这里是在给表1和表2的字段取别名，避免查询结果里的字段名冲突
-            -- t_singer 的字段对应 FROM t_singer，代表是从 t_singer 里的查询
-            t_singer.id          AS singer_id,
-            t_singer.name        AS singer_name,
-            t_singer.sex         AS singer_sex,
-            t_singer.create_time AS singer_create_time,
-            t_singer.update_time AS singer_update_time,
-            -- t_song 的字段对应 LEFT JOIN t_song，代表是从 t_song 里的查询
-            t_song.id            AS song_id,
-            t_song.name          AS song_name,
-            t_song.cover         AS song_cover,
-            t_song.create_time   AS song_create_time,
-            t_song.update_time   AS song_update_time
-        -- t_singer 是表1
-        FROM t_singer
-                 -- t_song 是表2，表1.主键 = 表2.外键
-                 LEFT JOIN t_song ON t_singer.id = t_song.singer_id
-        WHERE t_singer.id = #{id};
-    </select>
-
     <!-- t_singer 表是主表，它里面没有外键，所以只存储 singer 本身的数据即可 -->
     <insert id="save" parameterType="bean.SingerBean1">
         INSERT INTO t_singer (name, sex)

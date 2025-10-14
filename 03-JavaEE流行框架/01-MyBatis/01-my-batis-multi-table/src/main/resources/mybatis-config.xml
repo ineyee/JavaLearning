@@ -31,7 +31,7 @@
         开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
         生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
     -->
-    <environments default="ont_to_one">
+    <environments default="one_to_many">
         <!-- ont_to_one -->
         <environment id="ont_to_one">
             <transactionManager type="JDBC"/>
@@ -44,11 +44,25 @@
                 <property name="maxActive" value="10"/>
             </dataSource>
         </environment>
+        <!-- one_to_many -->
+        <environment id="one_to_many">
+            <transactionManager type="JDBC"/>
+            <dataSource type="common.DruidDataSourceFactory">
+                <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/one_to_many?serverTimezone=UTC"/>
+                <property name="username" value="root"/>
+                <property name="password" value="mysqlroot"/>
+                <property name="initialSize" value="5"/>
+                <property name="maxActive" value="10"/>
+            </dataSource>
+        </environment>
     </environments>
 
     <!-- 注册数据库表自动转 Java Bean 的映射文件 -->
     <mappers>
         <mapper resource="mappers/singer1.xml"/>
         <mapper resource="mappers/song1.xml"/>
+        <mapper resource="mappers/singer2.xml"/>
+        <mapper resource="mappers/song2.xml"/>
     </mappers>
 </configuration>

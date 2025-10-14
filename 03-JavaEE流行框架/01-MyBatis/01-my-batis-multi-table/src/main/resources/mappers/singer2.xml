@@ -1,0 +1,63 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.singerDao2">
+    <!--
+        resultMap，专门用来处理数据库表字段和 Java Bean 属性之间的映射关系
+            id 属性：当前 resultMap 的唯一标识，可以取名为 rm + 当前映射文件名，代表要处理 t_singer 表到 SingerBean 的映射
+            type 属性：当前 resultMap 要映射成的 Java Bean 类型（SQL 语句里 FROM 表对应的 JavaBean）
+        注意：一个 resultMap 可以被多个 SQL 语句所引用，比如 get 和 list 的映射其实是一样的，大家就可以共用一个 resultMap
+    -->
+    <resultMap id="rmSinger2" type="bean.SingerBean2">
+        <!--
+            一个 result 就代表一个数据库表字段到 Java Bean 属性的映射，这里映射的是上面 bean.SingerBean2 的属性
+                column 属性的值是数据库表字段名，如果我们的 SQL 语句里没取别名那就写数据库表里的原始字段名，如果取了别名那就写别名
+                property 属性的值是 JavaBean 的属性名
+        -->
+        <result column="singer_id" property="id"/>
+        <result column="singer_name" property="name"/>
+        <result column="singer_sex" property="sex"/>
+        <result column="singer_create_time" property="createTime"/>
+        <result column="singer_update_time" property="updateTime"/>
+
+        <!--
+            collection 代表上面的 bean.SingerBean2 对象内部持有多个 bean.SongBean2 对象（因为是一对多关系）
+                property 属性：代表上面的 bean.SingerBean2 对象通过 songBean2List 属性持有着 bean.SongBean2 对象数组
+                ofType 属性：代表上面的 bean.SingerBean2 对象持有的数组里存储的对象类型是 bean.SongBean2（SQL 语句里 JOIN 表对应的 JavaBean）
+        -->
+        <collection property="songBean2List" ofType="bean.SongBean2">
+            <!--
+                同样地，一个 result 就代表一个数据库表字段到 Java Bean 属性的映射，这里映射的是上面 bean.SongBean2 的属性
+                    column 属性的值是数据库表字段名，如果我们的 SQL 语句里没取别名那就写数据库表里的原始字段名，如果取了别名那就写别名
+                    property 属性的值是 JavaBean 的属性名
+            -->
+            <result column="song_id" property="id"/>
+            <result column="song_name" property="name"/>
+            <result column="song_cover" property="cover"/>
+            <result column="song_create_time" property="createTime"/>
+            <result column="song_update_time" property="updateTime"/>
+        </collection>
+    </resultMap>
+    <!-- 这里就不再直接写 resultType 属性了，而是通过 resultMap 属性来引用相应的 resultMap -->
+    <select id="list" resultMap="rmSinger2">
+        -- 多表查询要用 JOIN
+        SELECT
+            -- 这里是在给表1和表2的字段取别名，避免查询结果里的字段名冲突
+            -- t_singer 的字段对应 FROM t_singer，代表是从 t_singer 里的查询
+            t_singer.id          AS singer_id,
+            t_singer.name        AS singer_name,
+            t_singer.sex         AS singer_sex,
+            t_singer.create_time AS singer_create_time,
+            t_singer.update_time AS singer_update_time,
+            -- t_song 的字段对应 LEFT JOIN t_song，代表是从 t_song 里的查询
+            t_song.id            AS song_id,
+            t_song.name          AS song_name,
+            t_song.cover         AS song_cover,
+            t_song.create_time   AS song_create_time,
+            t_song.update_time   AS song_update_time
+        -- t_singer 是表1
+        FROM t_singer
+                 -- t_song 是表2，表1.主键 = 表2.外键
+                 LEFT JOIN t_song ON t_singer.id = t_song.singer_id;
+    </select>
+</mapper>
