@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ineyee</groupId>
-    <artifactId>01-my-batis-multi-table</artifactId>
+    <artifactId>01-hello-my-batis</artifactId>
     <packaging>war</packaging>
     <version>1.0.0</version>
-    <name>01-my-batis-multi-table Maven Webapp</name>
+    <name>hello-my-batis Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
@@ -13,11 +13,6 @@
             <artifactId>junit-jupiter</artifactId>
             <version>5.8.2</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.13.2</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
@@ -35,13 +30,27 @@
             <version>1.2.27</version>
         </dependency>
         <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>6.1.1</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.5.19</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
     <build>
-        <finalName>01-my-batis-multi-table</finalName>
+        <finalName>hello-my-batis</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>16</source>
+                    <target>16</target>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>
