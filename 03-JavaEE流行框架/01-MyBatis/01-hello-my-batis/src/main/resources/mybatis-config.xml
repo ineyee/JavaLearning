@@ -127,8 +127,8 @@
     <!-- 注册数据库表自动转 Java Bean 的映射文件 -->
     <mappers>
         <!-- 使用 XML 实现 dao 层 -->
-        <!--        <mapper resource="mappers/user.xml"/>-->
+        <mapper resource="mappers/user.xml"/>
         <!-- 使用注解实现 dao 层 -->
-        <mapper class="dao.UserDaoAnno"/>
+        <!--        <mapper class="dao.UserDaoAnno"/>-->
     </mappers>
 </configuration>

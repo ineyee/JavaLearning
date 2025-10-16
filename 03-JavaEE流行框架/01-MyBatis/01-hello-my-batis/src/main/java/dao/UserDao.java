@@ -24,8 +24,8 @@ public interface UserDao {
      * @param params 分页参数需包含 limit（一页几条数据）和 offset（从哪个位置开始获取数据）两个字段
      *               因为 user.xml 文件里是直接的 SQL 语句只能接收 limit 和 offset，不能接收 pageSize 和 pageNum
      * @return 用户 bean 列表
-     * ① [] 代表本次查询没有数据
-     * ② [bean] 代表本次查询有数据
+     * ① [bean] 代表本次查询有数据
+     * ② [] 代表本次查询没有数据
      */
     List<UserBean> list(Map<String, Object> params);
 
@@ -34,8 +34,8 @@ public interface UserDao {
      * 参数由 PageHelper 插件管理，所以这个方法就不用定义参数了
      *
      * @return 用户 bean 列表
-     * ① [] 代表本次查询没有数据
-     * ② [bean] 代表本次查询有数据
+     * ① [bean] 代表本次查询有数据
+     * ② [] 代表本次查询没有数据
      */
     List<UserBean> listPageHelper();
 
@@ -72,7 +72,7 @@ public interface UserDao {
     int remove(Integer id);
 
     /**
-     * 删除用户，支持批量
+     * 批量删除用户
      * 这种批量操作是通过 WHERE IN + executeUpdate 实现的，它的特点是批量操作中的任何一个操作失败，那整个操作就整体失败，不会出现部分成功部分失败的情况
      * SQL example: DELETE FROM t_user WHERE id IN (1, 2, 3);
      *
@@ -95,7 +95,7 @@ public interface UserDao {
     int update(Map<String, Object> params);
 
     /**
-     * 更新用户，支持批量
+     * 批量更新用户
      * 这种批量操作是通过 WHERE IN + executeUpdate 实现的，它的特点是批量操作中的任何一个操作失败，那整个操作就整体失败，不会出现部分成功部分失败的情况
      * SQL example: UPDATE t_user SET age = 31, height = 1.75 WHERE id IN (1, 2, 3);
      *

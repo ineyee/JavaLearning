@@ -167,7 +167,7 @@ public class UserTest {
     }
 
     // 批量保存成功一般是给客户端返回刚保存成功那批数据的 id data = [bean.id]，客户端可以根据 id 数组再手动查询一次数据库拿到完整数据
-    // 批量保存失败一般是给客户端返回 data=null
+    // 批量保存失败一般是给客户端返回 data=[]
     @Test
     void saveBatch() {
 //        try (SqlSession session = MyBatisUtil.openSession()) {
