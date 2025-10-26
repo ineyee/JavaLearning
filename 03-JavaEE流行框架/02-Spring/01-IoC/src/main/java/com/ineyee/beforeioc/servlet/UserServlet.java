@@ -4,7 +4,7 @@ import com.ineyee.beforeioc.service.UserService;
 import com.ineyee.beforeioc.service.UserServiceImpl;
 
 public class UserServlet {
-    // 持有 userService
+    // 需要我们手动创建来持有 userService
     private final UserService userService = new UserServiceImpl();
 
     public void remove(Integer id) {

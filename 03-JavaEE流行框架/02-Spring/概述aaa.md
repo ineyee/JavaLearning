@@ -10,10 +10,10 @@ Spring 可以算是 Java 开发中最常用的框架，功能非常强大。Spri
 
 之前的代码存在以下问题：
 
-* 比如《02-JavaWeb基础：05-ProjectArchitecture》的代码，Servlet 里需要持有 service 对象，Service 里需要持有 dao 对象，但是一旦 Service 层换了实现方案或 Dao 层换了实现方案，我们就只能重新修改 Java 代码、编译、打包、部署，也就是说代码的耦合性太强了——我依赖你、你被删掉了或被替换了、对我影响很大、我就得改代码
-* 诸如此类，对象的创建都会存在这样的问题
+* 比如《02-JavaWeb基础：05-ProjectArchitecture》的代码，Servlet 里需要我们手动创建来持有 service 对象，Service 里需要我们手动创建来持有 dao 对象，但是一旦 Service 层换了实现方案或 Dao 层换了实现方案，我们就只能重新修改 Java 代码来创建另外一个新对象、编译、打包、部署，也就是说代码的耦合性太强了——我依赖你、你被删掉了或被替换了、对我影响很大、我就得改代码
+* 诸如此类，对象的创建都会存在这样的代码耦合问题
 
-而`所谓 IoC 控制反转就是指对象的创建权由我们开发者移交给了 Spring 框架`，之前是我们开发者在代码里手动创建对象，现在则是我们开发者在配置文件里配置好对象、由 Spring 框架自动创建对象，这样一来当“Service 层换了实现方案或 Dao 层换了实现方案”时，我们就只需要改一下配置文件即可，成功解决代码耦合问题
+而所谓 IoC 控制反转就是指`对象的创建权`由我们开发者移交给了 Spring 框架，之前是我们开发者在代码里手动创建对象，现在则是我们开发者在配置文件里配置好对象、由 Spring 框架自动创建对象，这样一来当“Service 层换了实现方案或 Dao 层换了实现方案”时，我们就`只需要改一下配置文件`即可，成功解决代码耦合问题
 
 ## 三、怎么使用 IoC
 
@@ -40,229 +40,106 @@ Spring 可以算是 Java 开发中最常用的框架，功能非常强大。Spri
 </dependency>
 ```
 
-#### 2、创建 MyBatis 的配置文件
+#### 2、创建 Spring 的配置文件并配置好要创建的对象
 
-在 resources 目录下创建一个名字叫做 mybatis-config.xml 的配置文件，专门用来配置 MyBatis 相关的东西，详见配置文件里。
-
-```XML
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE configuration
-        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-config.dtd">
-<!--
-    configuration 标签里的内容必须按下面的顺序编写：
-        1、properties (可选)
-        2、settings (可选)
-        3、typeAliases (可选)
-        4、typeHandlers (可选)
-        5、objectFactory (可选)
-        6、objectWrapperFactory (可选)
-        7、reflectorFactory (可选)
-        8、plugins (可选)
-        9、environments (可选)
-        10、databaseIdProvider (可选)
-        11、mappers (可选)
--->
-<configuration>
-</configuration>
-```
-
-#### 3、使用 MyBatis 实现 dao 层
-
-###### 3.1 使用XML
-
-`只定义 dao 接口类，不定义 dao 实现类，用 SqlSession 的 getMapper() 方法自动生成 dao 接口类的实现类的对象。`这里的实现类就类似于我们在《02-JavaWeb基础：05-ProjectArchitecture》里自己定义的 UserDaoImpl 类，这里的实现类对象就类似我们在《02-JavaWeb基础：05-ProjectArchitecture》里自己创建的 UserDao userDao = new UserDaoImpl(); 对象
-
-* 首先创建一个 UserDao 接口类
-
-```Java
-package dao;
-
-import bean.UserBean;
-
-import java.util.List;
-import java.util.Map;
-
-public interface UserDao {
-    UserBean get(Integer id);
-    List<UserBean> list(Map<String, Object> params);
-    List<UserBean> listPageHelper();
-  
-    int save(UserBean userBean);
-    int saveBatch(List<UserBean> userBeanList);
-
-    int remove(Integer id);
-    int removeBatch(List<Integer> idList);
-
-    int update(Map<String, Object> params);
-    int updateBatch(Map<String, Object> params);
-}
-```
-
-* 然后在 resources 目录下创建一个名字叫做 mappers 的文件夹，该目录下的一个映射文件对应一张表和一个 Java Bean，`我们就是在这些映射文件里编写 SQL 语句来操作数据库并自动完成数据表和 Java Bean 的转换，这些映射文件其实就是 dao 层。`在 mappers 目录下创建一个名字叫做 user.xml 的映射文件，顾名思义，这个映射文件专门用来配置数据库里 t_user 表和 Java 代码里 UserBean 的映射关系，详见映射文件里
-  * `一定要在 mybatis-config.xml 配置文件里注册一下这个映射文件，否则 MyBatis 无法找到这个映射文件`
-  * `一定要确保映射文件里的 namespace 和标签按照强制规范来写，否则 MyBatis 无法完成实现类及其对象跟接口类的匹配`
+在 resources 目录下创建一个名字叫做 applicationContext.xml 的配置文件（这个文件名就用大驼峰，不要用中划线，因为是遗留下来的传统，很多 IDE 默认识别的就是这个名字），专门用来配置 Spring 相关的东西，我们需要在这里配置好要创建的对象
 
 ```XML
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!--
-    namespace 必须命名为对应 dao 接口类的全类名，因为这个 xml 文件会被匹配为对应 dao 接口类的实现类即数据层。如果名字不匹配的话，MyBatis 无法自动将当前文件做为对应接口类的实现
--->
-<mapper namespace="dao.UserDao">
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!--
-				SQL 语句的唯一标识必须和对应 dao 接口类里的方法名一致，参数和返回值的类型也必须保持一致，同样地MyBatis 要完成自动匹配
+        通过 Spring IoC 自动创建的对象都叫 bean，所以我们之前的 JavaBean 模型都改叫 domain 了
+            class：要创建哪个类的对象，全类名
+            id：当前 bean 对象的唯一标识，用于获取对象
     -->
-    <select id="get" parameterType="Integer" resultType="UserBean">
-    </select>
-    <select id="list" parameterType="Map" resultType="UserBean">
-    </select>
-    <select id="listPageHelper" parameterType="Map" resultType="UserBean">
-    </select>
-
-    <insert id="save" parameterType="UserBean">
-    </insert>
-    <insert id="saveBatch" parameterType="List" useGeneratedKeys="true" keyProperty="id">
-    </insert>
-
-    <delete id="remove" parameterType="Integer">
-    </delete>
-    <delete id="removeBatch" parameterType="List">
-    </delete>
-
-    <update id="update" parameterType="Map">
-    </update>
-    <update id="updateBatch" parameterType="Map">
-    </update>
-</mapper>
+    <bean class="com.ineyee.ioc.servlet.UserServlet" id="userServlet"/>
+    <bean class="com.ineyee.ioc.service.UserServiceImpl" id="userService"/>
+    <bean class="com.ineyee.ioc.dao.UserDaoImpl" id="userDao"/>
+</beans>
 ```
 
-###### 3.2 使用注解
-
-`只定义 dao 接口类，不定义 dao 实现类，用 SqlSession 的 getMapper() 方法自动生成 dao 接口类的实现类的对象。`这里的实现类就类似于我们在《02-JavaWeb基础：05-ProjectArchitecture》里自己定义的 UserDaoImpl 类，这里的实现类对象就类似我们在《02-JavaWeb基础：05-ProjectArchitecture》里自己创建的 UserDao userDao = new UserDaoImpl(); 对象
-
-创建一个 UserDao 接口类
-
-* `一定要在 mybatis-config.xml 配置文件里注册一下这个接口类，否则 MyBatis 无法找到这个接口类`
-* `直接在接口类里用注解编写 SQL 语句，连 xml 文件都不需要了，namespace、SQL 语句的唯一标识、参数和返回值类型也都会自动反射`
+#### 3、接下来直接获取对象使用即可，Spring 框架会自动创建
 
 ```Java
-package dao;
+// App.java
+package com.ineyee.ioc;
 
-import bean.UserBean;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Select;
+import com.ineyee.ioc.servlet.UserServlet;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.util.List;
-import java.util.Map;
+public class App {
+    public static void main(String[] args) {
+        // 读取 Spring 的配置文件
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-public interface UserDaoAnno {
-    @Select("""
-            SELECT id,
-                    name,
-                    age,
-                    height,
-                    email,
-                    create_time,
-                    update_time
-            FROM t_user
-            WHERE id = #{id};
-            """)
-    UserBean get(Integer id);
-
-    @Select("""
-            SELECT id,
-                   name,
-                   age,
-                   height,
-                   email,
-                   create_time,
-                   update_time
-            FROM t_user
-            ORDER BY create_time DESC
-                     -- limit、offset 是参数名，因为外界传进来一个 Map，所以参数名只要和 Map 中的 key 一一对应，就能顺利匹配到参数值
-                LIMIT #{limit}
-            OFFSET #{offset};
-            """)
-    List<UserBean> list(Map<String, Object> params);
-
-    @Select("""
-            SELECT id,
-                   name,
-                   age,
-                   height,
-                   email,
-                   create_time,
-                   update_time
-            FROM t_user
-            ORDER BY create_time DESC
-            """)
-    List<UserBean> listPageHelper();
-
-    // 需自动回填字段
-    int save(UserBean userBean);
-
-    // 需自动回填字段 + foreach 批量处理
-    int saveBatch(List<UserBean> userBeanList);
-
-    @Delete("""
-            DELETE
-            FROM t_user
-            WHERE id = #{id};
-            """)
-    int remove(Integer id);
-
-    // 需 foreach 批量处理
-    int removeBatch(List<Integer> idList);
-
-    // 需 if 动态 SQL
-    int update(Map<String, Object> params);
-
-    // 需 if 动态 SQL + foreach 批量处理
-    int updateBatch(Map<String, Object> params);
-}
-```
-
-###### 3.3 使用 XML 和使用注解对比
-
-使用注解
-
-* 优势：不用再写一大堆的 xml 文件及其配置，项目结构更加简单
-* 劣势：
-  * 注解不太擅长处理需要自动回填字段、if 动态 SQL、foreach 批量处理等复杂场景，虽然它能处理，但是处理起来的阅读性和可维护性反倒不如 xml 来得清晰直观
-  * 注解的 SQL 语句是写在 Java 代码里的，也就是说 SQL 和 Java 是耦合的，导致 SQL 语句也会被编译成 class 字节码文件，如果我们想改 SQL 语句，那就只能重新修改 Java 代码、编译、打包、部署
-
-使用 XML
-
-* 优势：
-  * xml 的功能非常强大，简单场景、复杂场景都能应对
-  * xml 的 SQL 语句是写在 .xml 配置文件里的，也就是说 SQL 和 Java 是解耦的，如果我们想改 SQL 语句，直接找到对应的 .xml 文件修改即可
-* 劣势：
-  * 需要写一大堆的 xml 文件及其配置
-
-`所以实际开发中，还是以 XML 为主。`如果实在要用注解，那就简单的场景用注解，复杂的场景用 XML，两者混合使用也是可以的，但是注意两者混合使用时只需要注册 xml 就可以了，不需要再注册接口类，否则会报错重复注册。
-
-#### 4、创建单元测试验证 dao 层是否正确
-
-详见 UserTest 文件里。
-
-```Java
-@Test
-void get() {
-    try (SqlSession session = MyBatisUtil.openSession()) {
-        UserDao userDao = session.getMapper(UserDao.class);
-
-        UserBean userBean = userDao.get(21);
-        if (userBean != null) {
-            System.out.println("查询成功：" + userBean);
-        } else {
-            System.out.println("查询失败");
-        }
+        // 通过 bean 对象的 id 获取对象
+        UserServlet userServlet = (UserServlet) applicationContext.getBean("userServlet");
+        userServlet.remove(11);
     }
 }
 ```
 
-#### 5、替换 JDBC 实现的 dao 层
+```Java
+// UserServlet.java
+package com.ineyee.ioc.servlet;
 
-接下来我们就用 MyBatis 实现的 dao 层，替换掉《02-JavaWeb基础：05-ProjectArchitecture》里用 JDBC 实现的 dao 层，详见项目里。
+import com.ineyee.ioc.service.UserService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class UserServlet {
+    // 持有 userService 但无需我们手动创建，由 Spring 自动创建
+    private UserService userService;
+
+    public void remove(Integer id) {
+        // 读取 Spring 的配置文件
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+        // 通过 bean 对象的 id 获取对象
+        userService = (UserService) applicationContext.getBean("userService");
+
+        System.out.println("===>UserServlet remove id：" + id);
+        userService.remove(id);
+    }
+}
+```
+
+```Java
+// UserServiceImpl.java
+package com.ineyee.ioc.service;
+
+import com.ineyee.ioc.dao.UserDao;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class UserServiceImpl implements UserService {
+    // 持有 userDao 但无需我们手动创建，由 Spring 自动创建
+    private UserDao userDao;
+
+    @Override
+    public Boolean remove(Integer id) {
+        // 读取 Spring 的配置文件
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+        // 通过 bean 对象的 id 获取对象
+        userDao = (UserDao) applicationContext.getBean("userDao");
+
+        System.out.println("===>UserServiceImpl remove id：" + id);
+        return userDao.remove(id) > 0;
+    }
+}
+```
+
+```Java
+// UserDaoImpl.java
+package com.ineyee.ioc.dao;
+
+public class UserDaoImpl implements UserDao {
+    @Override
+    public int remove(Integer id) {
+        System.out.println("===>UserDaoImpl remove id：" + id);
+        return 0;
+    }
+}
+```

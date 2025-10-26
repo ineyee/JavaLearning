@@ -1,4 +1,4 @@
-package com.ineyee;
+package com.ineyee.beforeioc;
 
 import com.ineyee.beforeioc.servlet.UserServlet;
 

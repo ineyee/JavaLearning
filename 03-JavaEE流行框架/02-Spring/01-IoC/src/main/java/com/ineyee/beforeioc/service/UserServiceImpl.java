@@ -4,7 +4,7 @@ import com.ineyee.beforeioc.dao.UserDao;
 import com.ineyee.beforeioc.dao.UserDaoImpl;
 
 public class UserServiceImpl implements UserService {
-    // 持有 userDao
+    // 需要我们手动创建来持有 userDao
     private final UserDao userDao = new UserDaoImpl();
 
     @Override

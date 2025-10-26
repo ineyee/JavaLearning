@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--
+        通过 Spring IoC 自动创建的对象都叫 bean，所以我们之前的 JavaBean 模型都改叫 domain 了
+            class：要创建哪个类的对象，全类名
+            id：当前 bean 对象的唯一标识，用于获取对象
+    -->
+    <bean class="com.ineyee.ioc.servlet.UserServlet" id="userServlet"/>
+    <bean class="com.ineyee.ioc.service.UserServiceImpl" id="userService"/>
+    <bean class="com.ineyee.ioc.dao.UserDaoImpl" id="userDao"/>
+</beans>
