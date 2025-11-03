@@ -62,6 +62,8 @@ Spring 可以算是 Java 开发中最常用的框架，功能非常强大。Spri
 
 #### 3、接下来直接获取对象使用即可，Spring 框架会自动创建
 
+`下面“重复创建 ApplicationContext”其实存在问题，那就是每创建一次 ApplicationContext，都会加载一遍 applicationContext.xml 文件并创建一遍文件里所有的 bean 对象，这显然是重复操作，我们应该只在应用启动时创建一次 ApplicationContext。你可能会问“如果只在应用启动时创建一次 ApplicationContext 的话，那 userService、userDao 这种依赖该怎么创建呢”，这就得用到下一篇的依赖注入了 `
+
 ```Java
 // App.java
 package com.ineyee.ioc;
