@@ -2,8 +2,8 @@
 
 Spring 可以算是 Java 开发中最常用的框架，功能非常强大。Spring 不是位于某一层的框架，而是每一层都跟 Spring 有关系，也就说 Spring 是一个用来整合串联各个层的框架，可以大大简化我们的开发代码。Spring 框架的几个核心概念：
 
-* IoC：Inversion of Control，控制反转
-* DI：Dependency Injection，依赖注入
+* `IoC：Inversion of Control，控制反转，负责创建对象`
+* DI：Dependency Injection，依赖注入，负责管理对象之间的依赖关系
 * AOP：Aspect Oriented Programming，面向切面编程
 
 ## 二、IoC 是什么
@@ -11,7 +11,7 @@ Spring 可以算是 Java 开发中最常用的框架，功能非常强大。Spri
 之前的代码存在以下问题：
 
 * 比如《02-JavaWeb基础：05-ProjectArchitecture》的代码，Servlet 里需要我们手动创建来持有 service 对象，Service 里需要我们手动创建来持有 dao 对象，但是一旦 Service 层换了实现方案或 Dao 层换了实现方案，我们就只能重新修改 Java 代码来创建另外一个新对象、编译、打包、部署，也就是说代码的耦合性太强了——我依赖你、你被删掉了或被替换了、对我影响很大、我就得改代码
-* 诸如此类，对象的创建都会存在这样的代码耦合问题
+* 诸如此类，所有对象的创建都会存在这样的代码耦合问题
 
 而所谓 IoC 控制反转就是指`对象的创建权`由我们开发者移交给了 Spring 框架，之前是我们开发者在代码里手动创建对象，现在则是我们开发者在配置文件里配置好对象、由 Spring 框架自动创建对象，这样一来当“Service 层换了实现方案或 Dao 层换了实现方案”时，我们就`只需要改一下配置文件`即可，成功解决代码耦合问题
 
@@ -50,13 +50,13 @@ Spring 可以算是 Java 开发中最常用的框架，功能非常强大。Spri
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!--
-        通过 Spring IoC 自动创建的对象都叫 bean，所以我们之前的 JavaBean 模型都改叫 domain 了
-            class：要创建哪个类的对象，全类名
-            id：当前 bean 对象的唯一标识，用于获取对象
+        bean 标签：通过 Spring IoC 自动创建的对象都叫 bean，所以我们之前的 JavaBean 模型都要改叫 domain 了
+            id 属性：当前 bean 对象的唯一标识，用于获取对象
+            class 属性：要创建哪个类的对象，全类名
     -->
-    <bean class="com.ineyee.ioc.servlet.UserServlet" id="userServlet"/>
-    <bean class="com.ineyee.ioc.service.UserServiceImpl" id="userService"/>
-    <bean class="com.ineyee.ioc.dao.UserDaoImpl" id="userDao"/>
+    <bean id="userServlet" class="com.ineyee.ioc.servlet.UserServlet"/>
+    <bean id="userService" class="com.ineyee.ioc.service.UserServiceImpl"/>
+    <bean id="userDao" class="com.ineyee.ioc.dao.UserDaoImpl"/>
 </beans>
 ```
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--
+        bean 标签：通过 Spring IoC 自动创建的对象都叫 bean，所以我们之前的 JavaBean 模型都要改叫 domain 了
+            id 属性：当前 bean 对象的唯一标识，用于获取对象
+            class 属性：要创建哪个类的对象，全类名
+    -->
+    <bean id="userServlet" class="com.ineyee._02_dibasicuse.servlet.UserServlet">
+        <!--
+            property 标签：代表当前对象内部有一个属性
+                name 属性：属性名是什么
+                ref 属性：属性值是什么，当属性的数据类型为对象类型时，得使用 ref 属性来给属性赋值，值也是一个 bean 对象、可以通过 bean 对象的唯一标识去获取
+
+            注意：
+                private UserService userService; 仅仅是个成员变量
+                属性 = 成员变量 + setter 方法 + getter 方法
+                而这里是属性，所以我们必须给成员变量提供 setter 方法 + getter 方法（由于这里只是给成员变量赋值，所以只提供 setter 方法也行），否则报错
+        -->
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <bean id="userService" class="com.ineyee._02_dibasicuse.service.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+    </bean>
+
+    <bean id="userDao" class="com.ineyee._02_dibasicuse.dao.UserDaoImpl"/>
+</beans>

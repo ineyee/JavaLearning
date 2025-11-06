@@ -7,7 +7,7 @@
             id 属性：当前 bean 对象的唯一标识，用于获取对象
             class 属性：要创建哪个类的对象，全类名
     -->
-    <bean id="userServlet" class="com.ineyee.ioc.servlet.UserServlet"/>
-    <bean id="userService" class="com.ineyee.ioc.service.UserServiceImpl"/>
-    <bean id="userDao" class="com.ineyee.ioc.dao.UserDaoImpl"/>
+    <bean id="userServlet" class="com.ineyee._01_beforedi.servlet.UserServlet"/>
+    <bean id="userService" class="com.ineyee._01_beforedi.service.UserServiceImpl"/>
+    <bean id="userDao" class="com.ineyee._01_beforedi.dao.UserDaoImpl"/>
 </beans>
