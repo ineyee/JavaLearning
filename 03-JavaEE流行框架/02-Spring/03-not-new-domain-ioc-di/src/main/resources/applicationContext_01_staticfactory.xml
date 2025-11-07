@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--
+        bean 标签：写一个 bean 标签就代表要创建一个对象，这种方式（写了 factory-method 属性）创建的就是我们最终想要的 connection 对象
+            id 属性：connection 对象的唯一标识，用于获取对象
+            class 属性 + factory-method 属性：代表调用工厂类 ConnectionFactory 的方法 getConnection() 来创建 connection 对象
+    -->
+    <bean id="connection" class="com.ineyee._01_staticfactory.ConnectionFactory" factory-method="getConnection"/>
+</beans>

@@ -1,22 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-    首先得在根标签这里添加一个 property 命名空间
-		约定俗称地我们会把这个命名空间取名为 p，是 property 的首字母
--->
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <!-- 基本数据类型、BigDecimal、字符串和自定义对象类型的全局单例对象引用可以简写 -->
-    <bean id="person1" class="com.ineyee._03_dibysetter.domain.Person"
-          p:partyMember="false"
-          p:age="18"
-          p:height="1.88"
-          p:salary="666666.66"
-          p:name="张三"
-          p:dog-ref="dog">
+    <!--
+        bean 标签：写一个 bean 标签就代表要创建一个对象
+            id 属性：对象的唯一标识，用于获取对象
+            class 属性：对象所属的类，全类名
+    -->
+    <bean id="person1" class="com.ineyee._03_dibysetter.domain.Person">
+        <!--
+            property 标签：写一个 property 标签就代表要给对象的一个属性赋值
+                name 属性：属性名是什么
+                value 属性 | ref 属性、bean 标签 | 集合标签：属性值是什么
+                    (1) 当属性的数据类型为基本数据类型、BigDecimal、字符串时，直接使用 value 属性给属性赋值即可，值总是一个字符串、框架内部会自动完成数据类型转换
+                    (2) 当属性的数据类型为自定义对象类型时
+                        ① 可以使用 ref 属性给属性赋值，因为值也是一个 bean 对象、所以可以通过 bean 对象的唯一标识 id 来获取，此时属性所指向的对象是一个单例对象
+                        ② 也可以使用 bean 标签给属性赋值，此时属性所指向的对象是一个局部对象
+                    (3) 当属性的数据类型为集合类型时，使用集合标签给属性赋值
+                        ① List 对应 list 标签，Map 对应 map 标签，Set 对应 set 标签
+                        ② 当集合里的元素为基本数据类型时、BigDecimal、字符串时，集合标签里嵌套 value 标签指定值；当集合里的元素为自定义对象类型时，集合标签里嵌套 ref 标签（引用单例对象）或 bean 标签（引用局部对象）指定值；当集合里的元素为集合类型时，集合标签里继续嵌套集合标签指定值
 
-        <!-- 集合不可以简写 -->
+            注意：
+                属性 = 成员变量 + setter 方法 + getter 方法
+                而这里是属性，所以我们必须给成员变量提供 setter 方法 + getter 方法（由于这里只是给成员变量赋值，所以只提供 setter 方法也行），否则报错
+        -->
+        <property name="partyMember" value="false"/>
+        <property name="age" value="18"/>
+        <property name="height" value="1.88"/>
+        <property name="salary" value="666666.66"/>
+        <property name="name" value="张三"/>
+
+        <property name="dog" ref="dog"/>
+
         <property name="friendList">
             <list>
                 <ref bean="person2"/>
@@ -40,23 +55,27 @@
         </property>
     </bean>
 
-    <bean id="person2" class="com.ineyee._03_dibysetter.domain.Person"
-          p:name="李四"
-          p:dog-ref="dog">
+    <bean id="person2" class="com.ineyee._03_dibysetter.domain.Person">
+        <property name="name" value="李四"/>
+        <property name="dog" ref="dog"/>
     </bean>
 
-    <bean id="person3" class="com.ineyee._03_dibysetter.domain.Person"
-          p:name="王五">
-        <!-- 自定义对象类型的局部对象不可以简写 -->
+    <bean id="person3" class="com.ineyee._03_dibysetter.domain.Person">
+        <property name="name" value="王五"/>
         <property name="dog">
+            <!--
+                当 bean 标签写在 property 标签里面时，其实类似于局部对象、框架会创建多个，所以就不用写 id 以供获取了，因为这个局部对象只属于当前对象的属性
+                当某个对象并非全局只需要创建一个时，就可以把它的 bean 标签放在 property 标签里
+                所以 person3 和 person4 持有的 dog 对象是两个不同的 dog 对象
+            -->
             <bean class="com.ineyee._03_dibysetter.domain.Dog">
                 <property name="name" value="泰迪"/>
             </bean>
         </property>
     </bean>
 
-    <bean id="person4" class="com.ineyee._03_dibysetter.domain.Person"
-          p:name="赵六">
+    <bean id="person4" class="com.ineyee._03_dibysetter.domain.Person">
+        <property name="name" value="赵六"/>
         <property name="dog">
             <bean class="com.ineyee._03_dibysetter.domain.Dog">
                 <property name="name" value="田园犬"/>
@@ -64,7 +83,12 @@
         </property>
     </bean>
 
-    <bean id="dog" class="com.ineyee._03_dibysetter.domain.Dog"
-          p:name="旺财">
+    <!--
+        当 bean 标签写在最外层时，框架其实只会全局创建一个该对象，也就是一个单例对象，其它任意地方通过 id 获取到的都是这同一个单例对象
+        当某个对象全局只需要创建一个时，就可以把它的 bean 标签放在最外层
+        所以 person1 和 person2 持有的 dog 对象都是这同一个单例 dog 对象
+    -->
+    <bean id="dog" class="com.ineyee._03_dibysetter.domain.Dog">
+        <property name="name" value="旺财"/>
     </bean>
 </beans>

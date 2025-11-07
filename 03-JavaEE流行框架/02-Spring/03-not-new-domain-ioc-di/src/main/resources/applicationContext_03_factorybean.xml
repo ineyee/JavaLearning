@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--
+        bean 标签：写一个 bean 标签就代表要创建一个对象
+            id 属性：connection 对象的唯一标识，用于获取对象
+            class 属性：对象所属的 FactoryBean 类，全类名
+
+        注意：
+            因为 ConnectionFactoryBean 实现了 FactoryBean 接口，所以 Spring 会自动调用 FactoryBean 的 getObject() 方法来创建对象
+            所以这种写法直接就是返回一个 connection 对象，而非返回一个 connectionFactoryBean 对象
+    -->
+    <bean id="connection" class="com.ineyee._03_factorybean.ConnectionFactoryBean">
+        <!--
+            property 标签：写一个 property 标签就代表要给对象的一个属性赋值
+                name 属性：属性名是什么
+                value 属性：属性值是什么
+        -->
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC"/>
+        <property name="username" value="root"/>
+        <property name="password" value="mysqlroot"/>
+    </bean>
+</beans>

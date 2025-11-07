@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--
+        bean 标签：写一个 bean 标签就代表要创建一个对象，这种方式（没写 factory-method 属性）就是我们之前非常熟悉的创建一个 ConnectionFactory 类型的工厂对象
+            id 属性：工厂对象的唯一标识，用于获取对象
+            class 属性：对象所属的类，全类名
+    -->
+    <bean id="connectionFactory" class="com.ineyee._02_instancefactory.ConnectionFactory">
+        <!--
+            property 标签：写一个 property 标签就代表要给对象的一个属性赋值
+                name 属性：属性名是什么
+                value 属性：属性值是什么
+        -->
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC"/>
+        <property name="username" value="root"/>
+        <property name="password" value="mysqlroot"/>
+    </bean>
+    <!--
+        bean 标签：写一个 bean 标签就代表要创建一个对象，然后再调用工厂对象的实例方法 getConnection() 来创建 connection 对象
+            id 属性：connection 对象的唯一标识，用于获取对象
+            factory-bean 属性：要创建 connection 对象的话，需要用哪个工厂对象，获取工厂对象的 beanId 即可
+            factory-method 属性：要创建 connection 对象的话，需要用工厂对象的哪个方法
+    -->
+    <bean id="connection" factory-bean="connectionFactory" factory-method="getConnection"/>
+</beans>
