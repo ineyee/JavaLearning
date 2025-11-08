@@ -5,19 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bf74b702-c509-4d04-ade7-a105a12520ff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/_01_staticfactory/App.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/_01_staticfactory/ConnectionFactory.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/applicationContext_02_instancefactory.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/ineyee/AppTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../01-IoC 概述.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../02-DI 概述.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../02-DI/src/main/resources/applicationContext_03_dibysetter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../02-DI/src/main/resources/applicationContext_03_dibysetter.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../03-创建过程比较复杂的对象的 IoC 与 DI.md" beforeDir="false" afterPath="$PROJECT_DIR$/../03-创建过程比较复杂的对象的 IoC 与 DI.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,9 +31,9 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="3585QXUPukG8RTldAvvMQpx18Uw" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -58,6 +47,7 @@
     "Application.App.executor": "Debug",
     "Application.com.ineyee._02_instancefactory.App.executor": "Debug",
     "Application.com.ineyee._03_factorybean.App.executor": "Debug",
+    "Application.com.ineyee._04_importconfigfile.App.executor": "Debug",
     "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -65,7 +55,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/yiyi/Desktop/JavaLearning/03-JavaEE流行框架/02-Spring/03-not-new-domain-ioc-di/src/main/resources",
+    "last_opened_file_path": "/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/02-Spring/03-not-new-domain-ioc-di/src/main/resources",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -81,16 +71,16 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/resources" />
+      <recent name="$PROJECT_DIR$/src/main/java/com/ineyee/_04_importconfigfile" />
       <recent name="$PROJECT_DIR$/src/main/java/com/ineyee/_03_factorybean" />
       <recent name="$PROJECT_DIR$/src/main/java/com/ineyee/_02_instancefactory" />
       <recent name="$PROJECT_DIR$/src/main" />
-      <recent name="$PROJECT_DIR$/src/main/java/com/ineyee" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="com.ineyee._01_staticfactory" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.com.ineyee._03_factorybean.App">
+  <component name="RunManager" selected="Application.com.ineyee._04_importconfigfile.App">
     <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.ineyee._01_staticfactory.App" />
       <module name="03-not-new-domain-ioc-di" />
@@ -130,8 +120,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="com.ineyee._04_importconfigfile.App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.ineyee._04_importconfigfile.App" />
+      <module name="03-not-new-domain-ioc-di" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.ineyee._04_importconfigfile.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.com.ineyee._04_importconfigfile.App" />
         <item itemvalue="Application.com.ineyee._03_factorybean.App" />
         <item itemvalue="Application.com.ineyee._02_instancefactory.App" />
         <item itemvalue="Application.App" />
@@ -154,6 +158,7 @@
       <option name="presentableId" value="Default" />
       <updated>1762478842846</updated>
       <workItem from="1762478843844" duration="15055000" />
+      <workItem from="1762565681873" duration="1326000" />
     </task>
     <servers />
   </component>

@@ -231,3 +231,53 @@ public class ConnectionFactoryBean implements FactoryBean<Connection> {
     </bean>
 </beans>
 ```
+
+## 补充：applicationContext.xml 引入其它配置文件
+
+前面的演示里，我们是把数据库相关配置的值直接写死在 applicationContext.xml 里注入的，但是实际开发中 applicationContext.xml 里的内容可能会非常多，我们如果想改一下数据库相关配置的值，就得找来找去，有点麻烦。
+
+所以我们一般都是把数据库相关配置的值写在独立的配置文件里，然后在 applicationContext.xml 里引入独立的配置文件，这样一来我们如果想改一下数据库相关配置的值，直接改独立的配置文件即可，applicationContext.xml 根本不用动。
+
+* `database.properties`
+
+```properties
+# key 用小驼峰，value 不用加 ""
+# key-value 的分隔符是 = 或 : ，推荐使用 = ，= 的左右两边不要加空格
+
+driverClassName=com.mysql.cj.jdbc.Driver
+url=jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC
+username=root
+password=mysqlroot
+```
+
+* `applicationContext_04_importconfigfile.xml`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    添加三个跟 context 命名空间相关的东西，这样才能写 context 标签来引入其它配置文件
+        xmlns:context="http://www.springframework.org/schema/context"
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 引入其它配置文件 -->
+    <context:property-placeholder location="classpath:database.properties"/>
+
+    <bean id="connection" class="com.ineyee._04_importconfigfile.ConnectionFactoryBean">
+        <!-- 通过 ${key} 的方式就能读取到 value -->
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+</beans>
+```
+
