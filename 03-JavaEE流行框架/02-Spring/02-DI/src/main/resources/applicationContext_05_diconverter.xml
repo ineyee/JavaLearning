@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="person" class="com.ineyee._05_diconverter.domain.Person">
+        <property name="createTime" value="2025-11-08 18:32:45"/>
+        <property name="updateTime" value="2026-12-09 17:33:46"/>
+    </bean>
+
+    <!--
+        注册自定义的类型转换器
+            全是固定写法，我们只需要在 set 集合里添加我们自定义的类型转换器即可
+            注册完后，我们就可以像给基本数据类型、BigDecimal、字符串那样直接使用 value 属性给 LocalDateTime 类型的属性赋值字符串了，框架内部就能自动完成字符串到 LocalDateTime 的转换了
+    -->
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <!-- 类型转换器1，能把 "HH:mm:ss yyyy/MM/dd" 格式的时间字符串转换成 LocalDateTime -->
+                <bean class="com.ineyee._05_diconverter.converter.StringDateConverter">
+                    <property name="format" value="HH:mm:ss yyyy/MM/dd"/>
+                </bean>
+                <!-- 类型转换器2，能把 "yyyy-MM-dd HH:mm:ss" 格式的时间字符串转换成 LocalDateTime -->
+                <bean class="com.ineyee._05_diconverter.converter.StringDateConverter">
+                    <property name="format" value="yyyy-MM-dd HH:mm:ss"/>
+                </bean>
+            </set>
+        </property>
+    </bean>
+</beans>
