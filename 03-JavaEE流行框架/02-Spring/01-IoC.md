@@ -145,3 +145,161 @@ public class UserDaoImpl implements UserDao {
     }
 }
 ```
+
+## 补充：scope 属性
+
+当我们通过 IoC 创建对象时，会发现控制台打印了一句“Creating shared instance of singleton bean 'person'”，单例！那这个单例是什么意思呢？
+
+#### 单例 vs 单例设计模式
+
+首先我们知道平常所说的单例设计模式是指“某个类的实例在整个程序运行过程中只有一份”，所以这里的单例绝对不是单例设计模式，因为这里“某个类的实例在整个程序运行过程中可能存在多份”。很简单就能验证，只要我们在整个程序运行过程中创建多个 IoC 容器，然后在不同的 IoC 容器里分别创建同一个类的对象，会发现这些对象并非同一个对象。
+
+* `Person.java`
+
+```java
+package com.ineyee.scopeproperty;
+
+public class Person {
+}
+```
+
+* `applicationContext_scopeproperty.xml`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="person" class="com.ineyee.scopeproperty.Person"/>
+</beans>
+```
+
+* `App.java`
+
+```java
+package com.ineyee.scopeproperty;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+    public static void main(String[] args) {
+        // 一个 applicationContext 对应一个 IoC 容器
+        ApplicationContext applicationContext1 = new ClassPathXmlApplicationContext("applicationContext_scopeproperty.xml");
+        Person person1 = (Person) applicationContext1.getBean("person");
+        System.out.println(person1); // Person@449a4f23，hashcode 跟 person2 不一样
+
+        // 一个 applicationContext 对应一个 IoC 容器
+        ApplicationContext applicationContext2 = new ClassPathXmlApplicationContext("applicationContext_scopeproperty.xml");
+        Person person2 = (Person) applicationContext2.getBean("person");
+        System.out.println(person2); // Person@173ed316，hashcode 跟 person1 不一样
+    }
+}
+```
+
+#### 单例 vs 同一个 IoC 容器里的单例
+
+有了上面的验证，我们可能会想是不是把作用域从“整个程序运行过程中”缩小为“同一个 IoC 容器里”就行了，也就是说“这里的单例是指某个类的实例在同一个 IoC 容器里只有一份”？事实也并非如此，验证也很简单。
+
+* `Person.java`
+
+```java
+package com.ineyee.scopeproperty;
+
+public class Person {
+}
+```
+
+* `applicationContext_scopeproperty.xml`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="person1" class="com.ineyee.scopeproperty.Person"/>
+    <bean id="person2" class="com.ineyee.scopeproperty.Person"/>
+</beans>
+```
+
+* `App.java`
+
+```java
+package com.ineyee.scopeproperty;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+    public static void main(String[] args) {
+        // 一个 applicationContext 对应一个 IoC 容器，只创建一个 IoC 容器
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext_scopeproperty.xml");
+
+        Person person1 = (Person) applicationContext.getBean("person1");
+        System.out.println(person1); // Person@5b1669c0，hashcode 跟 person2 不一样
+
+        Person person2 = (Person) applicationContext.getBean("person2");
+        System.out.println(person2); // Person@78e4deb0，hashcode 跟 person1 不一样
+    }
+}
+```
+
+#### 单例到底是什么
+
+`这里的单例其实是指“在同一个 IoC 容器里 + 通过同一个 beanId 获取到的对象只有一份”，`也就是说在不同的 IoC 容器里就算通过同一个 beanId 获取到的对象也不是同一份（上面的例子 1），在同一个 IoC 容器里通过不同的 beanId 获取到的对象也不是同一份（上面的例子 2），必须两个条件同时满足才行，验证也很简单。
+
+* `Person.java`
+
+```java
+package com.ineyee.scopeproperty;
+
+public class Person {
+}
+```
+
+* `applicationContext_scopeproperty.xml`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="person" class="com.ineyee.scopeproperty.Person"/>
+</beans>
+```
+
+* `App.java`
+
+```java
+package com.ineyee.scopeproperty;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+    public static void main(String[] args) {
+        // 一个 applicationContext 对应一个 IoC 容器，只创建一个 IoC 容器
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext_scopeproperty.xml");
+
+        Person person1 = (Person) applicationContext.getBean("person");
+        System.out.println(person1); // Person@449a4f23，hashcode 跟 person2 一样
+
+        Person person2 = (Person) applicationContext.getBean("person");
+        System.out.println(person2); // Person@449a4f23，hashcode 跟 person1 一样
+    }
+}
+```
+
+#### scope 属性
+
+之所以有上面单例的现象，是因为在创建对象时 bean 标签有个 scope 属性，它的默认值是 singleton。
+
+```xml
+<bean id="person" class="com.ineyee.scopeproperty.Person" scope="singleton"/>
+```
+
+它还有另外一个值是 prototype，只要设置为这个值，那无论什么情况下获取到的该对象都不是同一个对象，即不是单例。
+
+```xml
+<bean id="person" class="com.ineyee.scopeproperty.Person" scope="prototype"/>
+```
