@@ -79,6 +79,8 @@
         现在直接在 Spring 的配置文件里配置一下 mapper 扫描器即可
 
         配置完后我们就可以在代码里通过 applicationContext.getBean("dao 的短类名") 来直接获取到 dao 对象了，连 SqlSession 对象的 getMapper() 方法都不用调用了
+
+        这里就不用写 id 属性了，因为这个扫描器是一创建出来就去创建各种 dao 对象的，我们后续并不需要主动根据 id 获取这个扫描器
     -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <!-- 需要先指定一下 SqlSessionFactory 对象，以便能用它创建 SqlSession 对象 -->

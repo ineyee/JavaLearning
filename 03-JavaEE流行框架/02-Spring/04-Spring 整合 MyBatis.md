@@ -54,39 +54,20 @@
 </dependency>
 ```
 
-但是因为 MyBatis 内部自带了连接池，所以要想让 MyBatis 使用三方连接池，还得做一些事情：
+~~但是因为 MyBatis 内部自带了连接池，所以要想让 MyBatis 使用三方连接池，还得做一些事情：......~~
 
-* 在 java 目录下创建一个名字叫做 common 的文件夹，在 common 目录下创建一个名字叫做 DruidDataSourceFactory 的类
+这里跟之前稍有区别，单纯使用 MyBatis 的时候我们要想让 MyBatis 使用三方连接池，得提供一个 DruidDataSourceFactory，但是现在直接使用 dataSource 就可以了
 
-```Java
-package common;
-
-import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.ibatis.datasource.pooled.PooledDataSourceFactory;
-
-// 必须继承自 PooledDataSourceFactory
-public class DruidDataSourceFactory extends PooledDataSourceFactory {
-    public DruidDataSourceFactory() {
-        // 必须把 DruidDataSource 设置给 dataSource 属性
-        this.dataSource = new DruidDataSource();
-    }
-}
-```
-
-* 去 mybatis-config.xml 配置文件（下面会说到）里配置一下连接池
-
-```XML
-<environment id="dev">
-    <transactionManager type="JDBC"/>
-    <dataSource type="common.DruidDataSourceFactory">
-        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC"/>
-        <property name="username" value="root"/>
-        <property name="password" value="mysqlroot"/>
-        <property name="initialSize" value="5"/>
-        <property name="maxActive" value="10"/>
-    </dataSource>
-</environment>
+```xml
+<context:property-placeholder location="database-dev.properties"/>
+<bean id="devDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+    <property name="driverClassName" value="${driverClassName}"/>
+    <property name="url" value="${url}"/>
+    <property name="username" value="${username}"/>
+    <property name="password" value="${password}"/>
+    <property name="initialSize" value="${initialSize}"/>
+    <property name="maxActive" value="${maxActive}"/>
+</bean>
 ```
 
 我们还可以安装一个分页查询库：
@@ -214,7 +195,124 @@ void listPageHelper() {
 `第 2 步彻底变了，有了 Spring 之后就不需要 MyBatis 的配置文件了，我们只需要维护好 Spring 的配置文件即可，MyBatis 所有的配置都放到 Spring 的配置文件里了`
 
 ```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--
+        之前需要事先创建一个 MyBatisUtil 类来创建 SqlSessionFactory 对象
+        现在直接通过 Spring 来创建 SqlSessionFactory 对象
 
+        之前是在 MyBatisUtil 类里创建 SqlSessionFactory 对象的时候通过指定 MyBatis 的配置文件来让 SqlSessionFactory 对象知道 MyBatis 的各种配置
+        现在直接通过 SqlSessionFactory 对象的属性即可设置
+    -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--
+            是否开启驼峰命名自动映射，即数据库表自动转 Java Bean 时是否从经典数据库列名 create_time 映射到经典 Java 属性名 createTime
+            默认 false
+        -->
+        <property name="configuration">
+            <bean class="org.apache.ibatis.session.Configuration">
+                <property name="mapUnderscoreToCamelCase" value="true"/>
+            </bean>
+        </property>
+
+        <!--
+            类型别名 typeAliases，用来给 xml 文件（如 mappers 里的 xml 文件、Spring 的配置文件等）里的类型取别名，如 type、parameterType、resultType 这种以 type 结尾的属性都是接收一个类型
+            包名.类名，全类名，比较长；我们可以给全类名取个别名，短类名，比较短，写起来更方便；当然如果你偏好于写全类名，那也可以不定义别名
+                方式一：name = 可以是整个包的方式，value = 默认就会把这个包下所有的全类名 com.ineyee.domain.Xxx 取别名为短类名 Xxx
+                方式一：name = 也可以是单个类型的方式，value = 默认就会把这个全类名 com.ineyee.domain.Xxx 取别名为短类名 Xxx
+        -->
+        <property name="typeAliasesPackage" value="com.ineyee.domain"/>
+        <property name="typeAliases">
+            <list>
+                <value>com.ineyee.domain.User</value>
+            </list>
+        </property>
+
+        <!-- 插件 -->
+        <property name="plugins">
+            <list>
+                <!-- 拦截器设置为 PageHelper 的 PageInterceptor -->
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <props>
+                            <!--
+                                reasonable 设置为 true，代表使分页查询合理化：
+                                    当 pageNum <= 0 时，自动返回第一页的数据
+                                    当 pageNum > totalPage 时，自动返回最后一页的数据
+                            -->
+                            <prop key="reasonable">true</prop>
+                        </props>
+                    </property>
+                </bean>
+            </list>
+        </property>
+
+        <!--
+            开发环境和生产环境的数据库连接池及连接及数据库
+                开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
+                生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
+        -->
+        <property name="dataSource" ref="devDataSource"/>
+
+        <!--
+            注册数据库表自动转 Java Bean 的映射文件
+            这里我们不需要再一个一个映射文件注册了，直接通配符把所有的映射文件注册即可
+        -->
+        <property name="mapperLocations">
+            <list>
+                <value>mappers/*.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--
+        之前需要事先创建一个 MyBatisUtil 类来创建 SqlSessionFactory 对象，然后通过 SqlSessionFactory 对象创建 SqlSession 对象，进而用 SqlSession 对象的 getMapper() 方法自动生成 dao 接口类的实现类的对象
+        现在直接在 Spring 的配置文件里配置一下 mapper 扫描器即可
+
+        配置完后我们就可以在代码里通过 applicationContext.getBean("dao 的短类名") 来直接获取到 dao 对象了，连 SqlSession 对象的 getMapper() 方法都不用调用了
+
+        这里就不用写 id 属性了，因为这个扫描器是一创建出来就去创建各种 dao 对象的，我们后续并不需要主动根据 id 获取这个扫描器
+    -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 需要先指定一下 SqlSessionFactory 对象，以便能用它创建 SqlSession 对象 -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!--
+            然后指定一下 dao 包名即可，相当于自动在当前配置文件里添加了很多 <bean id="XxxDao"/> 来创建一个一个的 dao 对象，并且 bean 标签的 id 就是 dao 的短类名（com.ineyee.dao.XxxDao 里的 XxxDao）
+            将来我们需要使用哪个 dao 就能通过 dao 的短类名（即 beanId）直接获取相应的到 dao 对象，连 SqlSession 对象的 getMapper() 方法都不用调用了
+        -->
+        <property name="basePackage" value="com.ineyee.dao"/>
+    </bean>
+
+    <!--
+        开发环境和生产环境的数据库连接池及连接及数据库
+            开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
+            生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
+    -->
+    <context:property-placeholder location="database-dev.properties"/>
+    <bean id="devDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+    <context:property-placeholder location="database-prod.properties"/>
+    <bean id="prodDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+</beans>
 ```
 
 #### 3、使用 MyBatis 实现 dao 层
