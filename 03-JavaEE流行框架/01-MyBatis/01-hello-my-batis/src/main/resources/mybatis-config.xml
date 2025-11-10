@@ -28,7 +28,7 @@
 
 
     <!--
-        typeAliases，用来给 xml 文件里的类型取别名，如 type、parameterType、resultType 这种以 type 结尾的属性都是接收一个类型
+        typeAliases，用来给 xml 文件（如 mappers 里的 xml 文件、MyBatis 的配置文件等）里的类型取别名，如 type、parameterType、resultType 这种以 type 结尾的属性都是接收一个类型
         包名.类名，全类名，比较长；我们可以给全类名取个别名，短类名，比较短，写起来更方便；当然如果你偏好于写全类名，那也可以不定义别名
     -->
     <typeAliases>
