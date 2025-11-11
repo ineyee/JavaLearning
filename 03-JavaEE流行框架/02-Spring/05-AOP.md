@@ -19,9 +19,11 @@ public interface UserService {
 public class UserServiceImpl implements UserService {
     @Override
     public Boolean login(String username, String password) {
+        // 业务层既写业务代码
         System.out.println("假设这里是【业务规则校验】的业务代码，去数据库里查询用户和密码是否匹配");
         System.out.println("假设这里是【调用数据层 API】的业务代码，调用数据层的 login 方法");
 
+        // 业务层还写附加代码
         System.out.println("假设这里是【日志存储】的附加代码，当前项目里有一个 login.log 的文件，一旦用户登录成功，就把当前用户是谁、什么时间、什么地点、用什么设备登录的信息持久化到这个文件里以便排查问题");
 
         return true;
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UserService {
 ```java
 // UserServlet.java
 public class UserServlet {
+    // 控制器层直接持有业务层
     private UserService userService;
 
     public void setUserService(UserService userService) {
@@ -43,6 +46,23 @@ public class UserServlet {
         return userService.login(username, password);
     }
 }
+```
+
+```xml
+<!-- applicationContext_01_beforeproxypattern.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- 这个是业务层对象 -->
+    <bean id="userService" class="com.ineyee._01_beforeproxypattern.service.UserServiceImpl"/>
+
+    <!-- 这个是控制器层对象 -->
+    <bean id="userServlet" class="com.ineyee._01_beforeproxypattern.servlet.UserServlet">
+        <!-- 这里给控制器层注入的是业务层对象 -->
+        <property name="userService" ref="userService"/>
+    </bean>
+</beans>
 ```
 
 `于是问题就来了，实际开发中有时我们必须得在业务层添加附加代码，比如事务管理和日志存储，但是这些代码本来不是业务代码却非得写在业务层，会导致业务层臃肿、累赘。换句话说，我们的目标是：既给业务层添加附加代码，但是附加代码又不能写在业务层里。`
@@ -70,13 +90,107 @@ public class UserServlet {
 
 这样一来，租客跟中介对接，中介再跟房东对接，顺利解决问题。其实这就是`代理设计模式——在不修改目标类里目标方法的前提下、给目标方法增加额外的功能`，中介就是代理对象。
 
-## 二、静态代理
+## 二、静态代理（Static Proxy）
+
+> 所谓静态代理是指：我们开发人员需要手动创建代理类，我们的项目目录里会存在一个一个的 .java 代理类文件
+>
+> 静态代理有一个问题是：基本上我们要为每个 XxxService.java 业务层都编写一个代理类，很繁琐
 
 所以我们就可以通过“引入一个业务层代理”的方式来解决业务层存在的问题，业务层代理专门负责业务层的附加代码，业务层就可以只写业务代码了。这样一来，`之前的项目架构里是控制器层直接调用业务层的代码，而有了业务层代理之后，就是控制器层调用业务层代理的代码，业务层代理再调用业务层的代码。`
 
-因为项目本来可能用的是之前的项目架构，也就是控制器层直接调用业务层的代码
+因为项目之前可能用的是之前的项目架构，也就是控制器层直接调用业务层的代码，后来可能需要引入业务层代理，所以我们在引入业务层代理时，本着的原则应该是“既然是给业务层做附加代码，那就只修改业务层的代码，控制器层的代码一行都不要动”，尽管现在改成了“控制器层调用业务层代理的代码”，因此我们就得实现“控制器层表面还是在直接调用业务层的代码，实际却是在调用业务层代理的代码”。
 
+```java
+// UserServlet.java
+public class UserServlet {
+    // 控制器层表面还是持有业务层，实际却是持有业务层代理（本质原因是修改了注入的对象）
+    private UserService userService;
 
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    public Boolean login(String username, String password) {
+        // 控制器层表面还是在直接调用业务层的代码，实际却是在调用业务层代理的代码（相当于租客跟中介对接）
+        return userService.login(username, password);
+    }
+}
+```
+
+那怎么实现“控制器层表面还是在直接调用业务层的代码，实际却是在调用业务层代理的代码”呢？`核心的一点要求是：业务层实现了哪个接口，业务层代理就得实现哪个接口，这样一来业务层代理才能跟业务层拥有一模一样的方法，控制器层在不改动一行代码的情况下才不会报找不到方法的错误。另外一个改动是：依赖注入的地方，不能再给控制器层注入业务层了，而是应该注入业务层代理，又或者我们想换一个业务层代理、去掉业务层代理，直接修改配置文件就可以了，线上修改配置文件毕竟方便。`
+
+```java
+// UserServiceProxy.java
+public class UserServiceProxy implements UserService {
+    // 业务层代理持有业务层
+    private UserService userService;
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Override
+    public Boolean login(String username, String password) {
+        // 业务层代理调用业务层的代码（相当于中介跟房东对接）
+        Boolean result = userService.login(username, password);
+
+        // 业务层的附加代码都抽取到业务层代理中来了
+        System.out.println("假设这里是【日志存储】的附加代码，当前项目里有一个 login.log 的文件，一旦用户登录成功，就把当前用户是谁、什么时间、什么地点、用什么设备登录的信息持久化到这个文件里以便排查问题");
+
+        return result;
+    }
+}
+```
+
+```xml
+<!-- applicationContext_01_beforeproxypattern.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- 这个是业务层对象 -->
+    <bean id="userService" class="com.ineyee._02_staticproxy.service.UserServiceImpl"/>
+
+    <!-- 这个是业务层代理对象 -->
+    <bean id="userServiceProxy" class="com.ineyee._02_staticproxy.proxy.UserServiceProxy">
+        <!-- 这里给业务层代理注入的是业务层对象 -->
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <!-- 这个是控制器层对象 -->
+    <bean id="userServlet" class="com.ineyee._02_staticproxy.servlet.UserServlet">
+        <!-- 这里给控制器层注入的是业务层代理对象 -->
+        <property name="userService" ref="userServiceProxy"/>
+    </bean>
+</beans>
+```
+
+业务层就可以只写业务代码了，顺利解决问题。
+
+```java
+// UserService.java
+public interface UserService {
+    Boolean login(String username, String password);
+}
+
+// UserServiceImpl.java
+public class UserServiceImpl implements UserService {
+    @Override
+    public Boolean login(String username, String password) {
+        // 业务层只写业务代码
+        System.out.println("假设这里是【业务规则校验】的业务代码，去数据库里查询用户和密码是否匹配");
+        System.out.println("假设这里是【调用数据层 API】的业务代码，调用数据层的 login 方法");
+
+        return true;
+    }
+}
+```
+
+## 三、动态代理（Dynamic Proxy）
+
+> 所谓动态代理是指：我们开发人员不需要手动创建代理类，我们的项目目录里不会存在一个一个的 .java 代理类文件，而是在程序运行期间动态生成代理类的字码码
+>
+> 动态代理可以解决静态代理存在的问题
 
 ## 一、Spring 是什么
 

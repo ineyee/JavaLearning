@@ -3,6 +3,7 @@ package com.ineyee._01_beforeproxypattern.servlet;
 import com.ineyee._01_beforeproxypattern.service.UserService;
 
 public class UserServlet {
+    // 控制器层直接持有业务层
     private UserService userService;
 
     public void setUserService(UserService userService) {

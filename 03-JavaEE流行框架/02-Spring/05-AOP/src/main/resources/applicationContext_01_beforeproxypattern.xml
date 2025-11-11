@@ -2,8 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- 这个是业务层对象 -->
     <bean id="userService" class="com.ineyee._01_beforeproxypattern.service.UserServiceImpl"/>
+
+    <!-- 这个是控制器层对象 -->
     <bean id="userServlet" class="com.ineyee._01_beforeproxypattern.servlet.UserServlet">
+        <!-- 这里给控制器层注入的是业务层对象 -->
         <property name="userService" ref="userService"/>
     </bean>
 </beans>
