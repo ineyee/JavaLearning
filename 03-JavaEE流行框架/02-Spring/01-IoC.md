@@ -303,3 +303,48 @@ public class App {
 ```xml
 <bean id="person" class="com.ineyee.scopeproperty.Person" scope="prototype"/>
 ```
+
+## 补充：Spring Bean 的生命周期
+
+一个 Spring Bean 从出生到死亡，完整的生命周期方法如下，实际开发中我们可以根据需要选择实现：
+
+```java
+01 - 构造方法
+  如果是通过 setter 方法注入依赖的话，默认是调用无参构造方法
+  如果是通过构造方法注入依赖的话，则调用的是我们自定义的构造方法（不常用，下一篇 DI 会详说）
+  【01 像在诞生一个新生儿】
+
+02 - 依赖注入的 setter 方法
+  如果是通过 setter 方法注入依赖的话，肯定会触发
+  如果是通过构造方法注入依赖的话，则不会触发（不常用，下一篇 DI 会详说）
+  【02 像在给一个新生儿附加一些社会属性，如姓名、性别、年龄】
+  
+03 - BeanNameAware 接口的方法
+04 - ApplicationContextAware 接口的方法
+  BeanNameAware 接口提供了一个方法是 setBeanName，在这个回调方法里我们能获取到创建出来的 bean 对象名字叫什么，需要在类里实现该接口的方法
+  ApplicationContextAware 接口提供了一个方法是 setApplicationContext，在这个回调方法里我们能获取到当前 bean 对象所在的 IoC 容器对象是哪个，需要在类里实现该接口的方法
+  【03、04 像是给这个新生儿办理的出生证明，我们可以在出生证明上看到这个新生儿的名字、出生的城市】
+
+05 - BeanProcessor 的 BeforeInitialization 方法
+  bean 对象的“初始化完成方法”之前会触发
+  自定义一个类，继承 BeanPostProcessor，实现其中的两个方法，这个类和这两个方法不是针对某一个 bean 对象的，所有 bean 对象都会触发，所以我们可以在这个类里写一些所有 bean 对象的公共处理逻辑
+  
+0601 - InitializingBean 接口的方法
+  InitializingBean 接口提供了一个方法是 afterPropertiesSet，这个回调方法就是初始化完成的回调方法，需要在类里实现该接口的方法
+0602 - init-method 属性对应的方法
+  需要在类里自定义好“初始化完成方法”，并在 Spring 配置文件里将 bean 标签的 init-method 属性设置为该方法
+  【经历了 01、02、03、04，就代表这个对象彻底初始化好了，框架就会触发初始化完成的回调，0601 和 0602 是两套不同的监听回调方案，我们任选其一即可，做一些加载资源的操作】
+  
+07 - BeanProcessor 的 AfterInitialization 方法
+  bean 对象的“初始化完成方法”之后触发
+  自定义一个类，继承 BeanPostProcessor，实现其中的两个方法，这个类和这两个方法不是针对某一个 bean 对象的，所有 bean 对象都会触发，所以我们可以在这个类里写一些所有 bean 对象的公共处理逻辑
+  
+08 - 我们自定义的各种业务方法
+  在对象彻底初始化完成之后，我们会获取到该对象，然后调用该对象的各种业务方法
+  
+0901 - DisposableBean 接口的方法
+  DisposableBean 接口提供了一个方法是 destroy，这个回调方法就是即将销毁的回调方法，需要在类里实现该接口的方法
+0902 - destroy-method 属性对应的方法
+  需要在类里自定义好“即将销毁方法”，并在 Spring 配置文件里将 bean 标签的 destroy-method 属性设置为该方法
+  【0901 和 0902 是两套不同的监听回调方案，我们任选其一即可，做一些释放资源的操作】
+```
