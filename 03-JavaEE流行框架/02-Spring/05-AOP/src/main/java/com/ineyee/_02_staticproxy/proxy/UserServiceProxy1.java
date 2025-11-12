@@ -1,9 +1,10 @@
 package com.ineyee._02_staticproxy.proxy;
 
 import com.ineyee._02_staticproxy.service.UserService;
+import com.ineyee._02_staticproxy.service.UserServiceImpl;
 
-// 接口法
-public class UserServiceProxy implements UserService {
+// 继承法
+public class UserServiceProxy1 extends UserServiceImpl {
     // 业务层代理持有业务层
     private UserService userService;
 

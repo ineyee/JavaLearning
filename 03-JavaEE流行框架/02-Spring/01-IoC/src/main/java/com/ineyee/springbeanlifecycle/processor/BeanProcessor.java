@@ -13,6 +13,7 @@ public class BeanProcessor implements BeanPostProcessor {
     @Override
     public @Nullable Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         System.out.println("05 - BeanProcessor：BeforeInitialization(Object, String) = " + bean + ", " + beanName);
+        // 这里的返回值会传递给 postProcessAfterInitialization 方法的参数 bean
         return bean;
     }
 
@@ -20,6 +21,7 @@ public class BeanProcessor implements BeanPostProcessor {
     @Override
     public @Nullable Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         System.out.println("07 - BeanProcessor：AfterInitialization(Object, String) = " + bean + ", " + beanName);
+        // 这里的返回值就是将来通过 Spring 框架最终创建出来的 bean 对象
         return bean;
     }
 }

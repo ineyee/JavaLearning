@@ -10,6 +10,10 @@
         <!-- 这里给业务层代理注入的是业务层对象 -->
         <property name="userService" ref="userService"/>
     </bean>
+<!--    <bean id="userServiceProxy" class="com.ineyee._02_staticproxy.proxy.UserServiceProxy1">-->
+<!--        &lt;!&ndash; 这里给业务层代理注入的是业务层对象 &ndash;&gt;-->
+<!--        <property name="userService" ref="userService"/>-->
+<!--    </bean>-->
 
     <!-- 这个是控制器层对象 -->
     <bean id="userServlet" class="com.ineyee._02_staticproxy.servlet.UserServlet">
