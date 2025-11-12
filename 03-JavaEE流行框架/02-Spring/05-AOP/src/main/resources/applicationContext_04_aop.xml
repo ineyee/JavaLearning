@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!-- 这个是业务层对象 -->
+    <bean id="userService" class="com.ineyee._04_aop.service.UserServiceImpl"/>
+
+    <!-- 这个是控制器层对象 -->
+    <bean id="userServlet" class="com.ineyee._04_aop.servlet.UserServlet">
+        <!-- 这里给控制器层注入的是业务层对象 -->
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <!-- 注册一下 LogInterceptor，使其生效，我们的附加代码就在这个里面 -->
+    <bean id="logInterceptor" class="com.ineyee._04_aop.aop.LogInterceptor"/>
+    <!-- 切面 -->
+    <aop:config>
+        <!--
+            切入点：给哪些类的哪些方法附加代码
+                id 属性：切入点的唯一标识
+                expression 属性：当值为 execution(* *(..)) 时，表示给所有类的所有方法附加代码
+
+            第一个 * 的位置，用来匹配方法的返回值类型，* 表示任意返回值类型、void、int 都能匹配
+            第二个 * 的位置，用来匹配方法名
+                * 表示任意方法名
+                com.ineyee._04_aop.service.* 表示这个包里所有的方法名
+                com.ineyee._04_aop.service.UserService.* 表示这个类里所有的方法名
+                com.ineyee._04_aop.service.UserService.login 表示这个类的 login 方法
+            (..) 的位置，用来匹配方法的参数列表
+                (..) 表示任意个数、任意类型的参数
+                (T, ..) 表示第一个参数是确定类型 T，后面是任意个数、任意类型的参数
+                (T1, T2) 表示有两个参数，第一个参数是确定类型 T1，第二个参数是确定类型 T2
+                (*) 表示有一个参数，参数类型任意
+                () 表示无参
+        -->
+        <aop:pointcut id="pointcut" expression="execution(* com.ineyee._04_aop.service.UserService.login(..))"/>
+        <!-- 通知：按照切入点【pointcut-ref】的配置增加附加代码【advice-ref】 -->
+        <aop:advisor pointcut-ref="pointcut" advice-ref="logInterceptor"/>
+    </aop:config>
+</beans>
