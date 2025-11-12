@@ -554,7 +554,7 @@ public class LogInterceptor implements MethodInterceptor {
         Object result = invocation.proceed();
 
         // 业务层的附加代码都抽取到业务层代理中来了
-        System.out.println("假设这里是【日志存储】的附加代码，当前项目里有一个 login.log 的文件，一旦用户登录成功，就把当前用户是谁、什么时间、什么地点、用什么设备登录的信息持久化到这个文件里以便排查问题");
+        System.out.println("假设这里是【日志存储】的附加代码");
 
         return result;
     }
@@ -589,23 +589,34 @@ public class LogInterceptor implements MethodInterceptor {
         <!--
             切入点：给哪些类的哪些方法附加代码
                 id 属性：切入点的唯一标识
-                expression 属性：当值为 execution(* *(..)) 时，表示给所有类的所有方法附加代码
+                expression 属性：该属性的常见值为 @annotation(xxx) 和 execution(xxx)
+                    @annotation(xxx) 是通过方法注解匹配方法
+                    execution(xxx) 是通过方法定义匹配方法
 
-            第一个 * 的位置，用来匹配方法的返回值类型，* 表示任意返回值类型、void、int 都能匹配
-            第二个 * 的位置，用来匹配方法名
-                * 表示任意方法名
-                com.ineyee._04_aop.service.* 表示这个包里所有的方法名
-                com.ineyee._04_aop.service.UserService.* 表示这个类里所有的方法名
-                com.ineyee._04_aop.service.UserService.login 表示这个类的 login 方法
-            (..) 的位置，用来匹配方法的参数列表
-                (..) 表示任意个数、任意类型的参数
-                (T, ..) 表示第一个参数是确定类型 T，后面是任意个数、任意类型的参数
-                (T1, T2) 表示有两个参数，第一个参数是确定类型 T1，第二个参数是确定类型 T2
-                (*) 表示有一个参数，参数类型任意
-                () 表示无参
+                1、@annotation(xxx)
+                    @annotation(xxx) 表示匹配所有带有 @xxx 注解的方法，比如 @annotation(java.lang.Override) 表示匹配所有带有 @Override 注解的方法
+                    实际开发中，我们经常会自定义注解来配合 @annotation(xxx) 来使用，写上自定义注解的全名即可
+                2、execution(xxx)
+                    当值为 execution(* *(..)) 时，表示给所有类的所有方法附加代码
+                    第一个 * 的位置，用来匹配方法的返回值类型
+                        * 表示任意返回值类型
+                        void、int、String 等表示某个具体返回值类型
+                    第二个 * 的位置，用来匹配方法名
+                        * 表示任意方法名
+                        com.ineyee._04_aop.service.*.* 表示这个包里所有类的所有方法（不包含子包里的）
+                        com.ineyee._04_aop.service..*.* 表示这个包及其子包里所有类的所有方法
+                        com.ineyee._04_aop.service.UserService.* 表示这个类里所有的方法
+                        com.ineyee._04_aop.service.UserService.login 表示这个类里的 login 方法
+                    (..) 的位置，用来匹配方法的参数列表
+                        (..) 表示任意个数、任意类型的参数
+                        (T, ..) 表示第一个参数是确定类型 T，后面是任意个数、任意类型的参数
+                        (T1, T2) 表示有两个参数，第一个参数是确定类型 T1，第二个参数是确定类型 T2
+                        (*) 表示有一个参数，参数类型任意
+                        () 表示无参
         -->
+<!--        <aop:pointcut id="pointcut" expression="@annotation(java.lang.Override)"/>-->
         <aop:pointcut id="pointcut" expression="execution(* com.ineyee._04_aop.service.UserService.login(..))"/>
-        <!-- 通知：按照切入点【pointcut-ref】的配置增加附加代码【advice-ref】 -->
+        <!-- 通知：按照切入点【pointcut-ref】的配置把附加代码【advice-ref】给附加上去 -->
         <aop:advisor pointcut-ref="pointcut" advice-ref="logInterceptor"/>
     </aop:config>
 </beans>
