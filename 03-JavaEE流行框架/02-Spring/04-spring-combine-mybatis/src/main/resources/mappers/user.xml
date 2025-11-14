@@ -47,4 +47,38 @@
         -- 先按 create_time 降序排序，如果 create_time 相同，再按 id 降序排列
         ORDER BY create_time DESC, id DESC
     </select>
+
+    <!--
+        insert 标签里用来写“增”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
+            parameterType：给 SQL 语句提供参数的入参真实类型，外界传进来时统一是基类 Object
+            resultType 已经固定死了是 Integer，所以这里不需要再手动指定
+    -->
+    <insert id="save" parameterType="User">
+        -- 往数据库里写入数据时，建议 SQL 语句里显式写全表里的所有字段，不要只写一部分
+        -- 这样外界传进来的 bean 对象如果全部属性都有值，那刚好完全匹配
+        -- 如果有的可选属性没值，那 MyBatis 就会自动用 null 给属性赋值，因此最终数据库里对应的字段会存储为 null 或该可选字段的默认值
+        INSERT INTO t_user (name, age, height, email)
+        -- name、age、height、email 是参数名，因为外界传进来一个 bean 对象，所以参数名只要和 bean 对象中的属性名一一对应，就能顺利匹配到参数值
+        VALUES (#{name}, #{age}, #{height}, #{email});
+
+        -- 外界不是传进来一个 bean 对象来保存嘛
+        -- 实际开发中我们一般都是在保存成功后直接给客户端返回刚保存成功的那条完整数据 data=bean，这样客户端就不用再查询一遍了
+        -- 但是外界传进来的那个 bean 对象肯定是还没有 id、createTime、updateTime 这些属性值的
+        -- 而 MyBatis 就提供了一个自动回填的功能，可以在插入数据成功后自动把新插入数据的某些字段回填到传进来的 bean 对象中
+        -- 这样外界就可以直接拿着传进来的那个 bean 对象返回给客户端了，就不用再去数据库查询一遍了
+        -- order="AFTER"：代表在插入语句执行完毕后执行回填
+        -- keyProperty：要回填的属性名，即 bean 对象里的属性名（多个属性名之间用逗号隔开，不能有空格）
+        -- resultType：bean 的类型
+        <selectKey order="AFTER" keyProperty="id,createTime,updateTime" resultType="User">
+            SELECT
+            -- 别名要跟 keyProperty 里的一致
+            id AS id,
+            create_time AS createTime,
+            update_time AS updateTime
+            FROM t_user
+            -- LAST_INSERT_ID()：返回的是刚插入的记录的 id
+            WHERE id = LAST_INSERT_ID();
+        </selectKey>
+    </insert>
 </mapper>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       https://www.springframework.org/schema/context/tx.xsd">
+    <!-- 这个是数据层对象 -->
+    <bean id="moneyDao" class="com.ineyee._05_aoptx.dao.MoneyDaoImpl"/>
+
+    <!-- 这个是业务层对象 -->
+    <bean id="moneyService" class="com.ineyee._05_aoptx.service.MoneyServiceImpl">
+        <property name="moneyDao" ref="moneyDao"/>
+    </bean>
+
+    <!--
+        开发环境和生产环境的数据库连接池及连接及数据库
+            开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
+            生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
+    -->
+    <context:property-placeholder location="database-dev.properties"/>
+    <bean id="devDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+
+    <!-- Spring 的事务管理器，用来进行事务管理 -->
+    <bean id="txMgr" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 要进行事务管理，肯定得先拿到跟数据库相关的东西，因为事务管理就是决定如何操作数据库嘛 -->
+        <property name="dataSource" ref="devDataSource"/>
+    </bean>
+
+    <!-- 这里是附加代码，传个 transaction-manager 进去代表要搞的是事务管理的附加代码（这些附加代码 Spring 已经给我们提供好了，我们只需要配置一下即可） -->
+    <tx:advice id="advice" transaction-manager="txMgr">
+        <tx:attributes>
+            <!--
+                这个方法要使用事务
+                read-only：是否只读
+                propagation：传播行为
+                rollback-for：发生什么异常进行回滚
+            -->
+            <tx:method name="transfer" read-only="false" propagation="REQUIRED" rollback-for="Exception"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 切面 -->
+    <aop:config>
+        <!--
+            切入点：给哪些类的哪些方法附加代码
+            该切入点表示要给 com.ineyee._05_aoptx.service 包及其子包里所有类的所有方法都附加代码
+
+            好像只写到了类，没有写到方法，而是让其它地方指定方法，expression="execution(* com.ineyee._05_aoptx.service..*(..))
+            直接这里指定方法不可以吗？
+        -->
+        <aop:pointcut id="pointcut" expression="execution(* com.ineyee._05_aoptx.service..*.*(..))"/>
+        <!-- 通知：按照切入点【pointcut-ref】的配置把附加代码【advice-ref】给附加上去 -->
+        <aop:advisor pointcut-ref="pointcut" advice-ref="advice"/>
+    </aop:config>
+</beans>

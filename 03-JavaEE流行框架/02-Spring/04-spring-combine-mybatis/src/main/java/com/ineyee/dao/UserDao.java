@@ -16,4 +16,14 @@ public interface UserDao {
      * ② [] 代表本次查询没有数据
      */
     List<User> listPageHelper();
+
+    /**
+     * 新增一个用户
+     *
+     * @param user 用户 bean
+     * @return 影响的数据条数
+     * ① 影响的数据条数 > 0 代表保存成功，此时 MyBatis 会自动回填传进来 userBean 的其它参数，我们一般是给客户端响应刚保存成功的那条完整数据 data=bean，这样客户端就不用再查询一遍了
+     * ② 影响的数据条数 <= 0 代表保存失败，我们一般是给客户端响应 data=null
+     */
+    int save(User user);
 }

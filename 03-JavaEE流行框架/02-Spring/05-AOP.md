@@ -622,3 +622,50 @@ public class LogInterceptor implements MethodInterceptor {
 </beans>
 ```
 
+## 六、AOP 的实际应用场景：事务
+
+#### 1、基本使用
+
+最早我们通过 JDBC 实现 dao 层的时候，是通过数据库连接来管理事务的，事务管理写在 dao 层。
+
+```java
+// XxxDao.java
+
+// 从连接池里获取一个连接
+Connection conn = connectionPool.getConnection();
+
+// JDBC 默认开启了事务，且打开了自动提交
+// 所以如果我们想手动管理事务，就得先关闭自动提交，然后在多条 SQL 执行之后手动提交
+conn.setAutoCommit(false);
+
+try {
+    // 业务...
+
+    // 成功后提交事务
+    conn.commit();
+} catch (Exception e) {
+    // 失败后回滚事务
+    conn.rollback();
+}
+```
+
+但实际开发中，很多业务是跨 dao 的，也就是说一个业务可能要使用多个 dao 才能完成，所以把事务管理写在 dao 层，就只能保证一个 dao 操作的原子性，无法保证一个业务方法执行的原子性，因此实际开发中`事务管理应该总是写在业务层，以此来确保每个业务方法执行的原子性`。所以后来我们通过 MyBatis  实现 dao 层的时候，就把事务管理放到了业务层，MyBatis 是通过 SqlSession 来管理事务的，现在我们是单独使用 MyBatis，此时 SqlSession 既负责执行 SQL 语句也负责管理事务。
+
+```java
+// XxxService.java
+
+// 获取 SqlSession
+try (SqlSession session = MyBatisUtil.openSession()) {
+    // 业务...
+
+    // MyBatis 默认开启了事务，但关闭了自动提交
+    // 所以针对“增删改”操作，我们需要成功后手动提交事务，“查”操作不影响数据库，不需要提交事务
+    session.commit();
+} catch (Exception e) {
+    // 失败后回滚事务
+    session.rollback();
+}
+```
+
+再后来我们用 Spring 整合了 MyBatis，现在我们不是单独使用 MyBatis，而是 Spring + MyBatis，此时 SqlSession 只负责执行 SQL 语句，事务管理的工作交给了 Spring，它默认开启了事务，且打开了自动提交，当然 Spring 也给我们提供了手动管理事务的方式，不过需要结合 AOP 技术才能实现（因为事务管理的代码是附加代码，无非就是在业务代码前面附加上开启事务的代码，在业务代码后面附加上提交事务或回滚事务的代码，所以用 AOP 实现再合适不过）。`并且我们也不需要像《五、怎么使用 AOP》里那样在 Java 代码里自定义一个实现了 MethodInterceptor 接口的 Interceptor 类来存放附加代码，因为 Spring 早就给我们提供好了事务管理的附加代码，我们只需要在 Spring 配置文件里配置一下就能完成事务管理了，事务管理写在配置文件里的一大好处是如果线上我们需要修改某些业务的事务管理将会非常方便。`
+
