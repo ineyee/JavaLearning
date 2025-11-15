@@ -281,3 +281,110 @@ password=mysqlroot
 </beans>
 ```
 
+## 补充：多个 Spring 配置文件
+
+注意这里的《多个 Spring 配置文件》跟上面的《applicationContext.xml 引入其它配置文件》不一样，上面的还是一个 Spring 配置文件，只不过是把某些配置的值放到了单独的配置文件里，而这里的真正是多个 Spring 配置文件，是把原来一个 Spring 配置文件里的内容按模块拆分成了多个 Spring 配置文件，避免一个 Spring 配置文件过大过于臃肿。比如下面的演示就搞了两个 Spring 配置文件，一个是主配置文件，一个是专门用来搞事务管理的配置文件，然后在读取 Spring 配置文件的时候要加上通配符以便能读取到所有的 Spring 配置文件：
+
+```xml
+<!-- 主配置文件 applicationContext.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- 这个是数据层对象 -->
+    <bean id="moneyDao" class="com.ineyee._05_aoptx.dao.MoneyDaoImpl"/>
+
+    <!-- 这个是业务层对象 -->
+    <bean id="moneyService" class="com.ineyee._05_aoptx.service.MoneyServiceImpl">
+        <property name="moneyDao" ref="moneyDao"/>
+    </bean>
+</beans>
+```
+
+```xml
+<!-- 专门用来搞事务管理的配置文件 applicationContext-tx.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--
+        开发环境和生产环境的数据库连接池及连接及数据库
+            开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
+            生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
+
+        将会被下面的 txMgr 对象引用
+    -->
+    <context:property-placeholder location="database-dev.properties"/>
+    <bean id="devDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+
+    <!--
+        Spring 的事务管理器，用来进行事务管理
+
+        将会被下面的 advice 对象引用
+    -->
+    <bean id="txMgr" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 要进行事务管理，肯定得先拿到跟数据库相关的东西，因为事务管理就是决定如何操作数据库嘛 -->
+        <property name="dataSource" ref="devDataSource"/>
+    </bean>
+
+    <!--
+        这里是附加代码，传个 transaction-manager 进去代表要搞的是事务管理相关的附加代码（这些附加代码 Spring 已经给我们提供好了，我们只需要配置一下即可）
+
+        将会被下面的切面引用
+    -->
+    <tx:advice id="advice" transaction-manager="txMgr">
+        <!-- attributes 标签里需要写明哪些方法需要切入事务管理的附加代码 -->
+        <tx:attributes>
+            <!--
+                一个 method 标签就是一个方法，会结合切入点表达式所设置的类来共同决定到底是哪个类的哪些方法
+                    propagation 属性：指定事务嵌套时的传播行为
+                    rollback-for 属性：发生什么异常进行回滚
+            -->
+            <tx:method name="transfer" rollback-for="Exception"/>
+            <!-- * 是通配符，代表以 xxx 开头的方法 -->
+            <tx:method name="save*"/>
+            <tx:method name="remove*"/>
+            <tx:method name="update*"/>
+            <tx:method name="get*" propagation="SUPPORTS"/>
+            <tx:method name="list*" propagation="SUPPORTS"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 切面 -->
+    <aop:config>
+        <!--
+            切入点：给哪些类的哪些方法附加代码
+            该切入点表示要给 com.ineyee._05_aoptx.service 包及其子包里所有类的所有方法都附加代码
+
+            切入 Spring 事务管理代码的话，这里的切入点表达式只约束到类就可以了，具体的方法由上面的 attributes 指定
+        -->
+        <aop:pointcut id="pointcut" expression="execution(* com.ineyee._05_aoptx.service..*(..))"/>
+        <!-- 通知：按照切入点【pointcut-ref】的配置把附加代码【advice-ref】给附加上去 -->
+        <aop:advisor pointcut-ref="pointcut" advice-ref="advice"/>
+    </aop:config>
+</beans>
+```
+
+```java
+// 读取所有以 applicationContext 开头的 Spring 的配置文件
+ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath*:applicationContext*.xml");
+```
+

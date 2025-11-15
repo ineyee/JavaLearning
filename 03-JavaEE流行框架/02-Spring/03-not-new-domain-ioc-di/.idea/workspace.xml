@@ -52,7 +52,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/02-Spring/03-not-new-domain-ioc-di/src/main/resources",
+    "last_opened_file_path": "/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/02-Spring/03-not-new-domain-ioc-di",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -162,6 +162,7 @@
       <workItem from="1762478843844" duration="15055000" />
       <workItem from="1762565681873" duration="1326000" />
       <workItem from="1762758466974" duration="4044000" />
+      <workItem from="1763207898393" duration="215000" />
     </task>
     <servers />
   </component>
