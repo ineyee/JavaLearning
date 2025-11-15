@@ -669,3 +669,120 @@ try (SqlSession session = MyBatisUtil.openSession()) {
 
 再后来我们用 Spring 整合了 MyBatis，现在我们不是单独使用 MyBatis，而是 Spring + MyBatis，此时 SqlSession 只负责执行 SQL 语句，事务管理的工作交给了 Spring，它默认开启了事务，且打开了自动提交，当然 Spring 也给我们提供了手动管理事务的方式，不过需要结合 AOP 技术才能实现（因为事务管理的代码是附加代码，无非就是在业务代码前面附加上开启事务的代码，在业务代码后面附加上提交事务或回滚事务的代码，所以用 AOP 实现再合适不过）。`并且我们也不需要像《五、怎么使用 AOP》里那样在 Java 代码里自定义一个实现了 MethodInterceptor 接口的 Interceptor 类来存放附加代码，因为 Spring 早就给我们提供好了事务管理的附加代码，我们只需要在 Spring 配置文件里配置一下就能完成事务管理了，事务管理写在配置文件里的一大好处是如果线上我们需要修改某些业务的事务管理将会非常方便。`
 
+```java
+// XxxService.java
+public class MoneyServiceImpl implements MoneyService {
+    MoneyDao moneyDao;
+
+    public void setMoneyDao(MoneyDao moneyDao) {
+        this.moneyDao = moneyDao;
+    }
+
+    @Override
+    public void transfer(Integer fromUserId, Integer toUserId, Double money) {
+        // 这里会自动切入开启事务的代码
+        // fromUserId 扣钱
+        moneyDao.update(fromUserId, -money);
+
+        // 模拟业务执行过程中出现异常
+        System.out.println(10 / 0);
+
+        // toUserId 加钱
+        moneyDao.update(toUserId, money);
+
+        // 成功后，这里会自动切入会提交事务的代码
+        // 失败后，这里会自动切入会回滚事务的代码
+    }
+}
+```
+
+```xml
+<!-- applicationContext_05_aoptx.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!-- 这个是数据层对象 -->
+    <bean id="moneyDao" class="com.ineyee._05_aoptx.dao.MoneyDaoImpl"/>
+
+    <!-- 这个是业务层对象 -->
+    <bean id="moneyService" class="com.ineyee._05_aoptx.service.MoneyServiceImpl">
+        <property name="moneyDao" ref="moneyDao"/>
+    </bean>
+
+    <!--
+        开发环境和生产环境的数据库连接池及连接及数据库
+            开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
+            生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
+
+        将会被下面的 txMgr 对象引用
+    -->
+    <context:property-placeholder location="database-dev.properties"/>
+    <bean id="devDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+
+    <!--
+        Spring 的事务管理器，用来进行事务管理
+
+        将会被下面的 advice 对象引用
+    -->
+    <bean id="txMgr" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 要进行事务管理，肯定得先拿到跟数据库相关的东西，因为事务管理就是决定如何操作数据库嘛 -->
+        <property name="dataSource" ref="devDataSource"/>
+    </bean>
+
+    <!--
+        这里是附加代码，传个 transaction-manager 进去代表要搞的是事务管理相关的附加代码（这些附加代码 Spring 已经给我们提供好了，我们只需要配置一下即可）
+
+        将会被下面的切面引用
+    -->
+    <tx:advice id="advice" transaction-manager="txMgr">
+        <!-- attributes 标签里需要写明哪些方法需要切入事务管理的附加代码 -->
+        <tx:attributes>
+            <!--
+                一个 method 标签就是一个方法，会结合切入点表达式所设置的类来共同决定到底是哪个类的哪些方法
+                    read-only：是否只读
+                    propagation：传播行为
+                    rollback-for：发生什么异常进行回滚
+            -->
+            <tx:method name="transfer"/>
+            <!-- * 是通配符，代表以 xxx 开头的方法 -->
+            <tx:method name="save*"/>
+            <tx:method name="remove*"/>
+            <tx:method name="update*"/>
+            <tx:method name="get*"/>
+            <tx:method name="list*"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 切面 -->
+    <aop:config>
+        <!--
+            切入点：给哪些类的哪些方法附加代码
+            该切入点表示要给 com.ineyee._05_aoptx.service 包及其子包里所有类的所有方法都附加代码
+
+            切入 Spring 事务管理代码的话，这里的切入点表达式只约束到类就可以了，具体的方法由上面的 attributes 指定
+        -->
+        <aop:pointcut id="pointcut" expression="execution(* com.ineyee._05_aoptx.service..*(..))"/>
+        <!-- 通知：按照切入点【pointcut-ref】的配置把附加代码【advice-ref】给附加上去 -->
+        <aop:advisor pointcut-ref="pointcut" advice-ref="advice"/>
+    </aop:config>
+</beans>
+```
+
