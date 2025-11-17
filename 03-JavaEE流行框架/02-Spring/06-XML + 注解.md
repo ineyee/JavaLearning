@@ -128,7 +128,13 @@ public class App {
 
 ## 三、注解实现 IoC
 
-#### 1、基本实现
+#### 基本实现
+
+> 现在我们就知道了两种 Spring 创建对象的方式，<bean> 标签法和 @Component 注解法
+>
+> 同时我们也会发现 @Component 注解法只适用于那些我们自己定义的 Java 类，因为只有这些 Java 类我们才能在源码里编写注解，而系统的类或三方库的类我们还是只能通过 <bean> 标签法来搞，因为我们不能在人家的源码里编写注解
+>
+> 换句话说，@Component 注解法只适用于我们自己定义的 Java 类，而 <bean> 标签法是万能的
 
 纯 XML 开发方式下，我们只要在 Spring 配置文件里写一个 <bean> 标签，Spring 框架就会自动创建一个对象并放到 IoC 容器里。
 
@@ -174,13 +180,7 @@ XML + 注解混合开发方式下，我们要想让 Spring 框架自动创建一
   public class UserDaoImpl implements UserDao { }
   ```
 
-> 现在我们就知道了两种 Spring 创建对象的方式，<bean> 标签法和 @Component 注解法
->
-> 同时我们也会发现 @Component 注解法只适用于那些我们自己定义的 Java 类，因为只有这些 Java 类我们才能在源码里编写注解，而系统的类或三方库的类我们还是只能通过 <bean> 标签法来搞，因为我们不能在人家的源码里编写注解
->
-> 换句话说，@Component 注解法只适用于我们自己定义的 Java 类，而 <bean> 标签法是万能的
-
-#### 2、@Scope 注解
+#### 补充：@Scope 注解
 
 @Scope 注解就是之前 <bean> 标签里 scope 属性的功能，用来决定“在同一个 IoC 容器里 + 通过同一个 beanId 获取到的对象是不是只有一份”，默认值是 singleton，还有另外一个值是 prototype。
 
@@ -190,4 +190,169 @@ XML + 注解混合开发方式下，我们要想让 Spring 框架自动创建一
 //@Scope("prototype")
 public class User { }
 ```
+
+## 四、注解实现 DI
+
+#### 基本实现
+
+> 现在我们就知道了两种 Spring 依赖注入的方式，<property> 标签法和 @Autowired、@Value 注解法
+>
+> 同时我们也会发现 @Autowired、@Value 注解法只适用于那些我们自己定义的 Java 类 + 基本数据类型、BigDecimal、字符串、自定义对象类型的属性，因为只有这些 Java 类我们才能在源码里编写注解，而系统的类或三方库的类我们还是只能通过 <bean> 标签法来搞，因为我们不能在人家的源码里编写注解，并且
+>
+> 换句话说，@Autowired、@Value 注解法只适用于我们自己定义的 Java 类 + 基本数据类型、BigDecimal、字符串、自定义对象类型的属性，而 <property> 标签法是万能的
+
+实际开发中，一般都是通过 setter 方法注入，所以这里就不演示通过构造方法注入了。
+
+纯 XML 开发方式下，我们是在 Spring 配置文件里的 <bean> 标签里嵌套 <property> 标签来实现依赖注入的：
+
+* 当属性的数据类型为基本数据类型、BigDecimal、字符串时，直接使用 <property> 标签的 value 属性给属性赋值即可
+* 当属性的数据类型为自定义对象类型时，直接使用 <property> 标签的 ref 属性给属性赋值即可
+* 当属性的数据类型为集合类型时，需要使用特定的集合标签给属性赋值
+
+XML + 注解混合开发方式下，我们要实现依赖注入，直接在`我们自己定义的 Java 类`里的 setter 方法上写一个 @Value 或 @Autowired 注解就可以了，其中：
+
+* 当属性的数据类型为基本数据类型、BigDecimal、字符串时，用 @Value（@Value 注入的值总是一个字符串，会自动转换成目标数据类型）
+* 当属性的数据类型为自定义对象类型，用 @Autowired（@Autowired 是根据 setter 方法参数的数据类型注入的，而不是参数的名字）
+* ~~当属性的数据类型为集合类型时，我们还是只能通过 <bean> 标签法来搞~~
+
+```java
+// Dog.java
+
+@Component
+public class Dog {
+    private String name;
+
+    @Value("旺财")
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Dog{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+}
+```
+
+```java
+// Person.java
+
+@Component
+public class Person {
+    // 基本数据类型
+    private Boolean isPartyMember;
+    private Integer age;
+    private Double height;
+
+    @Value("false")
+    public void setPartyMember(Boolean partyMember) {
+        isPartyMember = partyMember;
+    }
+
+    @Value("18")
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    @Value("1.88")
+    public void setHeight(Double height) {
+        this.height = height;
+    }
+
+    // BigDecimal
+    private BigDecimal salary;
+
+    @Value("666666.66")
+    public void setSalary(BigDecimal salary) {
+        this.salary = salary;
+    }
+
+    // 字符串
+    private String name;
+
+    @Value("张三")
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    // 自定义对象类型
+    private Dog dog;
+
+    @Autowired
+    public void setDog(Dog dog) {
+        this.dog = dog;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "isPartyMember=" + isPartyMember +
+                ", age=" + age +
+                ", height=" + height +
+                ", salary=" + salary +
+                ", name='" + name + '\'' +
+                ", dog=" + dog +
+                '}';
+    }
+}
+```
+
+#### 补充：@Qualifier 注解
+
+上面我们已经提到“@Autowired 是根据 setter 方法参数的数据类型注入的，而不是参数的名字”，那么如果 IoC 容器里有多个 UserService 类的实现，比如：
+
+```java
+public interface UserService { }
+
+@Service(value = "userService")
+public class UserServiceImpl implements UserService { }
+
+@Service(value = "userService1")
+public class UserServiceImpl1 implements UserService { }
+```
+
+此时如果仅靠 @Autowired 类型注入就会报错：NoUniqueBeanDefinitionException，因为 Spring 不知道我们到底要用哪一个实现类的对象：
+
+```java
+@Controller
+public class UserServlet {
+    private UserService userService;
+
+    @Autowired()
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+}
+```
+
+这时就得用 @Qualifier 注解来告诉 Spring，我们明确想要用 beanId 为 xxx 的那一个bean 对象：
+
+```java
+@Controller
+public class UserServlet {
+    private UserService userService;
+
+    @Autowired
+    @Qualifier("userService1")
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
