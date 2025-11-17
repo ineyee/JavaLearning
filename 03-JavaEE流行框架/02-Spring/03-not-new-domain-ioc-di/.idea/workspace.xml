@@ -5,10 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bf74b702-c509-4d04-ade7-a105a12520ff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../06-xml-plus-annotation/src/main/java/com/ineyee/_03_notnewdomainiocdi/App.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../06-xml-plus-annotation/src/main/java/com/ineyee/_03_notnewdomainiocdi/ConnectionFactoryBean.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../06-xml-plus-annotation/src/main/resources/applicationContext_03_notnewdomainiocdi.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../06-xml-plus-annotation/src/main/resources/database.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../06-XML + 注解.md" beforeDir="false" afterPath="$PROJECT_DIR$/../06-XML + 注解.md" afterDir="false" />
     </list>
@@ -171,7 +167,7 @@
       <workItem from="1762758466974" duration="4044000" />
       <workItem from="1763207898393" duration="215000" />
       <workItem from="1763345989196" duration="11000" />
-      <workItem from="1763370197693" duration="1683000" />
+      <workItem from="1763370197693" duration="2153000" />
     </task>
     <servers />
   </component>

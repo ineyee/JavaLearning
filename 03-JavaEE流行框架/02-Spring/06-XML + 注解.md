@@ -342,7 +342,7 @@ public class UserServlet {
 }
 ```
 
-## 五、创建过程比较复杂的对象的 IoC 与 DI
+## 五、注解实现创建过程比较复杂的对象的 IoC 与 DI
 
 #### 基本实现
 
@@ -402,7 +402,7 @@ public class ConnectionFactoryBean implements FactoryBean<Connection> {
 }
 ```
 
-#### 补充：@PropertySource、注解
+#### 补充：@PropertySource 注解
 
 前面的演示里，我们是把数据库相关配置的值直接写死在 Java 类里注入的，但是实际开发中我们一般都是把数据库相关配置的值写在独立的配置文件里，然后在 Java 类里引入独立的配置文件，这样一来我们如果想改一下数据库相关配置的值，直接改独立的配置文件即可， Java 类根本不用动。
 
@@ -473,9 +473,104 @@ public class ConnectionFactoryBean implements FactoryBean<Connection> {
 }
 ```
 
+## 六、注解实现 AOP
 
+#### 基本实现
 
+纯 XML 开发方式下，我们需要创建一个实现了 MethodInterceptor 接口的 Interceptor 类，在这个类里写好`附加代码`，然后在 Spring 配置文件配置`切面`、`切入点`、`advisor`。
 
+XML + 注解混合开发方式下，我们要想实现 AOP，要做五步：
 
+* 第一步：在 Spring 配置文件里写个 aop:aspectj-autoproxy 标签
 
+* 第二步：自定义一个类，用 @Aspect 注解标识一下这个类是个`切面类`（@Aspect 注解就是之前 aop:config 标签的功能，用来表示一个切面，现在一个切面类就是一个切面），再用 @Component 注解让 Spring 自动创建这个类的对象并放到 IoC 容器里
+* 第三步：然后定义一个空方法，在这个空方法上面用 @Pointcut 注解来配置给哪些类的哪些方法附加代码（@Pointcut 注解就是之前 aop:pointcut 标签的功能，用来表示一个`切入点`）
+* 第四步：然后在这个类里定义一个一个的方法（方法名随便、参数必须是 ProceedingJoinPoint、返回值也必须是 Object），这一个一个的方法就是之前一个一个的 Interceptor 类里的 invoke 方法，这一个一个的方法就是业务层代理的方法，我们就是把`附加代码`写在这一个一个的方法里
+* 第五步：然后在这一个一个的方法上面用 @Around 注解把切入点和附加代码给整合起来（@Aspect 注解就是之前 aop:advisor 标签的功能，用来把切入点和附加代码给整合起来）
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--
+        通过 context:component-scan 标签告诉 Spring 框架哪个包里的类是通过注解实现 IoC 的
+        Spring 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 容器里
+    -->
+    <context:component-scan base-package="com.ineyee._04_aop.basicuse"/>
+
+    <!-- 注解实现 AOP 相关 -->
+    <aop:aspectj-autoproxy/>
+</beans>
+```
+
+```java
+@Aspect
+@Component
+public class DefaultAspect {
+    @Pointcut("execution(* com.ineyee._04_aop.basicuse.service..*.*(..))")
+    public void pointcut() {
+    }
+
+    // 我们可以认为这个方法就是业务层代理的方法
+    // 我们只需要专心考虑附加代码怎么写就可以了
+    @Around("pointcut()")
+    public Object log(ProceedingJoinPoint point) throws Throwable {
+        // 业务层代理调用业务层的代码（相当于中介跟房东对接）
+        Object result = point.proceed();
+
+        // 业务层的附加代码都抽取到业务层代理中来了
+        System.out.println("假设这里是【日志存储】的附加代码");
+
+        return result;
+    }
+}
+```
+
+* 控制器层的代码一点都不用动，加个 @Controller 和 @Autowired 注解即可
+
+```java
+@Controller
+public class UserServlet {
+    // 控制器层表面还是持有业务层，实际却是持有业务层代理（本质原因是我们在 afterInit 生命周期方法里把创建业务层对象“篡改”成了创建业务层代理对象）
+    private UserService userService;
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    public Boolean login(String username, String password) {
+        // 控制器层表面还是在直接调用业务层的代码，实际却是在调用业务层代理的代码（相当于租客跟中介对接）
+        return userService.login(username, password);
+    }
+}
+```
+
+* 业务层只写业务代码，加个 @Service 注解即可
+
+```java
+public interface UserService {
+    Boolean login(String username, String password);
+}
+
+@Service("userService")
+public class UserServiceImpl implements UserService {
+    @Override
+    public Boolean login(String username, String password) {
+        // 业务层只写业务代码
+        System.out.println("假设这里是【业务规则校验】的业务代码，去数据库里查询用户和密码是否匹配");
+        System.out.println("假设这里是【调用数据层 API】的业务代码，调用数据层的 login 方法");
+
+        return true;
+    }
+}
+```
 
