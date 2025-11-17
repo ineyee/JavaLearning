@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--
+        通过 context:component-scan 标签告诉 Spring 框架哪个包里的类是通过注解实现 IoC 的
+        Spring 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 容器里
+    -->
+    <context:component-scan base-package="com.ineyee._04_aop.tx"/>
+
+    <!--
+        开发环境和生产环境的数据库连接池及连接及数据库
+            开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
+            生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
+
+        将会被下面的 txMgr 对象引用
+    -->
+    <context:property-placeholder location="database-dev.properties"/>
+    <bean id="devDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+
+    <!--
+        Spring 的事务管理器，用来进行事务管理
+
+        将会被下面的注解驱动引用
+    -->
+    <bean id="txMgr" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 要进行事务管理，肯定得先拿到跟数据库相关的东西，因为事务管理就是决定如何操作数据库嘛 -->
+        <property name="dataSource" ref="devDataSource"/>
+    </bean>
+
+    <!-- 事务管理的注解驱动 -->
+    <tx:annotation-driven transaction-manager="txMgr"/>
+</beans>

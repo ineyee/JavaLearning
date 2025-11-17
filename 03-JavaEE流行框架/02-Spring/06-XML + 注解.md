@@ -477,7 +477,7 @@ public class ConnectionFactoryBean implements FactoryBean<Connection> {
 
 #### 基本实现
 
-纯 XML 开发方式下，我们需要创建一个实现了 MethodInterceptor 接口的 Interceptor 类，在这个类里写好`附加代码`，然后在 Spring 配置文件配置`切面`、`切入点`、`advisor`。
+纯 XML 开发方式下，我们需要创建一个实现了 MethodInterceptor 接口的 Interceptor 类，在这个类里写好`附加代码`，然后在 Spring 配置文件里配置`切面`、`切入点`、`advisor`。
 
 XML + 注解混合开发方式下，我们要想实现 AOP，要做五步：
 
@@ -570,6 +570,97 @@ public class UserServiceImpl implements UserService {
         System.out.println("假设这里是【调用数据层 API】的业务代码，调用数据层的 login 方法");
 
         return true;
+    }
+}
+```
+
+#### 补充：AOP 的实际应用场景——事务
+
+纯 XML 开发方式下，我们是直接在 Spring 配置文件里配置`数据源`、`事务管理器`、`附加代码`、`切面`就实现了事务管理。
+
+XML + 注解混合开发方式下，我们要想实现事务管理，要做四步：
+
+* 第一步：还是在 Spring 配置文件里配置`数据源`
+* 第二步：还是在 Spring 配置文件里配置`事务管理器`
+* 第三步：在 Spring 配置文件里新增配置一个`事务管理的注解驱动`，附加代码和切面就不用配置了
+* 第四步：然后我们想给哪个业务增加事务管理的代码，就直接在这个业务类里加上一个 @Transactional 注解就完事了，这样一来这个业务类里所有的方法都会自动加上事务管理的代码，当然我们也可以只在某一个方法上加上一个 @Transactional 注解
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--
+        通过 context:component-scan 标签告诉 Spring 框架哪个包里的类是通过注解实现 IoC 的
+        Spring 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 容器里
+    -->
+    <context:component-scan base-package="com.ineyee._04_aop.tx"/>
+
+    <!--
+        开发环境和生产环境的数据库连接池及连接及数据库
+            开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
+            生产阶段，我们可以把默认环境设置为生产环境，从而访问正式数据库
+
+        将会被下面的 txMgr 对象引用
+    -->
+    <context:property-placeholder location="database-dev.properties"/>
+    <bean id="devDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+
+    <!--
+        Spring 的事务管理器，用来进行事务管理
+
+        将会被下面的注解驱动引用
+    -->
+    <bean id="txMgr" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 要进行事务管理，肯定得先拿到跟数据库相关的东西，因为事务管理就是决定如何操作数据库嘛 -->
+        <property name="dataSource" ref="devDataSource"/>
+    </bean>
+
+    <!-- 事务管理的注解驱动 -->
+    <tx:annotation-driven transaction-manager="txMgr"/>
+</beans>
+```
+
+```java
+@Service("moneyService")
+@Transactional
+public class MoneyServiceImpl implements MoneyService {
+    MoneyDao moneyDao;
+
+    @Autowired
+    public void setMoneyDao(MoneyDao moneyDao) {
+        this.moneyDao = moneyDao;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void transfer(Integer fromUserId, Integer toUserId, Double money) {
+        // 这里会自动切入开启事务的代码
+        // fromUserId 扣钱
+        moneyDao.update(fromUserId, -money);
+
+        // 模拟业务执行过程中出现异常
+        System.out.println(10 / 0);
+
+        // toUserId 加钱
+        moneyDao.update(toUserId, money);
+
+        // 成功后，这里会自动切入会提交事务的代码
+        // 失败后，这里会自动切入会回滚事务的代码
     }
 }
 ```
