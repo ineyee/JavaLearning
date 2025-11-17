@@ -342,13 +342,136 @@ public class UserServlet {
 }
 ```
 
+## 五、创建过程比较复杂的对象的 IoC 与 DI
 
+#### 基本实现
 
+纯 XML 开发方式下，我们是用 Spring 自带的 FactoryBean 法创建了一个 FactoryBean 类，然后在 Spring 配置文件完成了 FactoryBean 对象的创建与依赖注入。
 
+XML + 注解混合开发方式下，我们依然得用 Spring 自带的 FactoryBean 法创建一个 FactoryBean 类，但是不是在 Spring 配置文件里做 FactoryBean 对象的创建与依赖注入，而是直接在 FactoryBean 类里做。
 
+```java
+// ConnectionFactoryBean.java
 
+// FactoryBean 类，类似于前面的工厂类
+// 必须实现 Spring 自带的 FactoryBean 接口，并且指定我们要创建的 Bean 类型
+// 这个类是用来创建 connection 对象的，而不是用来创建它自己的对象的，所以 beanId 直接叫 connection 即可，不能要默认的 connectionFactoryBean
+@Component("connection")
+public class ConnectionFactoryBean implements FactoryBean<Connection> {
+    private String driverClassName;
+    private String url;
+    private String username;
+    private String password;
 
+    @Value("com.mysql.cj.jdbc.Driver")
+    public void setDriverClassName(String driverClassName) {
+        this.driverClassName = driverClassName;
+    }
 
+    @Value("jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC")
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Value("root")
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Value("mysqlroot")
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    // 这个方法类似于前面的静态方法或实例方法
+    @Override
+    public Connection getObject() throws Exception {
+        // 第一步：将厂商的数据库驱动 Driver 注册到 JDBC 的驱动管理者 DriverManager
+        Class.forName(driverClassName);
+        // 第二步：利用 DriverManager 创建一个数据库连接对象 connection
+        Connection connection = DriverManager.getConnection(url, username, password);
+
+        return connection;
+    }
+
+    // 这个方法固定返回我们要创建的 Bean 类型
+    @Override
+    public Class<?> getObjectType() {
+        return Connection.class;
+    }
+}
+```
+
+#### 补充：@PropertySource、注解
+
+前面的演示里，我们是把数据库相关配置的值直接写死在 Java 类里注入的，但是实际开发中我们一般都是把数据库相关配置的值写在独立的配置文件里，然后在 Java 类里引入独立的配置文件，这样一来我们如果想改一下数据库相关配置的值，直接改独立的配置文件即可， Java 类根本不用动。
+
+@PropertySource 注解就是之前 context:property-placeholder 标签的功能，用来引入其它配置文件，只不过 context:property-placeholder 标签是写在 Spring 配置文件里，@PropertySource 注解是写在我们自己定义的 Java 类里。
+
+* `database.properties`
+
+```properties
+# key 用小驼峰，value 不用加 ""
+# key-value 的分隔符是 = 或 : ，推荐使用 = ，= 的左右两边不要加空格
+
+driverClassName=com.mysql.cj.jdbc.Driver
+url=jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC
+username=root
+password=mysqlroot
+```
+
+* `ConnectionFactoryBean.java`
+
+```java
+// FactoryBean 类，类似于前面的工厂类
+// 必须实现 Spring 自带的 FactoryBean 接口，并且指定我们要创建的 Bean 类型
+// 这个类是用来创建 connection 对象的，而不是用来创建它自己的对象的，所以 beanId 直接叫 connection 即可，不能要默认的 connectionFactoryBean
+@Component("connection")
+@PropertySource("database.properties")
+public class ConnectionFactoryBean implements FactoryBean<Connection> {
+    private String driverClassName;
+    private String url;
+    private String username;
+    private String password;
+
+    @Value("${driverClassName}")
+    public void setDriverClassName(String driverClassName) {
+        this.driverClassName = driverClassName;
+    }
+
+    @Value("${url}")
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Value("${username}")
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Value("${password}")
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    // 这个方法类似于前面的静态方法或实例方法
+    @Override
+    public Connection getObject() throws Exception {
+        // 第一步：将厂商的数据库驱动 Driver 注册到 JDBC 的驱动管理者 DriverManager
+        Class.forName(driverClassName);
+        // 第二步：利用 DriverManager 创建一个数据库连接对象 connection
+        Connection connection = DriverManager.getConnection(url, username, password);
+
+        return connection;
+    }
+
+    // 这个方法固定返回我们要创建的 Bean 类型
+    @Override
+    public Class<?> getObjectType() {
+        return Connection.class;
+    }
+}
+```
 
 
 
