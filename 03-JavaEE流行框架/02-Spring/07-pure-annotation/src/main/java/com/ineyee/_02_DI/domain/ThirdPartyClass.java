@@ -1,16 +1,16 @@
 package com.ineyee._02_DI.domain;
 
 public class ThirdPartyClass {
-    private Object datasource;
+    private Integer type;
 
-    public void setDatasource(Object datasource) {
-        this.datasource = datasource;
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     @Override
     public String toString() {
         return "ThirdPartyClass{" +
-                "datasource=" + datasource +
+                "type=" + type +
                 '}';
     }
 }
