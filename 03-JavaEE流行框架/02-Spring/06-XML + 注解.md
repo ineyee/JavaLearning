@@ -22,13 +22,11 @@ XML + 注解混合开发方式下，我们依然需要添加各个相关依赖
     <groupId>org.aspectj</groupId>
     <artifactId>aspectjrt</artifactId>
     <version>1.9.25</version>
-    <scope>runtime</scope>
 </dependency>
 <dependency>
     <groupId>org.aspectj</groupId>
     <artifactId>aspectjweaver</artifactId>
     <version>1.9.25</version>
-    <scope>runtime</scope>
 </dependency>
 
 <!-- MyBatis 相关的依赖 -->
