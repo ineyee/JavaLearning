@@ -1,0 +1,84 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    用户模块接口的数据层
+
+    数据层（dao）的职责就是直接与数据库打交道，即：
+        * 调用数据层的“增删改” API + 传给这些 API 一个和 bean 直接相关的参数，你就可以获取到影响的数据条数
+        * 调用数据层的“查” API + 传给这些 API 一个和 bean 直接相关的参数，你就可以获取到原始模型 bean
+
+    换句话说：
+        * 数据层只需要对自己负责就行，负责的体现就是干好创建 SQL 语句、执行 SQL 语句、获取执行结果、返回执行结果给业务层即可
+        * 对上，数据层要绝对相信业务层，相信的体现就是直接拿着参数去做访问数据库，而不再纠结于参数会不会出问题，要绝对相信经过业务层校验后的参数是肯定没问题的
+        * 其它的数据层就不用关心了，至于执行结果失败了怎样、成功了怎样，那是业务层拿到结果后该干的事
+
+    实践经验：
+        * 执行成功时，总是把执行成功的结果返回（虽然增删改操作执行成功的结果意义不大、查操作执行成功的结果意义才大），业务层用不用执行成功的结果由它自己决定
+        * 执行失败时，这里不需要 try-catch 执行失败的异常，往上层抛、抛到业务层
+-->
+<!--
+    namespace，当前文件的命名空间，可以理解为当前文件里所有 SQL 语句唯一标识的默认前缀，避免当前文件里 SQL 语句的唯一标识和别的文件里 SQL 语句的唯一标识重复
+    必须命名为对应 dao 接口的全类名，因为这个 xml 文件会被做为对应 dao 接口的实现即数据层。如果名字不匹配的话，MyBatis 无法自动将当前文件做为对应接口的实现
+
+    SQL 语句的唯一标识必须和对应 dao 接口类里的方法名一致，参数和返回值的类型也必须保持一致，同样地MyBatis 要完成自动匹配
+-->
+<mapper namespace="com.ineyee._05_combinemybatis.dao.UserDao">
+    <!--
+        select 标签里用来写“查”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
+            parameterType：给 SQL 语句提供参数的入参真实类型，外界传进来时统一是基类 Object
+            resultType：从数据库表里查询出来一条一条的数据，会自动转换成 UserBean 类型的对象
+    -->
+    <!--
+        使用 PageHelper 实现分页查询的话，SQL 语句里就不用再写 LIMIT OFFSET 了，PageHelper 会自动帮我们拼接上去
+        但是注意 SQL 语句的结尾不能写分号，否则 PageHelper 帮我们自动拼接的部分就不生效了
+    -->
+    <select id="listPageHelper" parameterType="Map" resultType="User">
+        SELECT id,
+               name,
+               age,
+               height,
+               email,
+               create_time,
+               update_time
+        FROM t_user
+        -- 先按 create_time 降序排序，如果 create_time 相同，再按 id 降序排列
+        ORDER BY create_time DESC, id DESC
+    </select>
+
+    <!--
+        insert 标签里用来写“增”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 dao 层方法的命名规范来命名
+            parameterType：给 SQL 语句提供参数的入参真实类型，外界传进来时统一是基类 Object
+            resultType 已经固定死了是 Integer，所以这里不需要再手动指定
+    -->
+    <insert id="save" parameterType="User">
+        -- 往数据库里写入数据时，建议 SQL 语句里显式写全表里的所有字段，不要只写一部分
+        -- 这样外界传进来的 bean 对象如果全部属性都有值，那刚好完全匹配
+        -- 如果有的可选属性没值，那 MyBatis 就会自动用 null 给属性赋值，因此最终数据库里对应的字段会存储为 null 或该可选字段的默认值
+        INSERT INTO t_user (name, age, height, email)
+        -- name、age、height、email 是参数名，因为外界传进来一个 bean 对象，所以参数名只要和 bean 对象中的属性名一一对应，就能顺利匹配到参数值
+        VALUES (#{name}, #{age}, #{height}, #{email});
+
+        -- 外界不是传进来一个 bean 对象来保存嘛
+        -- 实际开发中我们一般都是在保存成功后直接给客户端返回刚保存成功的那条完整数据 data=bean，这样客户端就不用再查询一遍了
+        -- 但是外界传进来的那个 bean 对象肯定是还没有 id、createTime、updateTime 这些属性值的
+        -- 而 MyBatis 就提供了一个自动回填的功能，可以在插入数据成功后自动把新插入数据的某些字段回填到传进来的 bean 对象中
+        -- 这样外界就可以直接拿着传进来的那个 bean 对象返回给客户端了，就不用再去数据库查询一遍了
+        -- order="AFTER"：代表在插入语句执行完毕后执行回填
+        -- keyProperty：要回填的属性名，即 bean 对象里的属性名（多个属性名之间用逗号隔开，不能有空格）
+        -- resultType：bean 的类型
+        <selectKey order="AFTER" keyProperty="id,createTime,updateTime" resultType="User">
+            SELECT
+            -- 别名要跟 keyProperty 里的一致
+            id AS id,
+            create_time AS createTime,
+            update_time AS updateTime
+            FROM t_user
+            -- LAST_INSERT_ID()：返回的是刚插入的记录的 id
+            WHERE id = LAST_INSERT_ID();
+        </selectKey>
+    </insert>
+</mapper>
