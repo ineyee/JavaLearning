@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 // 对象默认的 beanId 就是它所属类名的第一个字母变成小写（即 loginController），当然我们也可以通过 value 属性来自定义 beanId（value 属性名可以省略不写，直接写值）
 @Controller
 public class LoginController {
-    // 第三步：定义一个方法
+    // 第三步：定义一个方法，这个方法就是一个接口
     // 用 @RequestMapping(path = requestPath, method = requestMethod) 注解修饰这个方法来指定请求路径和请求方法，以便 Spring 框架能把来自客户端的请求精准分发到该方法
     //     path 属性用来指定请求路径，注意 / 不能少
     //     method 属性用来指定请求方法，默认是 Get
