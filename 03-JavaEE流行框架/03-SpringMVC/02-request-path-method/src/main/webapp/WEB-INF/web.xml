@@ -1,0 +1,40 @@
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+    <display-name>Archetype Created Web Application</display-name>
+
+    <!--
+        配置主控制器
+
+        配置主控制器为 SpringMVC 自带的 DispatcherServlet，这个 DispatcherServlet 是 SpringMVC 的“大脑”
+        所有进入应用的请求都会先经过它，再由它负责分发给相应控制器的方法进行处理，我们可以把它想象成公司的“总机接线员”
+    -->
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+
+        <!--
+            指定 Spring 配置文件的位置
+
+            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的详细配置（classpath:applicationContext.xml）
+            这个配置文件里会定义诸如组件扫描、数据源等具体的 Bean
+        -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext.xml</param-value>
+        </init-param>
+    </servlet>
+
+    <!--
+        配置主控制器可以拦截哪些请求
+
+        通过 <servlet-mapping> 将 DispatcherServlet 的拦截模式设置为 "/"
+        这意味着 DispatcherServlet 会拦截所有的HTTP请求（如 /user, /api/login等），但通常不包括静态资源（如 .js, .css, .jpg）
+    -->
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>
