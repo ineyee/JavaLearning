@@ -28,10 +28,10 @@
     </servlet>
 
     <!--
-        配置主控制器可以拦截哪些请求
+        配置主控制器可以拦截哪些请求（只写这一个地方不严谨，详见 6）
 
         通过 <servlet-mapping> 将 DispatcherServlet 的拦截模式设置为 "/"
-        这意味着 DispatcherServlet 会拦截所有的HTTP请求（如 /user, /api/login等），但通常不包括静态资源（如 .js, .css, .jpg）
+        这意味着 DispatcherServlet 会拦截所有的HTTP请求（如 /user, /api/login等），还有静态资源（如 .js, .css, .jpg）
     -->
     <servlet-mapping>
         <servlet-name>springmvc</servlet-name>
