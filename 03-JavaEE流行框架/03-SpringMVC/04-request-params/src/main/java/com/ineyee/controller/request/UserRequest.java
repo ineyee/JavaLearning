@@ -1,10 +1,10 @@
-package com.ineyee.controller.param;
+package com.ineyee.controller.request;
 
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public class UserQueryParam {
+public class UserRequest {
     // 基本数据类型
     @NotNull(message = "partyMember cant be empty")
     private Boolean isPartyMember;
@@ -60,7 +60,7 @@ public class UserQueryParam {
 
     @Override
     public String toString() {
-        return "UserQueryParam{" +
+        return "UserRequest{" +
                 "isPartyMember=" + isPartyMember +
                 ", age=" + age +
                 ", height=" + height +

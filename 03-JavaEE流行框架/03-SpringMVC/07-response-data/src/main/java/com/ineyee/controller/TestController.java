@@ -7,7 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class TestController {
@@ -32,10 +34,10 @@ public class TestController {
     // 响应体是 JSON 字符串
     // 用 produces 告诉客户端响应体的格式为 JSON 字符串
     // 用 @ResponseBody 注解修饰一下这个方法，这样一来 Spring 框架就会自动把该方法的返回值作为响应体返回给客户端并结束本次请求了
-    // 只要项目里添加并配置了 jackson-databind 依赖，其余什么都不需要做，Spring 框架就会自动把该方法的返回值转为 JSON 字符串并返回给客户端了，因此我们只需要直接返回 Java 对象即可
-    @GetMapping(value = "/testJson", produces = "application/json")
+    // 只要项目里添加并配置了 jackson-databind 依赖，其余什么都不需要做，只要该方法的返回值是 Java 对象或 Map，Spring 框架就会自动把该方法的返回值转为 JSON 字符串并返回给客户端了
+    @GetMapping(value = "/testJson1", produces = "application/json")
     @ResponseBody
-    public Response testJson() {
+    public Response testJson1() {
         Dog dog1 = new Dog();
         dog1.setName("旺财");
         Dog dog2 = new Dog();
@@ -51,6 +53,28 @@ public class TestController {
         response.setCode(0);
         response.setMessage("success");
         response.setData(person);
+
+        return response;
+    }
+
+    @GetMapping(value = "/testJson2", produces = "application/json")
+    @ResponseBody
+    public Map<String, Object> testJson2() {
+        Dog dog1 = new Dog();
+        dog1.setName("旺财");
+        Dog dog2 = new Dog();
+        dog2.setName("二哈");
+
+        Person person = new Person();
+        person.setName("张三");
+        person.setAge(18);
+        person.setHeight(1.88);
+        person.setDogList(List.of(dog1, dog2));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", 0);
+        response.put("message", "success");
+        response.put("data", person);
 
         return response;
     }

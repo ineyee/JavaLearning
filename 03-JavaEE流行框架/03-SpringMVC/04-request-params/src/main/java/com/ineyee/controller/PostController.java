@@ -1,6 +1,6 @@
 package com.ineyee.controller;
 
-import com.ineyee.controller.param.UserQueryParam;
+import com.ineyee.controller.request.UserRequest;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +33,8 @@ public class PostController {
     @PostMapping("/test02")
     @ResponseBody
     // 使用 @Valid 注解对参数进行校验
-    public String test02(@Valid UserQueryParam userQueryParam) {
-        return "test02 success = " + userQueryParam;
+    public String test02(@Valid UserRequest userRequest) {
+        return "test02 success = " + userRequest;
     }
 
     // 假设客户端发送的 post 请求为：
@@ -64,8 +64,8 @@ public class PostController {
     @ResponseBody
     // 使用 @RequestBody 注解获取参数
     // 使用 @Valid 注解对参数进行校验
-    public String test05(@Valid @RequestBody UserQueryParam userQueryParam) {
-        return "test05 success = " + userQueryParam;
+    public String test05(@Valid @RequestBody UserRequest userRequest) {
+        return "test05 success = " + userRequest;
     }
 
     // 假设客户端发送的 post 请求为：
