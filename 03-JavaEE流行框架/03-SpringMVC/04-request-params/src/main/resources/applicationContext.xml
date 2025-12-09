@@ -19,10 +19,16 @@
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
     <!-- 启用方法级别的验证 -->
     <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
+
+    <!-- 让静态资源走服务器默认的处理，而不是被 DispatcherServlet 拦截 -->
+    <mvc:default-servlet-handler/>
     <!--
         启用 Spring MVC 注解驱动
         这个配置会自动注册处理器映射器、处理器适配器、消息转换器等组件
         同时也会启用参数校验功能（@Valid 等）
+
+        但是添加了 mvc:default-servlet-handler 会导致 @Controller 无法处理请求
+        所以还得加上 mvc:annotation-driven 来保证 @Controller 可以正常处理请求
     -->
     <mvc:annotation-driven>
         <mvc:message-converters>
