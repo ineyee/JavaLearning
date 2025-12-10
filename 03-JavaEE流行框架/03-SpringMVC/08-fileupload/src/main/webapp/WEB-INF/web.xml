@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+        xmlns="https://jakarta.ee/xml/ns/jakartaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                        https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+        version="6.0">
+    <display-name>Archetype Created Web Application</display-name>
+    <!--
+        配置主控制器
+
+        配置主控制器为 SpringMVC 自带的 DispatcherServlet，这个 DispatcherServlet 是 SpringMVC 的“大脑”
+        所有进入应用的请求都会先经过它，再由它负责分发给相应控制器的方法进行处理，我们可以把它想象成公司的“总机接线员”
+    -->
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+
+        <!--
+            指定 Spring 配置文件的位置
+
+            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的详细配置（classpath:applicationContext.xml）
+            这个配置文件里会定义诸如组件扫描、数据源等具体的 Bean
+        -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext.xml</param-value>
+        </init-param>
+
+        <!-- 配置 multipart/form-data 请求的 multipart-config -->
+        <multipart-config>
+            <!--
+                设置文件上传时的临时目录，默认是 Servlet 容器的临时目录，一般不设置采用默认的就行
+                文件上传时，数据会先写入到硬盘上的临时目录，而不是直接放到内存中，这样可以防止上传大文件时占用过多内存
+                上传完成后，再将文件移动到指定的目标目录
+            -->
+            <location>/tmp</location>
+            <!--
+                设置单个文件的最大字节数，单位为字节
+                默认值是 -1，表示无限制
+                如果上传的文件超过该大小限制，Servlet 会抛出异常（如 IOException）
+                例如这里设置为 10485760 字节，即 10 MB
+            -->
+            <max-file-size>10485760</max-file-size>
+            <!--
+                设置一次上传请求中所有文件的总大小上限，单位为字节
+                    默认值是 -1，表示无限制
+                    如果上传的文件总大小超过该限制，Servlet 会抛出异常
+                    例如这里设置为 20971520 字节，即 20 MB
+                -->
+            <max-request-size>20971520</max-request-size>
+            <!--
+                设置文件写入到临时文件之前，允许保存在内存中的临界值，单位为字节
+                当文件大小超过该值时，才会写入硬盘临时目录；否则保存在内存中
+                默认是 0，表示所有上传文件都直接写入硬盘临时目录
+            -->
+            <file-size-threshold>0</file-size-threshold>
+        </multipart-config>
+    </servlet>
+
+    <!--
+        配置主控制器可以拦截哪些请求
+
+        通过 <servlet-mapping> 将 DispatcherServlet 的拦截模式设置为 "/"
+        这意味着 DispatcherServlet 会拦截所有的HTTP请求（如 /user, /api/login等），但通常不包括静态资源（如 .js, .css, .jpg）
+    -->
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>

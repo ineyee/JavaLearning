@@ -65,8 +65,17 @@ public class UploadServlet extends HttpServlet {
                 ServletContext applicationContext = req.getServletContext();
                 // 设置文件在服务器上的存储目录，这里存储在当前项目根目录下的 upload/image 文件夹里
                 // 一般就是存储在 upload/text、upload/image、upload/audio、upload/video 这类文件夹里
-                // 文件夹存在的话就是直接获取，不存在的话就会创建
+                // 文件夹存在的话就是直接获取
                 String dirPath = applicationContext.getRealPath("/upload/image");
+                // 不存在的话就创建，确保目录存在
+                File dir = new File(dirPath);
+                if (!dir.exists()) {
+                    // 创建目录及其父目录
+                    boolean dirCreated = dir.mkdirs();
+                    if (!dirCreated) {
+                        throw new IOException("Failed to create directory: " + dirPath);
+                    }
+                }
                 // 设置文件在服务器上的文件名
                 // 不建议用时间戳，因为大量用户可能在同一时间上传文件，文件名会重复
                 // 更不建议用客户端传上来的原始文件名，因为用户可能会上传同名文件，文件名会重复
