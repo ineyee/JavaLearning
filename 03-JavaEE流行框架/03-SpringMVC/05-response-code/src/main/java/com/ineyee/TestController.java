@@ -1,6 +1,6 @@
 package com.ineyee;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class TestController {
-    // 使用 @ResponseStatus 注解设置响应码
+    // 用 ResponseEntity 返回响应码
+    // 需要把返回值搞成 ResponseEntity<T>，T 就是响应体的数据类型
     @RequestMapping(path = "/test", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public String test() {
-        return "login success";
+    public ResponseEntity<Void> test() {
+        // 这里只返回响应码，没有响应头和响应体
+        return ResponseEntity.status(500).build();
     }
 }
