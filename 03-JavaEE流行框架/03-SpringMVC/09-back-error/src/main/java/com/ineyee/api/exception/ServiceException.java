@@ -1,4 +1,4 @@
-package com.ineyee.exception;
+package com.ineyee.api.exception;
 
 public class ServiceException extends Exception {
     public ServiceException(Integer code, String message) {

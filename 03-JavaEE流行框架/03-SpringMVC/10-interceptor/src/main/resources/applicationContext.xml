@@ -15,11 +15,14 @@
     -->
     <context:component-scan base-package="com.ineyee"/>
 
-    <!-- 让静态资源走服务器默认的处理，而不是被 DispatcherServlet 拦截 -->
+    <!--
+        DispatcherServlet 虽然拦截到了静态资源
+        但是我们不让它处理，而是转交给默认的静态资源 Servlet 走服务器默认的处理
+    -->
     <mvc:default-servlet-handler/>
     <!--
-        但是添加了 mvc:default-servlet-handler 会导致 @Controller 无法处理请求
-        所以还得加上 mvc:annotation-driven 来保证 @Controller 可以正常处理请求
+        但是添加了 mvc:default-servlet-handler 后又会导致 @Controller 等注解无法处理接口型请求
+        所以还得加上 mvc:annotation-driven 注解驱动来保证 @Controller 等注解可以正常处理接口型请求
     -->
     <mvc:annotation-driven/>
 
@@ -27,7 +30,7 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <!--
-                设置能拦截那些请求：这里的请求就是我们通过 / 设置了 DispatcherServlet 会拦截接口型请求 + 会拦截静态资源型请求这两种
+                设置拦截器能拦截那些请求：这里的请求就是我们通过 / 设置了 DispatcherServlet 会拦截接口型请求 + 会拦截静态资源型请求这两种
                 虽然 DispatcherServlet 把静态资源型请求转交给服务器默认的处理了，但拦截它肯定是会先拦截下来的，也就是说先拦截后转交，而不是直接转交
 
                 /*：代表 http://xxx/applicationContext/xxx 这种一级路径的请求才会被拦截

@@ -1,6 +1,7 @@
 package com.ineyee.controller;
 
-import com.ineyee.controller.request.UserRequest;
+import com.ineyee.dto.UserCreateDto;
+import com.ineyee.dto.UserUpdateDto;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +34,8 @@ public class PostController {
     @PostMapping("/test02")
     @ResponseBody
     // 使用 @Valid 注解对参数进行校验
-    public String test02(@Valid UserRequest userRequest) {
-        return "test02 success = " + userRequest;
+    public String test02(@Valid UserCreateDto userCreateDto) {
+        return "test02 success = " + userCreateDto;
     }
 
     // 假设客户端发送的 post 请求为：
@@ -64,13 +65,17 @@ public class PostController {
     @ResponseBody
     // 使用 @RequestBody 注解获取参数
     // 使用 @Valid 注解对参数进行校验
-    public String test05(@Valid @RequestBody UserRequest userRequest) {
-        return "test05 success = " + userRequest;
+    //
+    // 只要项目里添加并配置了 jackson-databind 依赖，其余什么都不需要做，只要该方法的参数是 Java 对象或 Map，Spring 框架就会自动把客户端请求体的 JSON 字符串转为 Java 对象或 Map
+    public String test05(@Valid @RequestBody UserUpdateDto userUpdateDto) {
+        return "test05 success = " + userUpdateDto;
     }
 
     // 假设客户端发送的 post 请求为：
     // url = http://localhost:9999/{{applicationContext}}/test06
     // body = {"ids": [1, 2, 3]}
+    //
+    // 只要项目里添加并配置了 jackson-databind 依赖，其余什么都不需要做，只要该方法的参数是 Java 对象或 Map，Spring 框架就会自动把客户端请求体的 JSON 字符串转为 Java 对象或 Map
     @PostMapping("/test06")
     @ResponseBody
     // 使用 @RequestBody 注解获取参数

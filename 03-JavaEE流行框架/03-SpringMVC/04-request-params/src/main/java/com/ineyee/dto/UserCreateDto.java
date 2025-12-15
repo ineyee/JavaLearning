@@ -1,10 +1,10 @@
-package com.ineyee.controller.request;
+package com.ineyee.dto;
 
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public class UserRequest {
+public class UserCreateDto {
     // 基本数据类型
     @NotNull(message = "partyMember cant be empty")
     private Boolean isPartyMember;
@@ -60,7 +60,7 @@ public class UserRequest {
 
     @Override
     public String toString() {
-        return "UserRequest{" +
+        return "UserCreateDto{" +
                 "isPartyMember=" + isPartyMember +
                 ", age=" + age +
                 ", height=" + height +

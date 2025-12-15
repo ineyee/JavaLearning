@@ -2,7 +2,7 @@ package com.ineyee.controller;
 
 import com.ineyee.domain.Dog;
 import com.ineyee.domain.Person;
-import com.ineyee.domain.Response;
+import com.ineyee.api.HttpResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,7 +39,7 @@ public class TestController {
     // 需要自定义响应码和响应头时，可以给 Response 包裹一个 ResponseEntity 作为返回值，不需要自定义响应码和响应头时，直接返回即可
     @GetMapping(value = "/testJson1", produces = "application/json")
     @ResponseBody
-    public Response testJson1() {
+    public HttpResult<Person> testJson1() {
         Dog dog1 = new Dog();
         dog1.setName("旺财");
         Dog dog2 = new Dog();
@@ -51,12 +51,7 @@ public class TestController {
         person.setHeight(1.88);
         person.setDogList(List.of(dog1, dog2));
 
-        Response response = new Response();
-        response.setCode(0);
-        response.setMessage("success");
-        response.setData(person);
-
-        return response;
+        return HttpResult.ok(person);
     }
 
     @GetMapping(value = "/testJson2", produces = "application/json")
@@ -73,11 +68,11 @@ public class TestController {
         person.setHeight(1.88);
         person.setDogList(List.of(dog1, dog2));
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", 0);
-        response.put("message", "success");
-        response.put("data", person);
+        Map<String, Object> httpResult = new HashMap<>();
+        httpResult.put("code", 0);
+        httpResult.put("message", "success");
+        httpResult.put("data", person);
 
-        return response;
+        return httpResult;
     }
 }

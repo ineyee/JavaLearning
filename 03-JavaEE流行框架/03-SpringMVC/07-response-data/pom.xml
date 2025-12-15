@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ineyee</groupId>
-    <artifactId>07-response-data</artifactId>
+    <artifactId>07-httpResult-data</artifactId>
     <packaging>war</packaging>
     <version>1.0.0</version>
-    <name>07-response-data Maven Webapp</name>
+    <name>07-httpResult-data Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
@@ -32,7 +32,7 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>07-response-data</finalName>
+        <finalName>07-httpResult-data</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

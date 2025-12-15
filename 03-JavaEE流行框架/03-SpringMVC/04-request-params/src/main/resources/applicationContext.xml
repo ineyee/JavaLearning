@@ -15,24 +15,28 @@
     -->
     <context:component-scan base-package="com.ineyee"/>
 
-    <!-- 配置验证器 -->
-    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
-    <!-- 启用方法级别的验证 -->
-    <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
-
-    <!-- 让静态资源走服务器默认的处理，而不是被 DispatcherServlet 拦截 -->
+    <!--
+        DispatcherServlet 虽然拦截到了静态资源
+        但是我们不让它处理，而是转交给默认的静态资源 Servlet 走服务器默认的处理
+    -->
     <mvc:default-servlet-handler/>
     <!--
-        启用 Spring MVC 注解驱动
-        这个配置会自动注册处理器映射器、处理器适配器、消息转换器等组件
-        同时也会启用参数校验功能（@Valid 等）
-
-        但是添加了 mvc:default-servlet-handler 会导致 @Controller 无法处理请求
-        所以还得加上 mvc:annotation-driven 来保证 @Controller 可以正常处理请求
+        用途一：
+            但是添加了 mvc:default-servlet-handler 后又会导致 @Controller 等注解无法处理接口型请求
+            所以还得加上 mvc:annotation-driven 注解驱动来保证 @Controller 等注解可以正常处理接口型请求
+        用途二：
+            自动启用参数校验功能（@Valid 等）
+        用途三：
+            自动注册消息转换器（mvc:message-converters）
     -->
     <mvc:annotation-driven>
         <mvc:message-converters>
             <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
+
+    <!-- 配置验证器 -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+    <!-- 启用方法级别的验证 -->
+    <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
 </beans>

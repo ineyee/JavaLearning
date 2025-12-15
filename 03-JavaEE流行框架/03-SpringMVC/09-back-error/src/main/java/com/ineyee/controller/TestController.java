@@ -1,6 +1,7 @@
 package com.ineyee.controller;
 
-import com.ineyee.exception.ServiceException;
+import com.ineyee.api.error.UserError;
+import com.ineyee.api.exception.ServiceException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,16 +15,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 // 如果要在每个接口方法里都写 try-catch，代码量就会非常大，而且给客户端响应错误的代码非常相似，就会写大量重复的代码
 //
 // 所以我们现在要实现一种新方案：
-// * controller 层调用 service 层的 API 时直接调用就可以了，不用再 try-catch，把异常继续往上抛即可
+// * controller 层调用 service 层的 API 时直接调用就可以了，不用再 try-catch，如果遇到了系统异常那就把系统异常继续往上抛，如果遇到了业务异常那就主动抛出个业务异常
 // * controller 层把异常继续往上抛，就会抛给 DispatcherServlet，DispatcherServlet 捕获到异常就会调用我们定义的异常处理器来统一处理异常、给客户端响应错误
 @Controller
 public class TestController {
     @GetMapping("/test01")
     @ResponseBody
     public void test01() throws Exception {
-        System.out.println(111111);
         // 假设这里是调用 service 层的 API 时，抛出了业务异常
-        throw new ServiceException(-1001, "invalid token");
+        throw new ServiceException(UserError.USER_ALREADY_EXIST.getCode(), UserError.USER_ALREADY_EXIST.getMessage());
     }
 
     @GetMapping("/test02")

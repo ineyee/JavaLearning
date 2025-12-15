@@ -1,4 +1,4 @@
-package com.ineyee;
+package com.ineyee.controller;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;

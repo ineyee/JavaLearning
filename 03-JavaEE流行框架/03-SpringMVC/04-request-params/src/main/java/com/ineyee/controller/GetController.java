@@ -1,6 +1,6 @@
 package com.ineyee.controller;
 
-import com.ineyee.controller.request.UserRequest;
+import com.ineyee.dto.UserCreateDto;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +30,8 @@ public class GetController {
     @GetMapping("/test02")
     @ResponseBody
     // 使用 @Valid 注解对参数进行校验
-    public String test02(@Valid UserRequest userRequest) {
-        return "test02 success = " + userRequest;
+    public String test02(@Valid UserCreateDto userCreateDto) {
+        return "test02 success = " + userCreateDto;
     }
 
     // 假设客户端发送的 get 请求为：http://localhost:9999/{{applicationContext}}/test03?partyMember=true&age=18&height=1.88&salary=11.21&name=ineyee

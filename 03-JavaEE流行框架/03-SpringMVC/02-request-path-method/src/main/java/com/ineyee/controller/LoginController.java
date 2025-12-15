@@ -1,4 +1,4 @@
-package com.ineyee;
+package com.ineyee.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +18,7 @@ public class LoginController {
     }
 
     // 退出登录接口
-    // 请求路径为 "/login"，请求方法为 POST
+    // 请求路径为 "/logout"，请求方法为 POST
     @PostMapping(path = "/logout")
     @ResponseBody
     public String logout() {

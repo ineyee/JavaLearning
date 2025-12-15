@@ -1,4 +1,4 @@
-package com.ineyee;
+package com.ineyee.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

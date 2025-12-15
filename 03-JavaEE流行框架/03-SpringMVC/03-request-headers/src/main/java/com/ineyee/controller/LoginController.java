@@ -1,4 +1,4 @@
-package com.ineyee;
+package com.ineyee.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;

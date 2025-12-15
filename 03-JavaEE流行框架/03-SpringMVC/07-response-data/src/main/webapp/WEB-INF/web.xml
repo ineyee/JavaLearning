@@ -12,14 +12,15 @@
         所有进入应用的请求都会先经过它，再由它负责分发给相应控制器的方法进行处理，我们可以把它想象成公司的“总机接线员”
     -->
     <servlet>
+        <!-- 主控制器的名字，这个名字是我们自己起的，后面在 servlet-mapping 中会用到 -->
         <servlet-name>springmvc</servlet-name>
+        <!-- 主控制器的实现类，使用 SpringMVC 自带的 DispatcherServlet 类 -->
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 
         <!--
             指定 Spring 配置文件的位置
 
-            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的详细配置（classpath:applicationContext.xml）
-            这个配置文件里会定义诸如组件扫描、数据源等具体的 Bean
+            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的配置文件（classpath:applicationContext.xml）
         -->
         <init-param>
             <param-name>contextConfigLocation</param-name>
@@ -28,10 +29,9 @@
     </servlet>
 
     <!--
-        配置主控制器可以拦截哪些请求
+        配置主控制器可以拦截哪些请求，注意还需配合 Spring 配置文件里的 <mvc:default-servlet-handler/> 和 <mvc:annotation-driven/> 一起使用
 
-        通过 <servlet-mapping> 将 DispatcherServlet 的拦截模式设置为 "/"
-        这意味着 DispatcherServlet 会拦截所有的HTTP请求（如 /user, /api/login等），但通常不包括静态资源（如 .js, .css, .jpg）
+        通过 <servlet-mapping> 将 DispatcherServlet 的拦截模式设置为 "/"，这意味着 DispatcherServlet 会拦截接口型请求，会拦截静态资源型请求，不会拦截动态资源型请求（拦截 2 个）
     -->
     <servlet-mapping>
         <servlet-name>springmvc</servlet-name>

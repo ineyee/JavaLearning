@@ -1,6 +1,7 @@
-package com.ineyee.exception;
+package com.ineyee.api.exception;
 
-import com.ineyee.domain.Response;
+import com.ineyee.api.HttpResult;
+import com.ineyee.api.error.CommonError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,12 +15,9 @@ public class GlobalExceptionHandler {
     // 这里是业务异常 ServiceException，业务异常各有各的错误码和错误信息，用户在客户端看到错误信息是有提示意义的
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
-    public Response handleServiceException(ServiceException e) {
+    public HttpResult<Void> handleServiceException(ServiceException e) {
         // 给客户端响应错误
-        Response response = new Response();
-        response.setCode(e.getCode());
-        response.setMessage(e.getMessage());
-        return response;
+        return HttpResult.error(e.getCode(), e.getMessage());
     }
 
     // 这个方法专门用来处理业务异常以外的系统异常
@@ -27,11 +25,8 @@ public class GlobalExceptionHandler {
     // 所以我们把系统异常的错误码统一为 -100000，错误信息统一为请求失败
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public Response handleException(Exception e) {
+    public HttpResult<Void> handleException(Exception e) {
         // 给客户端响应错误
-        Response response = new Response();
-        response.setCode(-100000);
-        response.setMessage("请求失败");
-        return response;
+        return HttpResult.error(CommonError.REQUEST_ERROR.getCode(), CommonError.REQUEST_ERROR.getMessage());
     }
 }

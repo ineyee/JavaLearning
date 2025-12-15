@@ -21,11 +21,5 @@
         但是添加了 mvc:default-servlet-handler 会导致 @Controller 无法处理请求
         所以还得加上 mvc:annotation-driven 来保证 @Controller 可以正常处理请求
     -->
-    <mvc:annotation-driven>
-        <mvc:message-converters>
-            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-                <property name="defaultCharset" value="utf-8"/>
-            </bean>
-        </mvc:message-converters>
-    </mvc:annotation-driven>
+    <mvc:annotation-driven/>
 </beans>

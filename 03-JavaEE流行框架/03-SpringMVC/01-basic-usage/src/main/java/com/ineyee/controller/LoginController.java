@@ -1,4 +1,4 @@
-package com.ineyee;
+package com.ineyee.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,15 +15,15 @@ public class LoginController {
     // 第三步：定义一个方法，这个方法就是一个接口
     // 用 @RequestMapping(path = requestPath, method = requestMethod) 注解修饰这个方法来指定请求路径和请求方法，以便 Spring 框架能把来自客户端的请求精准分发到该方法
     //     path 属性用来指定请求路径，注意 / 不能少
-    //     method 属性用来指定请求方法，默认是 Get
+    //     method 属性用来指定请求方法
     // 用 @ResponseBody 注解修饰一下这个方法，这样一来 Spring 框架就会自动把该方法的返回值作为响应体返回给客户端并结束本次请求了
-    @RequestMapping(path = "/login01", method = RequestMethod.GET)
+    @RequestMapping(path = "/login", method = RequestMethod.GET)
     @ResponseBody
     public String login1() {
         return "get success";
     }
 
-    @RequestMapping(path = "/login01", method = RequestMethod.POST)
+    @RequestMapping(path = "/login", method = RequestMethod.POST)
     @ResponseBody
     public String login2() {
         return "post success";

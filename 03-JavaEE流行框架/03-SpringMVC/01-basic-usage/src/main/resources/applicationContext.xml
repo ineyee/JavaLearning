@@ -15,11 +15,14 @@
     -->
     <context:component-scan base-package="com.ineyee"/>
 
-    <!-- 让静态资源走服务器默认的处理，而不是被 DispatcherServlet 拦截 -->
+    <!--
+        DispatcherServlet 虽然拦截到了静态资源
+        但是我们不让它处理，而是转交给默认的静态资源 Servlet 走服务器默认的处理
+    -->
     <mvc:default-servlet-handler/>
     <!--
-        但是添加了 mvc:default-servlet-handler 会导致 @Controller 无法处理请求
-        所以还得加上 mvc:annotation-driven 来保证 @Controller 可以正常处理请求
+        但是添加了 mvc:default-servlet-handler 后又会导致 @Controller 等注解无法处理接口型请求
+        所以还得加上 mvc:annotation-driven 注解驱动来保证 @Controller 等注解可以正常处理接口型请求
     -->
     <mvc:annotation-driven/>
 </beans>

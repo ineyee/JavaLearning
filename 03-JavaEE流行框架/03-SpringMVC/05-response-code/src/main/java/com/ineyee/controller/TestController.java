@@ -1,4 +1,4 @@
-package com.ineyee;
+package com.ineyee.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 public class TestController {
     // 用 ResponseEntity 返回响应码
     // 需要把返回值搞成 ResponseEntity<T>，T 就是响应体的数据类型
-    @RequestMapping(path = "/test", method = RequestMethod.GET)
+    @GetMapping(path = "/test")
     @ResponseBody
     public ResponseEntity<Void> test() {
         // 这里只返回响应码，没有响应头和响应体
