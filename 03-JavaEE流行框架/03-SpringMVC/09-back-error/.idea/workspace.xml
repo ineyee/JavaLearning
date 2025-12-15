@@ -10,55 +10,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5581100d-073f-4a3b-a56e-e1acaa37dcdd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../04-request-params/src/main/java/com/ineyee/dto/UserUpdateDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../01-basic-usage/src/main/java/com/ineyee/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../01-basic-usage/src/main/java/com/ineyee/controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../01-basic-usage/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../01-basic-usage/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../01-basic-usage/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../01-basic-usage/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../01-基本使用.md" beforeDir="false" afterPath="$PROJECT_DIR$/../01-基本使用.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../02-request-path-method/src/main/java/com/ineyee/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../02-request-path-method/src/main/java/com/ineyee/controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../02-request-path-method/src/main/java/com/ineyee/SongController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../02-request-path-method/src/main/java/com/ineyee/controller/SongController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../02-request-path-method/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../02-request-path-method/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../02-request-path-method/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../02-request-path-method/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../02-区分不同的请求路径和请求方法.md" beforeDir="false" afterPath="$PROJECT_DIR$/../02-区分不同的请求路径和请求方法.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../03-request-headers/src/main/java/com/ineyee/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../03-request-headers/src/main/java/com/ineyee/controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../03-request-headers/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../03-request-headers/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../03-request-headers/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../03-request-headers/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../03-获取请求头.md" beforeDir="false" afterPath="$PROJECT_DIR$/../03-获取请求头.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../04-request-params/src/main/java/com/ineyee/controller/GetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../04-request-params/src/main/java/com/ineyee/controller/GetController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../04-request-params/src/main/java/com/ineyee/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../04-request-params/src/main/java/com/ineyee/controller/PostController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../04-request-params/src/main/java/com/ineyee/controller/request/UserRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../04-request-params/src/main/java/com/ineyee/dto/UserCreateDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../04-request-params/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../04-request-params/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../04-request-params/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../04-request-params/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../04-获取请求参数.md" beforeDir="false" afterPath="$PROJECT_DIR$/../04-获取请求参数.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../05-response-code/src/main/java/com/ineyee/TestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../05-response-code/src/main/java/com/ineyee/controller/TestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../05-response-code/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../05-response-code/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../05-response-code/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../05-response-code/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../05-返回响应码.md" beforeDir="false" afterPath="$PROJECT_DIR$/../05-返回响应码.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../06-response-headers/src/main/java/com/ineyee/TestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../06-response-headers/src/main/java/com/ineyee/controller/TestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../06-response-headers/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../06-response-headers/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../06-response-headers/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../06-response-headers/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../07-response-data/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../07-response-data/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../07-response-data/src/main/java/com/ineyee/controller/TestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../07-response-data/src/main/java/com/ineyee/controller/TestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../07-response-data/src/main/java/com/ineyee/domain/Response.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../07-response-data/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../07-response-data/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../07-response-data/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../07-response-data/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../07-返回响应体.md" beforeDir="false" afterPath="$PROJECT_DIR$/../07-返回响应体.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../08-fileupload/src/main/java/com/ineyee/TestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../08-fileupload/src/main/java/com/ineyee/controller/TestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../08-fileupload/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../08-fileupload/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../08-fileupload/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../08-fileupload/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../08-文件上传.md" beforeDir="false" afterPath="$PROJECT_DIR$/../08-文件上传.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/java/com/ineyee/api/HttpResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/java/com/ineyee/api/error/CommonError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/java/com/ineyee/api/error/Error.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/java/com/ineyee/api/error/UserError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/java/com/ineyee/api/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/java/com/ineyee/api/exception/ServiceException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/webapp/index.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/controller/TestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/controller/TestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/domain/Response.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/exception/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/exception/ServiceException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/09-back-error/WEB-INF/classes/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/09-back-error/WEB-INF/classes/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/09-back-error/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/09-back-error/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/applicationContext.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../09-响应错误.md" beforeDir="false" afterPath="$PROJECT_DIR$/../09-响应错误.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -254,6 +220,7 @@
       <workItem from="1765770426003" duration="1398000" />
       <workItem from="1765777380188" duration="2726000" />
       <workItem from="1765780151933" duration="23000" />
+      <workItem from="1765781944651" duration="2597000" />
     </task>
     <servers />
   </component>

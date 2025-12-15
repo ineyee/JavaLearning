@@ -1,0 +1,305 @@
+#### 1、添加依赖
+
+首先安装 SpringMVC：
+
+```XML
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>7.0.1</version>
+</dependency>
+```
+
+然后我们知道 SpringMVC 是对 Servlet API 的封装，所以我们还需要安装 jakarta.servlet-api：
+
+```XML
+<dependency>
+    <groupId>jakarta.servlet</groupId>
+    <artifactId>jakarta.servlet-api</artifactId>
+    <version>6.1.0</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+#### 2、在 web.xml 里做一些配置
+
+> 这是非常老旧的配置方法，需要我们手动将 DispatcherServlet 的配置写入 web.xml 文件，这里仅做演示用
+>
+> Spring Boot 诞生后，在检测到 Spring MVC 的依赖后，会自动地、隐式地为我们配置好 DispatcherServlet，其默认拦截路径就是 "/"，让开发者能专注于写接口的业务代码，这个后面再说
+
+```xml
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+    <display-name>Archetype Created Web Application</display-name>
+
+    <!--
+        配置主控制器
+
+        配置主控制器为 SpringMVC 自带的 DispatcherServlet，这个 DispatcherServlet 是 SpringMVC 的“大脑”
+        所有进入应用的请求都会先经过它，再由它负责分发给相应控制器的方法进行处理，我们可以把它想象成公司的“总机接线员”
+    -->
+    <servlet>
+        <!-- 主控制器的名字，这个名字是我们自己起的，后面在 servlet-mapping 中会用到 -->
+        <servlet-name>springmvc</servlet-name>
+        <!-- 主控制器的实现类，使用 SpringMVC 自带的 DispatcherServlet 类 -->
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+
+        <!--
+            指定 Spring 配置文件的位置
+
+            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的配置文件（classpath:applicationContext.xml）
+        -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext.xml</param-value>
+        </init-param>
+    </servlet>
+
+    <!--
+        配置主控制器可以拦截哪些请求，注意还需配合 Spring 配置文件里的 <mvc:default-servlet-handler/> 和 <mvc:annotation-driven/> 一起使用
+
+        通过 <servlet-mapping> 将 DispatcherServlet 的拦截模式设置为 "/"，这意味着 DispatcherServlet 会拦截接口型请求，会拦截静态资源型请求，不会拦截动态资源型请求（拦截 2 个）
+    -->
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>
+```
+
+#### 3、创建 Spring 的配置文件，做一些配置
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!--
+        通过 context:component-scan 标签告诉 Spring 框架哪个包里的类是通过注解实现 IoC 的
+        Spring 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 容器里
+    -->
+    <context:component-scan base-package="com.ineyee"/>
+
+    <!--
+        DispatcherServlet 虽然拦截到了静态资源
+        但是我们不让它处理，而是转交给默认的静态资源 Servlet 走服务器默认的处理
+    -->
+    <mvc:default-servlet-handler/>
+    <!--
+        但是添加了 mvc:default-servlet-handler 后又会导致 @Controller 等注解无法处理接口型请求
+        所以还得加上 mvc:annotation-driven 注解驱动来保证 @Controller 等注解可以正常处理接口型请求
+    -->
+    <mvc:annotation-driven/>
+</beans>
+```
+
+#### 4、创建 controller 层，编写接口
+
+```java
+@PostMapping("/login")
+@ResponseBody
+public String login() {
+    return "login success";
+}
+```
+
+拦截器是 SpringMVC 的一部分
+
+DispatcherServlet 能拦截到的请求就是拦截器能拦截到的请求，之前我们通过 / 设置了 DispatcherServlet 会拦截接口型请求 + 会拦截静态资源型请求 + 不会拦截动态资源型请求，然后又通过 \<mvc:default-servlet-handler/\> 让拦截到的静态资源型请求走服务器默认的处理，而不是走 DispatcherServlet 的处理，也就是说最终 DispatcherServlet 只会拦截并处理接口型请求，因此拦截器也只会拦截并处理接口型请求
+
+拦截器常用来抽取接口的公共代码
+
+实际开发中，我们可以在项目里定义众多拦截器来实现不同的功能，这里我们以 HTTP 请求日志拦截器为例：
+
+* 第一步：自定义一个类，实现 HandlerInterceptor 接口
+* 第二步：重写该接口的三个方法
+  * preHandle
+    * 这个方法会在 controller 里接口方法执行前调用，返回 true 表示让请求继续往下执行，返回 false 表示让请求终止在这里
+    * 当有多个拦截器时，多个拦截器的该方法会按照拦截器的注册顺序正序执行
+  * postHandle
+    * 这个方法会在 controller 里接口方法执行后调用（接口方法 return 执行完毕后，Spring 框架会拿着返回值做一些事情，然后服务器才会给客户端发出去响应）
+    * 当有多个拦截器时，多个拦截器的该方法会按照拦截器的注册顺序倒序执行
+  * afterCompletion
+    * 这个方法会在服务器给客户端发出去响应后调用，至于客户端收没收到就管不了了
+    * 当有多个拦截器时，多个拦截器的该方法会按照拦截器的注册顺序倒序执行
+* 第三步：在 Spring 配置文件里添加一下拦截器
+
+```java
+// 第一步：自定义一个类，实现 HandlerInterceptor 接口
+// 第二步：重写该接口的三个方法
+public class HttpLogInterceptor implements HandlerInterceptor {
+    // 这个方法会在 controller 里接口方法执行前调用，返回 true 表示让请求继续往下执行，返回 false 表示让请求终止在这里
+    // 当有多个拦截器时，多个拦截器的该方法会按照拦截器的注册顺序正序执行
+    @Override
+    public boolean preHandle(HttpServletRequest request,
+                             HttpServletResponse response,
+                             Object handler) throws Exception {
+        // 记录请求开始时间
+        request.setAttribute("startTime", System.currentTimeMillis());
+
+        System.out.println("\n====================== 请求数据 ======================HttpLogInterceptor.preHandle begin");
+
+        // method
+        System.out.println("method = " + request.getMethod());
+
+        // url
+        System.out.println("url = " + request.getRequestURL().toString());
+
+        // headers
+        StringBuilder headerJson = new StringBuilder("{");
+        Enumeration<String> headerNames = request.getHeaderNames();
+        boolean firstHeader = true;
+        while (headerNames.hasMoreElements()) {
+            if (!firstHeader) headerJson.append(", ");
+            firstHeader = false;
+            String name = headerNames.nextElement();
+            headerJson.append("\"").append(name).append("\": \"").append(request.getHeader(name)).append("\"");
+        }
+        headerJson.append("}");
+        String headers = headerJson.toString();
+        System.out.println("headers = " + (headers.equals("{}") ? null : headers));
+
+        // params
+        Map<String, String[]> paramMap = request.getParameterMap();
+        StringBuilder paramJson = new StringBuilder("{");
+        boolean first = true;
+        for (Map.Entry<String, String[]> entry : paramMap.entrySet()) {
+            if (!first) paramJson.append(", ");
+            first = false;
+            paramJson.append("\"").append(entry.getKey()).append("\": ");
+            if (entry.getValue().length == 1) {
+                paramJson.append("\"").append(entry.getValue()[0]).append("\"");
+            } else {
+                paramJson.append("[");
+                for (int i = 0; i < entry.getValue().length; i++) {
+                    if (i > 0) paramJson.append(", ");
+                    paramJson.append("\"").append(entry.getValue()[i]).append("\"");
+                }
+                paramJson.append("]");
+            }
+        }
+        paramJson.append("}");
+        String params = paramJson.toString();
+        System.out.println("params = " + (params.equals("{}") ? null : params));
+
+        // body
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        String body = sb.toString().replaceAll("\\s+", " ").trim().replaceAll("^\\{\\s+", "{");
+        System.out.println("body = " + (body.isEmpty() ? null : body));
+
+        System.out.println("====================== 请求数据 ======================HttpLogInterceptor.preHandle end\n");
+
+        return true;
+    }
+
+    // 这个方法会在 controller 里接口方法执行后调用（接口方法 return 执行完毕后,Spring 框架会拿着返回值做一些事情,然后服务器才会给客户端发出去响应）
+    // 当有多个拦截器时，多个拦截器的该方法会按照拦截器的注册顺序倒序执行
+    @Override
+    public void postHandle(HttpServletRequest request,
+                           HttpServletResponse response,
+                           Object handler,
+                           @Nullable ModelAndView modelAndView) throws Exception {
+        // 注意；
+        // 如果 controller 里接口方法抛异常，该方法不会执行，但是 afterCompletion 方法依然会执行
+        // 所以响应日志我们给它放到 afterCompletion 方法里记录，以保证异常情况下也能记录
+    }
+
+    // 这个方法会在服务器给客户端发出去响应后调用，至于客户端收没收到就管不了了
+    // 当有多个拦截器时，多个拦截器的该方法会按照拦截器的注册顺序倒序执行
+    @Override
+    public void afterCompletion(HttpServletRequest request,
+                                HttpServletResponse response,
+                                Object handler,
+                                @Nullable Exception ex) throws Exception {
+        if (ex == null) {
+            System.out.println("\n====================== 响应数据 ======================HttpLogInterceptor.afterCompletion begin");
+
+            // url
+            System.out.println("response for url = " + request.getRequestURL().toString());
+
+            // statusCode
+            System.out.println("statusCode = " + response.getStatus());
+
+            // headers
+            StringBuilder responseHeaderJson = new StringBuilder("{");
+            boolean firstHeader = true;
+            for (String headerName : response.getHeaderNames()) {
+                if (!firstHeader) responseHeaderJson.append(", ");
+                firstHeader = false;
+                responseHeaderJson.append("\"").append(headerName).append("\": \"").append(response.getHeader(headerName)).append("\"");
+            }
+            responseHeaderJson.append("}");
+            String responseHeaders = responseHeaderJson.toString();
+            System.out.println("headers = " + (responseHeaders.equals("{}") ? null : responseHeaders));
+
+            // 耗时
+            Long startTime = (Long) request.getAttribute("startTime");
+            if (startTime != null) {
+                long duration = System.currentTimeMillis() - startTime;
+                System.out.println("duration = " + duration + "ms");
+            }
+
+            System.out.println("====================== 响应数据 ======================HttpLogInterceptor.afterCompletion end\n");
+        } else {
+            System.out.println("\n====================== Controller 里接口方法抛出了异常 ======================HttpLogInterceptor.afterCompletion begin");
+
+            // url
+            System.out.println("response for url = " + request.getRequestURL().toString());
+
+            // 组合异常信息为 JSON 字符串
+            StringBuilder exceptionJson = new StringBuilder("{");
+            exceptionJson.append("\"exception_type\": \"").append(ex.getClass().getName()).append("\", ");
+            // 对异常消息进行简单的转义处理（转义双引号和反斜杠）
+            String message = ex.getMessage() != null ? ex.getMessage().replace("\\", "\\\\").replace("\"", "\\\"") : "null";
+            exceptionJson.append("\"exception_message\": \"").append(message).append("\"");
+            exceptionJson.append("}");
+            System.out.println("exception = " + exceptionJson);
+
+            System.out.println("====================== Controller 里接口方法抛出了异常 ======================HttpLogInterceptor.afterCompletion end\n");
+        }
+    }
+}
+```
+
+```xml
+<!-- 添加一下拦截器 -->
+<mvc:interceptors>
+    <mvc:interceptor>
+        <!--
+            设置拦截器能拦截那些请求：这里的请求就是我们通过 / 设置了 DispatcherServlet 会拦截接口型请求 + 会拦截静态资源型请求这两种
+            虽然 DispatcherServlet 把静态资源型请求转交给服务器默认的处理了，但拦截它肯定是会先拦截下来的，也就是说先拦截后转交，而不是直接转交
+
+            /*：代表 http://xxx/applicationContext/xxx 这种一级路径的请求才会被拦截
+            /**：代表 http://xxx/applicationContext/xxx、http://xxx/applicationContext/xxx/xxx 这种一级路径或 N 级路径的请求都会被拦截
+        -->
+        <mvc:mapping path="/**"/>
+        <!--
+            如果我们把静态资源都放在 applicationContext/asset 目录下，这里就代表不要拦截 asset 及其子目录下的静态资源请求
+            这样一来拦截器就是只拦截接口型请求了
+        -->
+        <mvc:exclude-mapping path="/asset/**"/>
+        <!-- 我们自定义的 HTTP 请求日志拦截器 -->
+        <bean class="com.ineyee.interceptor.HttpLogInterceptor"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+
+
+
+
+
+
+
