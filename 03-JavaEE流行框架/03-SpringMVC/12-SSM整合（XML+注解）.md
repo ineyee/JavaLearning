@@ -268,32 +268,36 @@
 </dependency>
 ```
 
+## 五、api 目录里的东西
+
+api 目录里的东西基本都是固定的，可以先搞到项目里，后续再根据实际业务情况做扩展。
+
+## 六、表现层之模型层 domain
+
+纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。
+
+## 七、数据层 dao
+
+* 数据层（dao）的职责就是直接与数据库打交道
+* 调用数据层的“增删改” API + 传给这些 API 一个和 domain 直接相关的参数，你就可以获取到影响的数据条数
+* 调用数据层的“查” API + 传给这些 API 一个和 domain 直接相关的参数，你就可以获取到原始模型 domain
+* 一张表对应的 dao，我们一般会把它定义成接口，然后为这个接口编写多个实现类，因为实际开发中我们很可能需要根据实际情况切换访问数据库的方案，比如 JDBC、Hibernate、MyBatis 等，这种面向接口编程的方式方便切换方案
+
+#### 1、dao 接口
+
+
+
+
+
+
+
+
+
+
+
 
 
 ------
-
-#### 1、添加依赖
-
-首先安装 SpringMVC：
-
-```XML
-<dependency>
-    <groupId>org.springframework</groupId>
-    <artifactId>spring-webmvc</artifactId>
-    <version>7.0.1</version>
-</dependency>
-```
-
-然后我们知道 SpringMVC 是对 Servlet API 的封装，所以我们还需要安装 jakarta.servlet-api：
-
-```XML
-<dependency>
-    <groupId>jakarta.servlet</groupId>
-    <artifactId>jakarta.servlet-api</artifactId>
-    <version>6.1.0</version>
-    <scope>provided</scope>
-</dependency>
-```
 
 #### 2、在 web.xml 里做一些配置
 
