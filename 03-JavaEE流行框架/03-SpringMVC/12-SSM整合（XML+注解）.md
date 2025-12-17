@@ -41,7 +41,8 @@
 │  │  │  │  ├─mappers/(数据层的实现)
 │  │  │  │  │  ├─user.xml
 │  │  │  │  │  ├─product.xml
-│  │  │  │  ├─applicationContext.xml(Spring 的配置文件)
+│  │  │  │  ├─applicationContext.xml(Spring 的主配置文件)
+│  │  │  │  ├─dispatcherServlet.xml(Spring 的子配置文件，for SpringMVC)
 │  ├─target/(项目的打包产物)
 │  ├─pom.xml(项目的配置文件，里面记录着项目的很多信息)
 ```
@@ -286,11 +287,128 @@
 </dependency>
 ```
 
-## 五、api 目录里的东西
+## 五、在 web.xml 里做一些配置
+
+> 这是非常老旧的配置方法，需要我们手动将 DispatcherServlet 的配置写入 web.xml 文件，这里仅做演示用
+>
+> Spring Boot 诞生后，在检测到 Spring MVC 的依赖后，会自动地、隐式地为我们配置好 DispatcherServlet，其默认拦截路径就是 "/"，让开发者能专注于写接口的业务代码，这个后面再说
+
+```xml
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+    <display-name>Archetype Created Web Application</display-name>
+
+    <!-- 指定 Spring 主配置文件的位置 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+    <!-- 用来加载 Spring 主配置文件 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!--
+        配置主控制器
+
+        配置主控制器为 SpringMVC 自带的 DispatcherServlet，这个 DispatcherServlet 是 SpringMVC 的“大脑”
+        所有进入应用的请求都会先经过它，再由它负责分发给相应控制器的方法进行处理，我们可以把它想象成公司的“总机接线员”
+    -->
+    <servlet>
+        <!-- 主控制器的名字，这个名字是我们自己起的，后面在 servlet-mapping 中会用到 -->
+        <servlet-name>springmvc</servlet-name>
+        <!-- 主控制器的实现类，使用 SpringMVC 自带的 DispatcherServlet 类 -->
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+
+        <!--
+            指定 Spring 子配置文件的位置
+
+            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的子配置文件（classpath:dispatcherServlet.xml）
+        -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:dispatcherServlet.xml</param-value>
+        </init-param>
+    </servlet>
+
+    <!--
+        配置主控制器可以拦截哪些请求，注意还需配合 Spring 配置文件里的 <mvc:default-servlet-handler/> 和 <mvc:annotation-driven/> 一起使用
+
+        通过 <servlet-mapping> 将 DispatcherServlet 的拦截模式设置为 "/"，这意味着 DispatcherServlet 会拦截接口型请求，会拦截静态资源型请求，不会拦截动态资源型请求（拦截 2 个）
+    -->
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>
+```
+
+## 六、创建 Spring 的配置文件，做一些配置
+
+* applicationContext.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--
+        通过 context:component-scan 标签告诉 Spring 框架哪个包里的类是通过注解实现 IoC 的
+        Spring 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 父容器里
+
+        父容器只需要扫描 service 所在的包即可
+    -->
+    <context:component-scan base-package="com.ineyee.service"/>
+</beans>
+```
+
+* dispatcherServlet.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!--
+        通过 context:component-scan 标签告诉 SpringMVC 框架哪个包里的 Controller 类是通过注解实现 IoC 的
+        SpringMVC 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 子容器里
+
+        子容器只需要扫描 controller 所在的包即可
+    -->
+    <context:component-scan base-package="com.ineyee.controller"/>
+
+    <!--
+        DispatcherServlet 虽然拦截到了静态资源
+        但是我们不让它处理，而是转交给默认的静态资源 Servlet 走服务器默认的处理
+    -->
+    <mvc:default-servlet-handler/>
+    <!--
+        但是添加了 mvc:default-servlet-handler 后又会导致 @Controller 等注解无法处理接口型请求
+        所以还得加上 mvc:annotation-driven 注解驱动来保证 @Controller 等注解可以正常处理接口型请求
+    -->
+    <mvc:annotation-driven/>
+</beans>
+```
+
+## 七、api 目录里的东西
 
 api 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## 六、表现层之模型层 domain
+## 八、表现层之模型层 domain
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -298,7 +416,7 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。
 
-## 七、数据层 dao
+## 九、数据层 dao
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -306,7 +424,7 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 先定义一个 dao 接口，然后再定义一个 mapper 文件、这个 mapper 文件其实就是 dao 接口的实现。
 
-## 八、业务层 service
+## 十、业务层 service
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -314,7 +432,7 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 先定义一个 service 接口，然后再定义一个 service 接口的实现类、自动注入 dao。
 
-## 九、控制器层 controller
+## 十一、控制器层 controller
 
 定义一个 controller 类、自动注入 service。
 
