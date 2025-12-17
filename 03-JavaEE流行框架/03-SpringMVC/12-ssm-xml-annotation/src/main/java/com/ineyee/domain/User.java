@@ -1,5 +1,7 @@
 package com.ineyee.domain;
 
+import jakarta.validation.constraints.NotNull;
+
 // 用户模块接口的表现层之模型层
 // 纯粹地存储数据，Domain 的字段必须和数据库表里的字段一一对应
 //
@@ -11,9 +13,11 @@ public class User extends BaseDomain {
     public User() {
     }
 
+    @NotNull(message = "name cant be null")
     private String name; // 必传
     private Integer age; // 可选
     private Double height; // 可选
+    @NotNull(message = "email cant be null")
     private String email; // 必传
 
     public String getName() {

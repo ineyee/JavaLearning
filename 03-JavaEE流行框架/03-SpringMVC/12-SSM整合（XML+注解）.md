@@ -10,7 +10,7 @@
 │  │  │  │  ├─com.ineyee/(公司唯一标识)
 │  │  │  │  │  ├─api/(给客户端响应数据和错误)
 │  │  │  │  │  │  ├─HttpResult.java(给客户端响应数据和错误的包装类)
-│  │  │  │  │  │  ├─error/(错误码和错误信息枚举常量)
+│  │  │  │  │  │  ├─error/(错误码和错误信息的枚举常量)
 │  │  │  │  │  │  │  ├─Error.java(父接口)
 │  │  │  │  │  │  │  ├─CommonError implements Error(通用错误码及错误信息)
 │  │  │  │  │  │  │  ├─UserError implements Error(用户模块错误码及错误信息)
@@ -21,23 +21,26 @@
 │  │  │  │  │  │  ├─BaseDomain
 │  │  │  │  │  │  ├─User extends BaseDomain
 │  │  │  │  │  │  ├─Product extends BaseDomain
-│  │  │  │  │  ├─controller/(表现层之控制器层)
-│  │  │  │  │  │  ├─UserServlet
-│  │  │  │  │  │  ├─ProductServlet
+│  │  │  │  │  ├─dao/(数据层的接口)
+│  │  │  │  │  │  ├─UserDao
+│  │  │  │  │  │  ├─ProductDao
 │  │  │  │  │  ├─service/(业务层)
 │  │  │  │  │  │  ├─UserService
 │  │  │  │  │  │  ├─UserServiceImpl implements UserService
 │  │  │  │  │  │  ├─ProductService
 │  │  │  │  │  │  ├─ProductServiceImpl implements ProductService
-│  │  │  │  │  ├─dao/(数据层)
-│  │  │  │  │  │  ├─UserDao
-│  │  │  │  │  │  ├─ProductDao
+│  │  │  │  │  ├─controller/(表现层之控制器层)
+│  │  │  │  │  │  ├─UserController
+│  │  │  │  │  │  ├─ProductController
 │  │  │  │  │  ├─dto/(接收客户端的请求参数)
 │  │  │  │  │  │  ├─UserSaveDto
 │  │  │  │  │  │  ├─UserRemoveDto
 │  │  │  │  │  │  ├─UserUpdateDto
 │  │  │  │  │  │  ├─UserGetDto、UserListDto
 │  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
+│  │  │  │  ├─mappers/(数据层的实现)
+│  │  │  │  │  ├─user.xml
+│  │  │  │  │  ├─product.xml
 │  │  │  │  ├─applicationContext.xml(Spring 的配置文件)
 │  ├─target/(项目的打包产物)
 │  ├─pom.xml(项目的配置文件，里面记录着项目的很多信息)
@@ -176,6 +179,21 @@
 </dependency>
 ```
 
+* （可选）把所有参数都获取到一个请求参数模型里时，添加校验参数是否必传相关的库，jakarta.validation-api 是接口，hibernate-validator 是具体实现
+
+```xml
+<dependency>
+    <groupId>jakarta.validation</groupId>
+    <artifactId>jakarta.validation-api</artifactId>
+    <version>3.0.2</version>
+</dependency>
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>8.0.0.Final</version>
+</dependency>
+```
+
 * （可选）然后我们可以安装文件上传库，以便 SpringMVC 能帮我们非常简单地实现文件上传
 
 ```xml
@@ -270,26 +288,35 @@
 
 ## 五、api 目录里的东西
 
-api 目录里的东西基本都是固定的，可以先搞到项目里，后续再根据实际业务情况做扩展。
+api 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
 ## 六、表现层之模型层 domain
+
+> * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
+> * 一个数据库里可以有多张表，比如 user、product 这两张表
+> * 一张表对应一组 dao、service、domain、controller，比如 UserDao、UserService、User、UserController、ProductDao、ProductService、Product、ProductController 这两组
 
 纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。
 
 ## 七、数据层 dao
 
-* 数据层（dao）的职责就是直接与数据库打交道
-* 调用数据层的“增删改” API + 传给这些 API 一个和 domain 直接相关的参数，你就可以获取到影响的数据条数
-* 调用数据层的“查” API + 传给这些 API 一个和 domain 直接相关的参数，你就可以获取到原始模型 domain
-* 一张表对应的 dao，我们一般会把它定义成接口，然后为这个接口编写多个实现类，因为实际开发中我们很可能需要根据实际情况切换访问数据库的方案，比如 JDBC、Hibernate、MyBatis 等，这种面向接口编程的方式方便切换方案
+> * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
+> * 一个数据库里可以有多张表，比如 user、product 这两张表
+> * 一张表对应一组 dao、service、domain、controller，比如 UserDao、UserService、User、UserController、ProductDao、ProductService、Product、ProductController 这两组
 
-#### 1、dao 接口
+先定义一个 dao 接口，然后再定义一个 mapper 文件、这个 mapper 文件其实就是 dao 接口的实现。
 
+## 八、业务层 service
 
+> * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
+> * 一个数据库里可以有多张表，比如 user、product 这两张表
+> * 一张表对应一组 dao、service、domain、controller，比如 UserDao、UserService、User、UserController、ProductDao、ProductService、Product、ProductController 这两组
 
+先定义一个 service 接口，然后再定义一个 service 接口的实现类、自动注入 dao。
 
+## 九、控制器层 controller
 
-
+定义一个 controller 类、自动注入 service。
 
 
 
