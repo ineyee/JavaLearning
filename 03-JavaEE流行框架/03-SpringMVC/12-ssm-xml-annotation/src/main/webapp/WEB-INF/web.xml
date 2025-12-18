@@ -1,9 +1,47 @@
-<!DOCTYPE web-app PUBLIC
-        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-        "http://java.sun.com/dtd/web-app_2_3.dtd" >
-
-<web-app>
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+        xmlns="https://jakarta.ee/xml/ns/jakartaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                        https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+        version="6.0">
     <display-name>Archetype Created Web Application</display-name>
+
+    <!-- 指定 Spring 主配置文件的位置 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+
+    <!-- 用来加载 Spring 主配置文件 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- 字符编码过滤器，用来处理 HTTP 请求的字符编码 -->
+    <filter>
+        <!-- 过滤器的名字，这个名字是我们自己起的，后面在 filter-mapping 中会用到 -->
+        <filter-name>characterEncodingFilter</filter-name>
+        <!-- 过滤器的实现类，使用 Spring 框架自带的 CharacterEncodingFilter 类 -->
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+
+        <!--
+            告诉过滤器强制使用 UTF-8 编码来处理请求参数，UTF-8 是目前最通用的字符编码
+        -->
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <!-- 配置字符编码过滤器的拦截范围，/* 代表会拦截接口型请求 + 静态资源请求 + 动态资源请求所有的 HTTP 请求-->
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <!--
         配置主控制器
@@ -18,16 +56,45 @@
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 
         <!--
-            指定 Spring 配置文件的位置
+            指定 Spring 子配置文件的位置
 
-            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的配置文件（classpath:applicationContext.xml）
+            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的子配置文件（classpath:dispatcherServlet.xml）
         -->
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:applicationContext.xml</param-value>
+            <param-value>classpath:dispatcherServlet.xml</param-value>
         </init-param>
-    </servlet>
 
+        <!-- 配置 multipart/form-data 请求的 multipart-config -->
+        <multipart-config>
+            <!--
+                设置文件上传时的临时目录，默认是 Servlet 容器的临时目录，一般不设置采用默认的就行
+                文件上传时，数据会先写入到硬盘上的临时目录，而不是直接放到内存中，这样可以防止上传大文件时占用过多内存
+                上传完成后，再将文件移动到指定的目标目录
+            -->
+            <location>/tmp</location>
+            <!--
+                设置单个文件的最大字节数，单位为字节
+                默认值是 -1，表示无限制
+                如果上传的文件超过该大小限制，Servlet 会抛出异常（如 IOException）
+                例如这里设置为 10485760 字节，即 10 MB
+            -->
+            <max-file-size>10485760</max-file-size>
+            <!--
+                设置一次上传请求中所有文件的总大小上限，单位为字节
+                    默认值是 -1，表示无限制
+                    如果上传的文件总大小超过该限制，Servlet 会抛出异常
+                    例如这里设置为 20971520 字节，即 20 MB
+                -->
+            <max-request-size>20971520</max-request-size>
+            <!--
+                设置文件写入到临时文件之前，允许保存在内存中的临界值，单位为字节
+                当文件大小超过该值时，才会写入硬盘临时目录；否则保存在内存中
+                默认是 0，表示所有上传文件都直接写入硬盘临时目录
+            -->
+            <file-size-threshold>0</file-size-threshold>
+        </multipart-config>
+    </servlet>
     <!--
         配置主控制器可以拦截哪些请求，注意还需配合 Spring 配置文件里的 <mvc:default-servlet-handler/> 和 <mvc:annotation-driven/> 一起使用
 

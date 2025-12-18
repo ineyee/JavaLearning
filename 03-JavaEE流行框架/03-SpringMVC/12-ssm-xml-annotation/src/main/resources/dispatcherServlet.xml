@@ -23,8 +23,56 @@
     -->
     <mvc:default-servlet-handler/>
     <!--
-        但是添加了 mvc:default-servlet-handler 后又会导致 @Controller 等注解无法处理接口型请求
-        所以还得加上 mvc:annotation-driven 注解驱动来保证 @Controller 等注解可以正常处理接口型请求
+        用途一：
+            但是添加了 mvc:default-servlet-handler 后又会导致 @Controller 等注解无法处理接口型请求
+            所以还得加上 mvc:annotation-driven 注解驱动来保证 @Controller 等注解可以正常处理接口型请求
+        用途二：
+            自动启用参数校验功能（@Valid 等）
+        用途三：
+            自动注册消息转换器（mvc:message-converters）
     -->
-    <mvc:annotation-driven/>
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <!-- 配置一下当响应体为 String 时的编码方式 -->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="defaultCharset" value="utf-8"/>
+            </bean>
+            <!-- 配置一下当响应体为 Java 对象或 Map 时的编码方式 -->
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="defaultCharset" value="utf-8"/>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 配置验证器，用于校验参数是否必传 -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+    <!-- 启用方法级别的验证 -->
+    <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
+
+    <!--
+        在 Spring 的配置文件里把 commons-fileupload 三方库的 StandardServletMultipartResolver 添加到 IoC 容器，id 值固定为 multipartResolver
+        将来 SpringMVC 就会通过这个 id 值拿到这个解析器去解析 multipart/form-data 请求的参数
+    -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
+
+    <!-- 添加一下拦截器 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--
+                设置拦截器能拦截那些请求：这里的请求就是我们通过 / 设置了 DispatcherServlet 会拦截接口型请求 + 会拦截静态资源型请求这两种
+                虽然 DispatcherServlet 把静态资源型请求转交给服务器默认的处理了，但拦截它肯定是会先拦截下来的，也就是说先拦截后转交，而不是直接转交
+
+                /*：代表 http://xxx/applicationContext/xxx 这种一级路径的请求才会被拦截
+                /**：代表 http://xxx/applicationContext/xxx、http://xxx/applicationContext/xxx/xxx 这种一级路径或 N 级路径的请求都会被拦截
+            -->
+            <mvc:mapping path="/**"/>
+            <!--
+                如果我们把静态资源都放在 applicationContext/asset 目录下，这里就代表不要拦截 asset 及其子目录下的静态资源请求
+                这样一来拦截器就是只拦截接口型请求了
+            -->
+            <mvc:exclude-mapping path="/asset/**"/>
+            <!-- 我们自定义的 HTTP 请求日志拦截器 -->
+            <bean class="com.ineyee.interceptor.HttpLogInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
 </beans>
