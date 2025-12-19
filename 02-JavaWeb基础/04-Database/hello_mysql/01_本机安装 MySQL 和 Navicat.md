@@ -9,6 +9,7 @@ MySQL Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯�
 * 下载完双击安装即可（期间设置一下 root 用户的密码，比如是 mysqlroot），macOS 上会默认安装在 /usr/local/mysql，数据库数据默认存放路径为 /usr/local/mysql/data（/ 代表根目录 Macintosh HD，~/ 代表当前用户目录 /Users/ineyee）
 * 在 .bash_profile 里配置一下环境变量：export PATH="/usr/local/mysql/bin:$PATH"，并执行 source ~/.bash_profile 来让修改立即生效
 * 终端执行 mysql --version 或 mysql -V 来验证是否安装成功
+* 然后在 /usr/local/mysql 目录下创建一个文件夹 etc，在 etc 文件夹里创建一个配置文件 my.cnf，在 my.cnf 添加“[mysqld]（这里换行）default-time-zone = '+00:00'”，把 MySQL 的默认时区设置为 0 时区，这样才能确保将来通过 SQL 语句自动生成并存储在数据库里的 create_time、update_time 是 0 时区的时间
 * macOS 电脑上可以在【系统设置】里找到 MySQL 软件，我们可以在这里启动或者停止 MySQL 服务，也可以勾选开关机自动启动或停止 MySQL 服务
 
 ## 二、本机安装 Navicat
