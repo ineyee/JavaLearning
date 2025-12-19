@@ -8,12 +8,7 @@
         jdbc:mysql://：MySQL 的固定写法
         localhost、3306：域名和端口号
         db_hello_mysql：数据库的名称
-        serverTimezone=UTC：推荐设置当前会话时区为零时区，以便 MySQL 能正确处理 DATETIME、TIMESTAMP 字段
-            因为 DATETIME、TIMESTAMP 字段的默认值是获取服务器所在时区的时间，如服务器 1 部署在东八区，服务器 2 部署在西八区，
-            用户 1 通过东八区的服务器注册时存储在数据库的 createTime 就是东八区的时间 "2025-06-17 17:59:00"、并且没有携带时区信息
-            用户 2 通过西八区的服务器注册时存储在数据库的 createTime 就是西八区的时间 "2025-06-17 09:59:00"、并且没有携带时区信息
-            这样在西八区展示东八区用户的 createTime 就会有问题，因为我们不知道 "2025-06-17 17:59:00" 是东八区的、也没法转换为西八区对应的时间
-            因此我们统一把 DATETIME、TIMESTAMP 字段都设置成零时区的，各个区在拿到时间后转换成自己时区的时间展示即可
+        serverTimezone=UTC：告诉数据库驱动 MySQL 已经把默认时区设置为了 0 时区
         root、mysqlroot：数据库的用户名和密码
     -->
     <url>jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC</url>
