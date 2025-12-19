@@ -32,6 +32,8 @@
 │  │  │  │  │  │  ├─UserRemoveDto
 │  │  │  │  │  │  ├─UserUpdateDto
 │  │  │  │  │  │  ├─UserGetDto、UserListDto
+│  │  │  │  │  ├─interceptor/(各种拦截器)
+│  │  │  │  │  │  ├─HttpLogInterceptor(HTTP 请求日志拦截器)
 │  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
 │  │  │  │  ├─mappers/(数据层的实现)
 │  │  │  │  │  ├─user.xml
@@ -175,6 +177,16 @@
 </dependency>
 ```
 
+* （可选）然后我们可以安装一个数据类型转换库，只要我们安装了这个库 Jackson 就会自动检测并注册 JavaTimeModule，就能完成数据库里日期 DATETIME 和 Java 代码里 LocalDateTime 类型的转换（还需要在 SpringMVC 配置文件里设置一下 LocalDateTime 的格式）
+
+```xml
+<dependency>
+  <groupId>com.fasterxml.jackson.datatype</groupId>
+  <artifactId>jackson-datatype-jsr310</artifactId>
+  <version>2.15.2</version>
+</dependency>
+```
+
 * （可选）把所有参数都获取到一个请求参数模型里时，添加校验参数是否必传相关的库，jakarta.validation-api 是接口，hibernate-validator 是具体实现
 
 ```xml
@@ -298,18 +310,17 @@
         version="6.0">
     <display-name>Archetype Created Web Application</display-name>
 
-    <!-- 指定 Spring 主配置文件的位置 -->
+    <!-- 1、指定 Spring 主配置文件的位置 -->
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:applicationContext.xml</param-value>
     </context-param>
-
     <!-- 用来加载 Spring 主配置文件 -->
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
-    <!-- 字符编码过滤器，用来处理 HTTP 请求的字符编码 -->
+    <!-- 2、字符编码过滤器，用来处理 HTTP 请求的字符编码 -->
     <filter>
         <!-- 过滤器的名字，这个名字是我们自己起的，后面在 filter-mapping 中会用到 -->
         <filter-name>characterEncodingFilter</filter-name>
@@ -335,7 +346,7 @@
     </filter-mapping>
 
     <!--
-        配置主控制器
+        3、配置主控制器
 
         配置主控制器为 SpringMVC 自带的 DispatcherServlet，这个 DispatcherServlet 是 SpringMVC 的“大脑”
         所有进入应用的请求都会先经过它，再由它负责分发给相应控制器的方法进行处理，我们可以把它想象成公司的“总机接线员”
@@ -400,7 +411,7 @@
 
 ## 六、创建 Spring 的配置文件，做一些配置
 
-* applicationContext.xml
+* applicationContext.xml 主配置文件
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -421,7 +432,7 @@
 </beans>
 ```
 
-* dispatcherServlet.xml
+* dispatcherServlet.xml 子配置文件
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -492,7 +503,7 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 #### 1、Java 代码
 
-先定义一个 service 接口，然后再定义一个 service 接口的实现类、自动注入 dao。
+先定义一个 service 接口，然后再定义一个 service 接口的实现类、用 @Service 修饰一下放入父 IoC 容器里、自动注入 dao。
 
 #### 2、配置
 
@@ -506,7 +517,7 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 #### 1、Java 代码
 
-定义一个 controller 类、自动注入 service。
+定义一个 controller 类、用 @Controller 修饰一下放入子 IoC 容器里、自动注入 service。
 
 #### 2、配置
 

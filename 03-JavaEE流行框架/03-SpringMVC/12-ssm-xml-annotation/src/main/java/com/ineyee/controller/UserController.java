@@ -77,12 +77,10 @@ public class UserController {
     /*
      url = http://localhost:9999/helloMyBatis/user/save
      body = {
-        "user": {
-            "name": "库里",
-            "age": 37,
-            "height": 1.88,
-            "email": "curry@qq.com"
-        }
+         "name": "库里",
+         "age": 37,
+         "height": 1.88,
+         "email": "curry@qq.com"
      }
      */
     @PostMapping("/save")
@@ -98,28 +96,26 @@ public class UserController {
 
     /*
      url = http://localhost:9999/helloMyBatis/user/saveBatch
-     body = {
-         "userList": [
-             {
-                 "name": "三三",
-                 "age": 18,
-                 "height": 1.88,
-                 "email": "sansan@qq.com"
-             },
-             {
-                 "name": "四四",
-                 "age": 19,
-                 "height": 1.99,
-                 "email": "sisi@qq.com"
-             },
-             {
-                 "name": "五五",
-                 "age": 20,
-                 "height": 2.00,
-                 "email": "wuwu@qq.com"
-             }
-         ]
-     }
+     body = [
+         {
+             "name": "三三",
+             "age": 18,
+             "height": 1.88,
+             "email": "sansan@qq.com"
+         },
+         {
+             "name": "四四",
+             "age": 19,
+             "height": 1.99,
+             "email": "sisi@qq.com"
+         },
+         {
+             "name": "五五",
+             "age": 20,
+             "height": 2.00,
+             "email": "wuwu@qq.com"
+         }
+     ]
      */
     @PostMapping("/saveBatch")
     @ResponseBody
@@ -140,8 +136,8 @@ public class UserController {
      */
     @PostMapping("/remove")
     @ResponseBody
-    public HttpResult<Void> remove(@RequestBody Integer id) throws ServiceException {
-        Boolean ret = userService.remove(id);
+    public HttpResult<Void> remove(@RequestBody Map<String, Object> params) throws ServiceException {
+        Boolean ret = userService.remove((Integer) params.get("id"));
         if (ret) {
             return HttpResult.ok();
         } else {
@@ -151,9 +147,7 @@ public class UserController {
 
     /*
      url = http://localhost:9999/helloMyBatis/user/removeBatch
-     body = {
-        "idList": [1, 2, 54, 55]
-     }
+     body = [1, 2, 54, 55]
      */
     @PostMapping("/removeBatch")
     @ResponseBody
@@ -175,7 +169,12 @@ public class UserController {
         }
      }
      */
-    public HttpResult<Void> update(@RequestBody Integer id, @RequestBody Map<String, Object> fieldsToUpdate) throws ServiceException {
+    @PostMapping("/update")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public HttpResult<Void> update(@RequestBody Map<String, Object> params) throws ServiceException {
+        Integer id = (Integer) params.get("id");
+        Map<String, Object> fieldsToUpdate = (Map<String, Object>) params.get("fieldsToUpdate");
         Boolean ret = userService.update(id, fieldsToUpdate);
         if (ret) {
             return HttpResult.ok();
@@ -193,7 +192,12 @@ public class UserController {
         }
      }
      */
-    public HttpResult<Void> updateBatch(@RequestBody List<Integer> idList, @RequestBody Map<String, Object> fieldsToUpdate) throws ServiceException {
+    @PostMapping("/updateBatch")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public HttpResult<Void> updateBatch(@RequestBody Map<String, Object> params) throws ServiceException {
+        List<Integer> idList = (List<Integer>) params.get("idList");
+        Map<String, Object> fieldsToUpdate = (Map<String, Object>) params.get("fieldsToUpdate");
         Boolean ret = userService.updateBatch(idList, fieldsToUpdate);
         if (ret) {
             return HttpResult.ok();

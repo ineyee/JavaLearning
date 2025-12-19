@@ -5,8 +5,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
-import java.io.BufferedReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -67,13 +68,8 @@ public class HttpLogInterceptor implements HandlerInterceptor {
         String params = paramJson.toString();
         System.out.println("params = " + (params.equals("{}") ? null : params));
 
-        // body
-        StringBuilder sb = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        String body = sb.toString().replaceAll("\\s+", " ").trim().replaceAll("^\\{\\s+", "{");
-        System.out.println("body = " + (body.isEmpty() ? null : body));
+        // body - 先打印占位符，实际内容在 postHandle 中打印（因为 ContentCachingRequestWrapper 需要在内容被读取后才会缓存）
+        System.out.println("body = [将在请求处理后显示]");
 
         System.out.println("====================== 请求数据 ======================HttpLogInterceptor.preHandle end\n");
 
@@ -90,6 +86,21 @@ public class HttpLogInterceptor implements HandlerInterceptor {
         // 注意；
         // 如果 controller 里接口方法抛异常，该方法不会执行，但是 afterCompletion 方法依然会执行
         // 所以响应日志我们给它放到 afterCompletion 方法里记录，以保证异常情况下也能记录
+
+        // 在这里打印请求体内容（此时 Spring MVC 已经读取并缓存了请求体）
+        if (request instanceof ContentCachingRequestWrapper) {
+            ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
+            byte[] buf = wrapper.getContentAsByteArray();
+            if (buf.length > 0) {
+                String body = new String(buf, 0, buf.length, StandardCharsets.UTF_8)
+                        .replaceAll("\\s+", " ")
+                        .trim()
+                        .replaceAll("^\\{\\s+", "{");
+                System.out.println("\n====================== 请求体内容 ======================");
+                System.out.println("body = " + body);
+                System.out.println("====================== 请求体内容 ======================\n");
+            }
+        }
     }
 
     // 这个方法会在服务器给客户端发出去响应后调用，至于客户端收没收到就管不了了
