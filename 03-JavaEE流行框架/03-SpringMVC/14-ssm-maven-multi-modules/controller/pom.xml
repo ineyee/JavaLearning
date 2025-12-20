@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+      声明 pom.xml 文件的版本，就像 .html 文件里声明是 H5 那样，决定了该文件里能写什么标签不能写什么标签
+      目前都使用 4.0.0，是必要元素
+    -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 父项目的 maven 坐标 -->
+    <parent>
+        <groupId>com.ineyee</groupId>
+        <artifactId>14-ssm-maven-multi-modules</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <!--
+      当前项目的 maven 坐标
+        groupId：会继承父项目的
+        artifactId：默认就是项目名，我们创建项目时填写的
+        version：1.0.0，项目版本号，我们创建项目时填写的
+    -->
+    <artifactId>controller</artifactId>
+    <version>1.0.0</version>
+
+    <!-- 所有的依赖 -->
+    <dependencies>
+        <!-- service 项目 -->
+        <dependency>
+            <groupId>com.ineyee</groupId>
+            <artifactId>service</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- SpringMVC 相关依赖 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>7.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>8.0.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-fileupload2-jakarta-servlet6</artifactId>
+            <version>2.0.0-M4</version>
+        </dependency>
+        <!-- Java 对象或 Map 和 Json 字符串互转的库 -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+    </dependencies>
+
+    <!-- 构建信息，比如输出产物的名字、插件配置等 -->
+    <build>
+        <!-- 输出产物的名字 -->
+        <finalName>ssm</finalName>
+        <!-- 插件配置 -->
+        <plugins>
+        </plugins>
+    </build>
+
+    <!--
+      打包方式，比如 jar、war 等
+      如果不写这个标签，默认是打包成 jar
+      如果是个 JavaWeb 项目，那应该打包成 war
+    -->
+    <packaging>war</packaging>
+</project>

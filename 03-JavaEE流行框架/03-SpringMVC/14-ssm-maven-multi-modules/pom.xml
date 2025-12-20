@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+        声明 pom.xml 文件的版本，就像 .html 文件里声明是 H5 那样，决定了该文件里能写什么标签不能写什么标签
+        目前都使用 4.0.0，是必要元素
+    -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      当前项目的 maven 坐标
+        groupId：com.ineyee，公司域名倒写，我们创建项目时填写的
+        artifactId：默认就是项目名，我们创建项目时填写的
+        version：1.0.0，项目版本号，我们创建项目时填写的
+    -->
+    <groupId>com.ineyee</groupId>
+    <artifactId>14-ssm-maven-multi-modules</artifactId>
+    <version>1.0.0</version>
+
+    <!-- 子模块 -->
+    <modules>
+        <module>dao</module>
+        <module>service</module>
+        <module>controller</module>
+    </modules>
+
+    <!-- 所有的依赖 -->
+    <dependencies>
+        <!-- 日志打印 -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.19</version>
+        </dependency>
+        <!-- 单元测试 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- 属性信息 -->
+    <properties>
+        <!-- 告诉 Maven 编译、打包源码时使用 UTF-8，避免有些环境（如 Windows 服务器）使用系统默认的 GBK、ISO-8859-1 编码 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 告诉 Maven 编译器插件，把源码编译成兼容 JDK8 的字节码文件 -->
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <!--
+      打包方式
+      只要当前项目是别人的父项目，那打包方式就必须得是 pom
+    -->
+    <packaging>pom</packaging>
+</project>

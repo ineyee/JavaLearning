@@ -173,23 +173,13 @@
 </dependency>
 ```
 
-* （可选）然后我们可以安装 Java 对象或 Map 和 Json 字符串互转的库，以便 SpringMVC 能完成“请求体的 Json 字符串自动转 Java 对象或 Map”、“响应体的 Java 对象或 Map 自动转 Json 字符串”
+* （可选）然后我们可以安装 Java 对象或 Map 和 Json 字符串互转的库，以便 SpringMVC 能完成“请求体的 Json 字符串自动转 Java 对象或 Map”、“响应体的 Java 对象或 Map 自动转 Json 字符串”，并且这个库的 3.x 版本往后还会自动把 LocalDateTime 转为 "2025-12-20T19:30:45" 格式返回给客户端
 
 ```xml
 <dependency>
-    <groupId>com.fasterxml.jackson.core</groupId>
+    <groupId>tools.jackson.core</groupId>
     <artifactId>jackson-databind</artifactId>
-    <version>2.15.2</version>
-</dependency>
-```
-
-* （可选）然后我们可以安装一个数据类型转换库，只要我们安装了这个库 Jackson 就会自动检测并注册 JavaTimeModule，就能完成数据库里日期 DATETIME 和 Java 代码里 LocalDateTime 类型的转换（还需要在 SpringMVC 配置文件里设置一下 LocalDateTime 的格式）
-
-```xml
-<dependency>
-  <groupId>com.fasterxml.jackson.datatype</groupId>
-  <artifactId>jackson-datatype-jsr310</artifactId>
-  <version>2.15.2</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 

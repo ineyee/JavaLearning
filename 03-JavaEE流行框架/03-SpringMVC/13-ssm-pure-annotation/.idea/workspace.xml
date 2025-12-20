@@ -10,39 +10,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="69e4e1ee-dd23-44af-9376-e4e67c6fdf71" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/java/com/ineyee/controller/FileUploadController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../13-SSM整合（纯注解）.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/HttpResult.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/error/CommonError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/error/Error.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/error/UserError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/exception/ServiceException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/SpringConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/SpringMVCConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/WebInitializer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/controller/FileUploadController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/controller/UserController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/dao/UserDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/domain/BaseDomain.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/domain/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/filter/CachedBodyFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/interceptor/HttpLogInterceptor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/service/UserService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/service/UserServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/dao.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/mappers/user.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/index.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../12-SSM整合（XML+注解）.md" beforeDir="false" afterPath="$PROJECT_DIR$/../12-SSM整合（XML+注解）.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../12-SSM整合（纯注解）.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/resources/applicationContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../12-ssm-xml-annotation/src/main/resources/applicationContext.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-SSM整合（Maven 分模块构建）.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-maven-multi-project/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-maven-multi-project/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-maven-multi-project/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/artifacts/controller.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/dictionaries/project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/HttpResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/error/CommonError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/error/Error.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/error/UserError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/cfg/SpringConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/cfg/SpringMVCConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/cfg/WebInitializer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/controller/FileUploadController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/controller/UserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/filter/CachedBodyFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/interceptor/HttpLogInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/webapp/index.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/java/com/ineyee/cfg/DaoConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/java/com/ineyee/dao/UserDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/java/com/ineyee/domain/BaseDomain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/java/com/ineyee/domain/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/resources/dao.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/resources/mappers/user.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/main/java/com/ineyee/api/exception/ServiceException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/main/java/com/ineyee/cfg/ServiceConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/main/java/com/ineyee/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/main/java/com/ineyee/service/UserServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/test/java/com/ineyee/AppTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../13-SSM整合（纯注解）.md" beforeDir="false" afterPath="$PROJECT_DIR$/../13-SSM整合（纯注解）.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/SpringConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/SpringConfig.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,9 +69,9 @@
     <option name="FILTER_DEBUG" value="true" />
     <option name="CUSTOM_FILTER" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="375gNyk6KSU9VK5FPqXoBTz6TKA" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -70,26 +80,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Tomcat Server.Tomcat 11.0.10.executor": "Debug",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/03-SpringMVC/13-ssm-pure-annotation/src/main/java/com/ineyee",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Tomcat Server.Tomcat 11.0.10.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/03-SpringMVC/13-ssm-pure-annotation/src/main/java/com/ineyee&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java/com/ineyee" />
@@ -112,7 +125,7 @@
   </component>
   <component name="RunManager">
     <configuration name="Tomcat 11.0.10" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 11.0.10" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
-      <option name="UPDATING_POLICY" value="redeploy-artifacts" />
+      <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
         <artifact name="13-ssm-pure-annotation:war exploded">
           <settings>
@@ -121,7 +134,7 @@
         </artifact>
       </deployment>
       <server-settings>
-        <option name="BASE_DIRECTORY_NAME" value="bef8d5c7-241e-4629-bdb5-ec01d23414dc" />
+        <option name="BASE_DIRECTORY_NAME" value="ce740a72-8b1b-4305-ad67-8798df16b862" />
       </server-settings>
       <predefined_log_file enabled="true" id="Tomcat" />
       <predefined_log_file enabled="true" id="Tomcat Catalina" />
@@ -129,7 +142,7 @@
       <predefined_log_file id="Tomcat Host Manager" />
       <predefined_log_file id="Tomcat Localhost Access" />
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="60820" />
+        <option name="DEBUG_PORT" value="58592" />
       </RunnerSettings>
       <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
         <option name="USE_ENV_VARIABLES" value="true" />
@@ -215,6 +228,8 @@
       <option name="presentableId" value="Default" />
       <updated>1766198309690</updated>
       <workItem from="1766198310699" duration="6358000" />
+      <workItem from="1766213099821" duration="966000" />
+      <workItem from="1766219406926" duration="9896000" />
     </task>
     <servers />
   </component>

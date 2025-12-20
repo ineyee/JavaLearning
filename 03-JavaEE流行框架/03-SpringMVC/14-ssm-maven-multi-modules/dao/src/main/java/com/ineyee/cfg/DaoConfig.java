@@ -8,33 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
 
-// Spring 主配置类
-// 1 开头的都是数据层 dao 的相关配置
-// 2 开头的都是业务层 service 的相关配置
+// 数据层配置类
 @Configuration
-// 通过 @ComponentScan 注解告诉 Spring 框架哪个包里的类是通过注解实现 IoC 的
-// Spring 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 父容器里
-//
-// 父容器只需要扫描 service 所在的包即可
-@ComponentScan("com.ineyee.service")
 // 1.1 导入配置文件
 @PropertySource("classpath:dao.properties")
 // 1.4 配置一下 mapper 扫描器即可，这样一来 Spring 就会自动创建所有的 dao 对象并放入父 IoC 容器里了
 @MapperScan("com.ineyee.dao")
-// 2.2 这个注解是“事务管理的注解驱动”的功能，附加代码和切面就不用配置了
-@EnableTransactionManagement
-public class SpringConfig {
+public class DaoConfig {
     /*
     1.2 开发环境和生产环境的数据库连接池、连接、数据库，数据源将会被 sqlSessionFactory 引用
         开发阶段，我们可以把默认环境设置为开发环境，从而访问测试数据库
@@ -151,18 +139,4 @@ public class SpringConfig {
 
         return sqlSessionFactoryBean;
     }
-
-    // 2.1 Spring 的事务管理器，用来进行事务管理
-    @Bean
-    public DataSourceTransactionManager txMgr() {
-        DataSourceTransactionManager txMgr = new DataSourceTransactionManager();
-        DataSource ds = applicationContext.getBean(dataSource, DataSource.class);
-        txMgr.setDataSource(ds);
-        return txMgr;
-    }
-
-    // 2.3
-    // 然后我们想给哪个业务增加事务管理的代码
-    // 就直接在这个业务类里加上一个 @Transactional 注解就完事了，这样一来这个业务类里所有的方法都会自动加上事务管理的代码
-    // 当然我们也可以只在某一个方法上加上一个 @Transactional 注解
 }
