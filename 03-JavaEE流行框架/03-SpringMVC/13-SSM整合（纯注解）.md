@@ -1,6 +1,6 @@
-本篇我们用 SSM 整合实现一下《02-JavaWeb基础：05-ProjectArchitecture》，基于 XML + 注解
+本篇我们用 SSM 整合实现一下《02-JavaWeb基础：05-ProjectArchitecture》，基于纯注解
 
-## 一、项目目录结构划分
+## ✅ 一、项目目录结构划分
 
 ```
 ├─${project-name}/(项目名)
@@ -8,6 +8,10 @@
 │  │  ├─main/
 │  │  │  ├─java/(我们编写的 Java 代码都放在这个文件夹里)
 │  │  │  │  ├─com.ineyee/(公司唯一标识)
+│  │  │  │  │  ├─cfg/(之前的 xml 文件现在都变成了 Java 配置类)
+│  │  │  │  │  │  ├─WebInitializer.java(对应之前的 web.xml 配置文件)
+│  │  │  │  │  │  ├─SpringConfig.java(对应之前的 applicationContext.xml 配置文件)
+│  │  │  │  │  │  ├─SpringMVCConfig.java(对应之前的 dispatchServlet.xml 配置文件)
 │  │  │  │  │  ├─api/(给客户端响应数据和错误)
 │  │  │  │  │  │  ├─HttpResult.java(给客户端响应数据和错误的包装类)
 │  │  │  │  │  │  ├─error/(错误码和错误信息的枚举常量)
@@ -46,7 +50,7 @@
 │  ├─pom.xml(项目的配置文件，里面记录着项目的很多信息)
 ```
 
-## 二、Tomcat 部署配置
+## ✅ 二、Tomcat 部署配置
 
 - 在 Current File - Edit Configurations - Add New - Tomcat Server - Local - IDE 会自动检测到我们安装在本机的 Tomcat，大多数配置我们不需要修改，只需要修改部分配置
 - Server - HTTP port，由默认的 8080 换成自定义的端口比如 9999（本机上可能有其它软件已经在监听 8080 端口了，会导致 Tomcat 无法监听；${TOMCAT_HOME}/conf/server.xml 文件，<Connector> 标签里也能修改端口）
@@ -56,7 +60,7 @@
 - `把下面的 Application context 由 “/12_ssm_xml_annotation_war_exploded”或”/12_ssm_xml_annotation_war“这么长的一串换成自定义的“/ssm”（注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的）`
 - Apply - OK
 
-## 三、Maven 项目配置
+## ✅ 三、Maven 项目配置
 
 ```xml
 <!-- pom.xml -->
@@ -115,7 +119,7 @@
 </project>
 ```
 
-## 四、添加依赖
+## ✅ 四、添加依赖
 
 #### 1、Spring 相关依赖（串联各个层）
 
@@ -296,184 +300,170 @@
 </dependency>
 ```
 
-## 五、在 web.xml 里做一些配置
+## ✅ 五、在 WebInitializer 里做一些配置
 
-> 这是非常老旧的配置方法，需要我们手动将 DispatcherServlet 的配置写入 web.xml 文件，这里仅做演示用
+> 这是非常老旧的配置方法，需要我们手动将 DispatcherServlet 的配置写入 WebInitializer 类里，这里仅做演示用
 >
 > Spring Boot 诞生后，在检测到 Spring MVC 的依赖后，会自动地、隐式地为我们配置好 DispatcherServlet，其默认拦截路径就是 "/"，让开发者能专注于写接口的业务代码，这个后面再说
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app
-        xmlns="https://jakarta.ee/xml/ns/jakartaee"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                        https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-        version="6.0">
-    <display-name>Archetype Created Web Application</display-name>
+> 整体工作流程总结：
+>
+> * JavaWeb 项目在 Tomcat 等 Servlet 容器中启动
+> * 容器会读取项目中哪个类继承自 AbstractAnnotationConfigDispatcherServletInitializer 类，就会找到我们自己创建的  WebInitializer 类，创建并初始化 DispatcherServlet
+> * DispatcherServlet 会根据配置加载主配置类和子配置类，创建 Spring 容器及各个 controller 层的 bean 对象
+> * 此后，所有来自客户端的请求都会首先经过 DispatcherServlet
+> * DispatcherServlet 会根据请求路径和请求方法，找到 @Controller 中具体的方法执行，最后返回响应给客户端
 
-    <!-- 1、指定 Spring 主配置文件的位置 -->
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:applicationContext.xml</param-value>
-    </context-param>
-    <!-- 用来加载 Spring 主配置文件 -->
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
+之前 XML + 注解我们是在 web.xml 里做一些配置，现在纯注解我们是在 WebInitializer 类里做一些配置，有了这个类，我们就可以把 web.xml 删掉了，它俩是同样的用途：
 
-    <!-- 2、字符编码过滤器，用来处理 HTTP 请求的字符编码 -->
-    <filter>
-        <!-- 过滤器的名字，这个名字是我们自己起的，后面在 filter-mapping 中会用到 -->
-        <filter-name>characterEncodingFilter</filter-name>
-        <!-- 过滤器的实现类，使用 Spring 框架自带的 CharacterEncodingFilter 类 -->
-        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+```java
+// 创建一个 WebInitializer 类，继承 AbstractAnnotationConfigDispatcherServletInitializer 类
+// 重写若干方法，在这些方法里做配置
+public class WebInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+    // 1、指定 Spring 主配置类
+    @Override
+    protected Class<?> @Nullable [] getRootConfigClasses() {
+        return new Class[]{SpringConfig.class};
+    }
 
-        <!--
-            告诉过滤器强制使用 UTF-8 编码来处理请求参数，UTF-8 是目前最通用的字符编码
-        -->
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>UTF-8</param-value>
-        </init-param>
-        <init-param>
-            <param-name>forceEncoding</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </filter>
-    <!-- 配置字符编码过滤器的拦截范围，/* 代表会拦截接口型请求 + 静态资源请求 + 动态资源请求所有的 HTTP 请求-->
-    <filter-mapping>
-        <filter-name>characterEncodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    // 2、指定 Spring 子配置类，for SpringMVC
+    @Override
+    protected Class<?> @Nullable [] getServletConfigClasses() {
+        return new Class[]{SpringMVCConfig.class};
+    }
 
-    <!--
-        3、配置主控制器
+    // 配置主控制器可以拦截哪些请求，注意还需配合 SpringMVC 配置类里的 configureDefaultServletHandling 方法一起使用
+    // 将 DispatcherServlet 的拦截模式设置为 "/"，这意味着 DispatcherServlet 会拦截接口型请求，会拦截静态资源型请求，不会拦截动态资源型请求（拦截 2 个）
+    @Override
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
 
-        配置主控制器为 SpringMVC 自带的 DispatcherServlet，这个 DispatcherServlet 是 SpringMVC 的“大脑”
-        所有进入应用的请求都会先经过它，再由它负责分发给相应控制器的方法进行处理，我们可以把它想象成公司的“总机接线员”
-    -->
-    <servlet>
-        <!-- 主控制器的名字，这个名字是我们自己起的，后面在 servlet-mapping 中会用到 -->
-        <servlet-name>springmvc</servlet-name>
-        <!-- 主控制器的实现类，使用 SpringMVC 自带的 DispatcherServlet 类 -->
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    /*
+     * 3、配置过滤器
+     * 相当于 XML 里的 <filter> + <filter-mapping>
+     *
+     * 配置了两个过滤器：
+     * 1. CharacterEncodingFilter: 字符编码过滤器，用来处理 HTTP 请求的字符编码
+     * 2. CachedBodyFilter: 请求体缓存过滤器，用来包装请求使请求体可以被多次读取
+     *
+     * 过滤器会自动拦截所有请求（/* 模式），包括：接口型请求 + 静态资源请求 + 动态资源请求
+     * 过滤器的执行顺序：数组中的顺序就是执行顺序
+     */
+    @Override
+    protected Filter[] getServletFilters() {
+        // 1、创建字符编码过滤器
+        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        // 设置编码为 UTF-8，UTF-8 是目前最通用的字符编码
+        characterEncodingFilter.setEncoding("UTF-8");
+        // 强制使用 UTF-8 编码来处理请求和响应
+        // 相当于 XML 里的 <init-param><param-name>forceEncoding</param-name><param-value>true</param-value></init-param>
+        characterEncodingFilter.setForceEncoding(true);
 
-        <!--
-            指定 Spring 子配置文件的位置
+        // 2、创建请求体缓存过滤器
+        // 因为 HTTP 请求体只能被读取一次，拦截器读取后 Controller 就无法读取了
+        // 所以需要用这个过滤器在拦截器之前包装请求，使请求体可以被多次读取
+        CachedBodyFilter cachedBodyFilter = new CachedBodyFilter();
 
-            通过 <init-param> 参数告诉 DispatcherServlet 去哪里加载 Spring 的子配置文件（classpath:dispatcherServlet.xml）
-        -->
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:dispatcherServlet.xml</param-value>
-        </init-param>
+        // 返回过滤器数组，执行顺序：characterEncodingFilter -> cachedBodyFilter
+        return new Filter[]{characterEncodingFilter, cachedBodyFilter};
+    }
 
-        <!-- 配置 multipart/form-data 请求的 multipart-config -->
-        <multipart-config>
-            <!--
-                设置文件上传时的临时目录，默认是 Servlet 容器的临时目录，一般不设置采用默认的就行
-                文件上传时，数据会先写入到硬盘上的临时目录，而不是直接放到内存中，这样可以防止上传大文件时占用过多内存
-                上传完成后，再将文件移动到指定的目标目录
-            -->
-            <location>/tmp</location>
-            <!--
-                设置单个文件的最大字节数，单位为字节
-                默认值是 -1，表示无限制
-                如果上传的文件超过该大小限制，Servlet 会抛出异常（如 IOException）
-                例如这里设置为 10485760 字节，即 10 MB
-            -->
-            <max-file-size>10485760</max-file-size>
-            <!--
-                设置一次上传请求中所有文件的总大小上限，单位为字节
-                    默认值是 -1，表示无限制
-                    如果上传的文件总大小超过该限制，Servlet 会抛出异常
-                    例如这里设置为 20971520 字节，即 20 MB
-                -->
-            <max-request-size>20971520</max-request-size>
-            <!--
-                设置文件写入到临时文件之前，允许保存在内存中的临界值，单位为字节
-                当文件大小超过该值时，才会写入硬盘临时目录；否则保存在内存中
-                默认是 0，表示所有上传文件都直接写入硬盘临时目录
-            -->
-            <file-size-threshold>0</file-size-threshold>
-        </multipart-config>
-    </servlet>
-    <!--
-        配置主控制器可以拦截哪些请求，注意还需配合 Spring 配置文件里的 <mvc:default-servlet-handler/> 和 <mvc:annotation-driven/> 一起使用
+    // 4、配置文件上传，相当于 XML 里的 <multipart-config>
+    @Override
+    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
+        /*
+         * 创建 MultipartConfigElement 对象，配置文件上传参数
+         *
+         * 参数说明：
+         * 1. location: 文件上传时的临时目录，默认是 Servlet 容器的临时目录
+         *    - 文件上传时，数据会先写入到硬盘上的临时目录，而不是直接放到内存中
+         *    - 这样可以防止上传大文件时占用过多内存
+         *    - 上传完成后，再将文件移动到指定的目标目录
+         *
+         * 2. maxFileSize: 单个文件的最大字节数
+         *    - 默认值是 -1，表示无限制
+         *    - 如果上传的文件超过该大小限制，会抛出异常
+         *    - 这里设置为 10485760 字节，即 10 MB
+         *
+         * 3. maxRequestSize: 一次上传请求中所有文件的总大小上限
+         *    - 默认值是 -1，表示无限制
+         *    - 如果上传的文件总大小超过该限制，会抛出异常
+         *    - 这里设置为 20971520 字节，即 20 MB
+         *
+         * 4. fileSizeThreshold: 文件写入到临时文件之前，允许保存在内存中的临界值
+         *    - 当文件大小超过该值时，才会写入硬盘临时目录；否则保存在内存中
+         *    - 默认是 0，表示所有上传文件都直接写入硬盘临时目录
+         */
+        MultipartConfigElement multipartConfig = new MultipartConfigElement(
+                "/tmp",           // location: 临时目录
+                10485760,         // maxFileSize: 单个文件最大 10 MB
+                20971520,         // maxRequestSize: 请求总大小最大 20 MB
+                0                 // fileSizeThreshold: 内存临界值 0 字节
+        );
 
-        通过 <servlet-mapping> 将 DispatcherServlet 的拦截模式设置为 "/"，这意味着 DispatcherServlet 会拦截接口型请求，会拦截静态资源型请求，不会拦截动态资源型请求（拦截 2 个）
-    -->
-    <servlet-mapping>
-        <servlet-name>springmvc</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
-</web-app>
+        // 将文件上传配置应用到 DispatcherServlet
+        registration.setMultipartConfig(multipartConfig);
+    }
+}
 ```
 
-## 六、创建 Spring 的配置文件，做一些配置
+## ✅ 六、创建 Spring 的配置类，做一些配置
 
-* applicationContext.xml 主配置文件
+之前 XML + 注解我们是在 applicationContext.xml 主配置文件和 dispatcherServlet.xml 子配置文件里做一些配置，现在纯注解我们是在  SpringConfig 主配置类和 SpringMVCConfig 子配置类里做一些配置，它们是同样的用途：
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context
-       https://www.springframework.org/schema/context/spring-context.xsd">
-    <!--
-        通过 context:component-scan 标签告诉 Spring 框架哪个包里的类是通过注解实现 IoC 的
-        Spring 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 父容器里
+* SpringConfig 主配置类
 
-        父容器只需要扫描 service 所在的包即可
-    -->
-    <context:component-scan base-package="com.ineyee.service"/>
-</beans>
+```java
+// Spring 主配置类
+@Configuration
+// 通过 @ComponentScan 注解告诉 Spring 框架哪个包里的类是通过注解实现 IoC 的
+// Spring 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 父容器里
+//
+// 父容器只需要扫描 service 所在的包即可
+@ComponentScan("com.ineyee.service")
+public class SpringConfig { }
 ```
 
-* dispatcherServlet.xml 子配置文件
+* SpringMVCConfig 子配置类
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context
-       https://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/mvc
-       https://www.springframework.org/schema/mvc/spring-mvc.xsd">
-    <!--
-        通过 context:component-scan 标签告诉 SpringMVC 框架哪个包里的 Controller 类是通过注解实现 IoC 的
-        SpringMVC 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 子容器里
+```java
+// Spring 子配置类，for SpringMVC，实现 WebMvcConfigurer 接口
+// 实现若干方法，在这些方法里做配置
+@Configuration
+// 使用注解来开发 SpringMVC 的话，得加上这个注解
+@EnableWebMvc
+/*
+通过 @ComponentScan 注解告诉 SpringMVC 框架哪个包里的 Controller 类是通过注解实现 IoC 的
+SpringMVC 框架就会扫描这个包里所有有注解的类来自动创建对象并放到 IoC 子容器里
 
-        子容器只需要扫描 controller 所在的包即可
-    -->
-    <context:component-scan base-package="com.ineyee.controller"/>
+子容器需要扫描：
+    1. controller 所在的包
+    2. 全局异常处理器所在的包（@ControllerAdvice）
+    3. 拦截器所在的包
+ */
+@ComponentScan("com.ineyee.controller")
+@ComponentScan("com.ineyee.api.exception")
+@ComponentScan("com.ineyee.interceptor")
+public class SpringMVCConfig implements WebMvcConfigurer {
+    /*
+    相当于 XML 里 <mvc:default-servlet-handler/> + <mvc:annotation-driven/> 的用途
 
-    <!--
-        DispatcherServlet 虽然拦截到了静态资源
-        但是我们不让它处理，而是转交给默认的静态资源 Servlet 走服务器默认的处理
-    -->
-    <mvc:default-servlet-handler/>
-    <!--
-        但是添加了 mvc:default-servlet-handler 后又会导致 @Controller 等注解无法处理接口型请求
-        所以还得加上 mvc:annotation-driven 注解驱动来保证 @Controller 等注解可以正常处理接口型请求
-    -->
-    <mvc:annotation-driven/>
-</beans>
+    DispatcherServlet 虽然拦截到了静态资源
+    但是我们不让它处理，而是转交给默认的静态资源 Servlet 走服务器默认的处理
+     */
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        configurer.enable();
+    }
+}
 ```
 
-## 七、api 目录里的东西
+## ✅ 七、api 目录里的东西
 
 api 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## 八、表现层之模型层 domain
+## ✅ 八、表现层之模型层 domain
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -481,7 +471,7 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。
 
-## 九、数据层 dao
+## ✅ 九、数据层 dao
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -495,9 +485,9 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 首先创建一个 dao.properties 文件，把数据层 dao 相关配置的值都写在这个配置文件里。
 
-然后去 Spring 主配置文件里配置一堆数据层 dao 的相关配置。
+然后去 Spring 主配置类里配置一堆数据层 dao 的相关配置（当然我们也可以抽取成单独的配置类来为主配置类减负）。
 
-## 十、业务层 service
+## ✅ 十、业务层 service
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -509,9 +499,9 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 #### 2、配置
 
-去 Spring 主配置文件里配置一堆业务层 service 的相关配置。
+去 Spring 主配置类里配置一堆业务层 service 的相关配置（当然我们也可以抽取成单独的配置类来为主配置类减负）。
 
-## 十一、控制器层 controller
+## ✅ 十一、控制器层 controller
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表

@@ -174,5 +174,8 @@
         <!-- 通知：按照切入点【pointcut-ref】的配置把附加代码【advice-ref】给附加上去 -->
         <aop:advisor pointcut-ref="pointcut" advice-ref="advice"/>
     </aop:config>
+
+    <!-- 4、事务管理的注解驱动 -->
+    <tx:annotation-driven transaction-manager="txMgr"/>
     <!-- ================================= 二、业务层 service的相关配置 ================================= -->
 </beans>
