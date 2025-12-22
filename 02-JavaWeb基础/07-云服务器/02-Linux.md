@@ -46,29 +46,59 @@
 * 文件操作
 
 ```bash
+# =================================
 # 创建文件，这里 touch 是创建的意思
 touch file.txt
+# 拷贝文件到某个目录里，copy
+cp file.text dir
 
+# =================================
+# 强制删除文件，remove -force
+rm -f file.txt
+
+# =================================
+# 移动文件到某个目录里，move
+mv file.text dir
+
+# =================================
+# 读取文件内容，concatenate
+cat file.txt
+# 实时查看文件末尾新增的内容，tail follow（重要！用于监控应用日志）
+tail -f app.log
 ```
 
 * 目录操作
 
 ```bash
+# =================================
 # 创建目录，make directory
 mkdir dir
-# 递归创建目录，make directory -parents
+# 创建嵌套目录，make directory -parents
 mkdir -p dir1/dir2
+# 递归拷贝一个目录到另一个目录里，copy recursive
+cp -r dir1 dir2
 
+# =================================
+# 强制递归删除目录，remove -recursive&force
+rm -rf file.txt
 
+# =================================
+# 移动一个目录到另一个目录里，move
+mv dir1 dir2
+
+# =================================
 # list，列出当前目录下所有的文件夹和文件（不包括隐藏的）
 ls
 # list all，列出当前目录下所有的文件夹和文件（包括隐藏的）
 ls -a
+# list long，列出当前目录下所有文件夹和文件的详细信息，如读写权限、占用内存、修改日期等（不包括隐藏的）
+ls -l
+# list all long，列出当前目录下所有文件夹和文件的详细信息，如读写权限、占用内存、修改日期等（包括隐藏的）
+ls -a -l
+# print working directory，显示当前目录的完整路径
+pwd
 
-ls -l # list long，列出当前目录下所有文件夹和文件的详细信息，如读写权限、占用内存、修改日期等（不包括隐藏的）
-ls -a -l # list all long，列出当前目录下所有文件夹和文件的详细信息，如读写权限、占用内存、修改日期等（包括隐藏的）
-
-
+# =================================
 # 切换目录，change directory
 cd /path/to/dir
 # 切换到上一层目录
@@ -77,39 +107,36 @@ cd ..
 cd /
 # 切换到当前用户的目录
 cd ~
-
-
-pwd # print working directory，显示当前目录的完整路径
 ```
+
+#### 2、查找文件和搜索文本
+
+* 查找文件
 
 ```bash
-# 文件操作
-cat file.txt    # 查看文件内容
-tail -f app.log # 实时查看日志文件（重要！用于监控应用日志）
-head -n 20 file # 查看文件前20行
-less file.txt   # 分页查看大文件
+# 查找特定名字文件所在的路径
+# 如果我们完全不知道这个文件在哪里，可以先 cd 到根目录，从根目录开始找
+# 如果我们知道这个文件在某个子目录里，可以先 cd 到这个子目录，从这个子目录开始找，会更快
+find -name file.txt # 区分大小写
+find -iname file.txt # ignore 忽略大小写
 
-# 目录操作
-cp -r source dest   # 复制目录
-mv old new          # 移动/重命名
-rm -rf dir          # 删除目录（谨慎使用）
+# 查找满足时间条件的所有文件，通常都会先 cd 到指定的目录
+# 天数 = -10，modify time 小于 10 天————即 10 天内修改————的文件
+# 天数 = +10，modify time 大于 10 天————即 10 天前修改————的文件
+# 天数 = 10，modify time 等于 10 天————即第 10 天当天修改————的文件
+find -mtime 天数
 ```
 
-### 2. 文件查找和搜索
+* 搜索文本（重要！用于查找日志中的错误）
 
 ```bash
-# 查找文件
-find /path -name "*.jar"        # 按文件名查找
-find /path -type f -mtime -7    # 查找7天内修改的文件
-
-# 文本搜索（重要！用于查找日志中的错误）
-grep "ERROR" app.log                    # 搜索包含ERROR的行
-grep -r "NullPointerException" /logs    # 递归搜索目录
-grep -i "error" app.log                 # 忽略大小写搜索
-grep -A 5 -B 5 "Exception" app.log      # 显示匹配行前后5行
+# 在 app.log 文件里搜索包含 ERROR 的行，区分大小写，number
+grep -n "ERROR" app.log
+# 在 app.log 文件里搜索包含 error 的行，忽略大小写，number ignore
+grep -n -i "error" app.log
 ```
 
-### 3. 文件权限管理
+#### 3、文件权限管理
 
 ```bash
 # 修改权限（重要！部署时经常用到）
