@@ -43,19 +43,44 @@
 
 #### 1、文件和目录操作
 
-* 查看目录内容
+* 文件操作
 
 ```bash
-ls # 列出当前目录下所有的文件夹和文件（不包括隐藏的）
-ls -a # 列出当前目录下所有的文件夹和文件（包括隐藏的）
+# 创建文件，这里 touch 是创建的意思
+touch file.txt
 
-ls -l # 列出当前目录下所有文件夹和文件的详细信息，如读写权限、占用内存、修改日期等（不包括隐藏的）
-ls -a -l # 列出当前目录下所有文件夹和文件的详细信息，如读写权限、占用内存、修改日期等（包括隐藏的）
-
-pwd # 显示当前目录的完整路径
 ```
 
-* 
+* 目录操作
+
+```bash
+# 创建目录，make directory
+mkdir dir
+# 递归创建目录，make directory -parents
+mkdir -p dir1/dir2
+
+
+# list，列出当前目录下所有的文件夹和文件（不包括隐藏的）
+ls
+# list all，列出当前目录下所有的文件夹和文件（包括隐藏的）
+ls -a
+
+ls -l # list long，列出当前目录下所有文件夹和文件的详细信息，如读写权限、占用内存、修改日期等（不包括隐藏的）
+ls -a -l # list all long，列出当前目录下所有文件夹和文件的详细信息，如读写权限、占用内存、修改日期等（包括隐藏的）
+
+
+# 切换目录，change directory
+cd /path/to/dir
+# 切换到上一层目录
+cd ..
+# 切换到根目录
+cd /
+# 切换到当前用户的目录
+cd ~
+
+
+pwd # print working directory，显示当前目录的完整路径
+```
 
 ```bash
 # 文件操作
@@ -65,8 +90,6 @@ head -n 20 file # 查看文件前20行
 less file.txt   # 分页查看大文件
 
 # 目录操作
-cd /path/to/dir # 切换目录
-mkdir -p dir1/dir2  # 递归创建目录
 cp -r source dest   # 复制目录
 mv old new          # 移动/重命名
 rm -rf dir          # 删除目录（谨慎使用）
