@@ -182,43 +182,58 @@ tar -czvf 目标压缩目录名.tar.gz 源目录
 tar -xzvf 要被解压缩的目录名.tar.gz
 ```
 
-## 二、进程管理（核心重要！）
+## ✅ 四、系统服务管理
 
 ```bash
-# 查看进程
-ps -ef | grep java              # 查找Java进程
-ps aux | grep tomcat            # 查看进程详细信息
-top                             # 实时查看进程资源占用
-htop                            # 更友好的进程查看工具
+# 查看当前服务器上都有哪些服务
+systemctl list-units --type=service
+# 启动某个服务
+systemctl start <服务名>
+# 关闭某个服务
+systemctl stop <服务名>
+# 重启某个服务
+systemctl restart <服务名>
+# 查看某个服务的状态
+systemctl status <服务名>
 
-# 杀死进程
-kill -9 PID                     # 强制杀死进程
-pkill -f "java.*myapp"          # 按名称杀死进程
-killall java                    # 杀死所有Java进程（谨慎！）
-
-# 后台运行（部署应用时常用）
-nohup java -jar app.jar > app.log 2>&1 &    # 后台运行并输出到日志
+# 查看开机即启动的服务都有哪些
+systemctl list-unit-files
+# 添加某个服务开机即启动
+systemctl enable <服务名>
+# 禁止某个服务开机即启动
+systemctl disable <服务名>
 ```
 
-## 三、网络相关
+## ✅ 五、进程管理（核心重要！）
 
 ```bash
-# 查看端口占用（重要！排查端口冲突）
-netstat -tlnp | grep 8080       # 查看8080端口占用情况
-lsof -i:8080                    # 查看占用8080端口的进程
+# 查看所有正在运行的进程
+ps -ef
+# 查看某个进程的详细信息
+ps aux | grep tomcat
+# 实时查看进程资源占用
+top
 
+# 强制杀死进程
+kill -9 <进程 ID——PID>
+
+# 后台运行并输出到日志（部署应用时常用）
+nohup java -jar app.jar > app.log 2>&1 &
+```
+
+## ✅ 六、网络相关
+
+```bash
 # 网络连接
-curl http://localhost:8080/health   # 测试HTTP接口
-wget http://example.com/file.jar    # 下载文件
-ping baidu.com                      # 测试网络连通性
-telnet host port                    # 测试端口是否开放
+ping <ip 地址或域名> # 测试服务器能不能正常访问
+telnet <host> <port> # 测试端口是否开放
 
-# 防火墙
-firewall-cmd --list-ports           # 查看开放的端口
-firewall-cmd --add-port=8080/tcp    # 开放8080端口
+# 查看端口占用（重要！排查端口冲突）
+netstat -tlnp | grep 8080 # 查看8080端口占用情况
+lsof -i:8080 # 查看占用8080端口的进程
 ```
 
-## 五、日志分析（日常工作高频使用）
+## ✅ 七、日志分析（日常工作高频）
 
 ```bash
 # 日志查看技巧
@@ -228,30 +243,18 @@ grep "Exception" app.log | wc -l             # 统计异常数量
 grep "2025-12-22" app.log | grep "ERROR"     # 查看今天的错误日志
 
 # 日志分析组合
-cat app.log | grep "ERROR" | awk '{print $1}' | sort | uniq -c
 # 提取错误日志 -> 提取第一列 -> 排序 -> 统计重复次数
+cat app.log | grep "ERROR" | awk '{print $1}' | sort | uniq -c
 ```
 
-## 六、软件安装和环境配置
+## ✅ 八、Shell 脚本基础
 
 ```bash
-# yum/apt包管理（CentOS用yum，Ubuntu用apt）
-yum install -y java-1.8.0-openjdk           # 安装JDK
-apt-get update && apt-get install mysql-server
-
-# 环境变量配置（重要！配置Java环境）
-vim /etc/profile                            # 编辑系统环境变量
-export JAVA_HOME=/usr/java/jdk1.8
-export PATH=$JAVA_HOME/bin:$PATH
-source /etc/profile                         # 使配置生效
-```
-
-## 七、Shell 脚本基础
-
-```bash
+# 指定脚本的解释器，告诉操作系统使用哪个程序来执行脚本
+# 如果脚本的第一行是 #!/bin/bash，当您运行脚本时，系统会自动调用 /bin/bash 来执行脚本中的命令
 #!/bin/bash
-# 启动应用脚本示例
 
+# 变量定义
 APP_NAME="myapp"
 JAR_FILE="/opt/app/myapp.jar"
 LOG_FILE="/var/log/myapp.log"
@@ -270,56 +273,125 @@ nohup java -Xms512m -Xmx2g -jar $JAR_FILE > $LOG_FILE 2>&1 &
 echo "Started, PID: $!"
 ```
 
-## 八、文本处理三剑客
+## 九、安装软件和配置环境变量
+
+> 阿里云的实例（即服务器）详情页面里有个“远程连接”，点击它即可连接上服务器，接下来在阿里云给我们打开的终端里操作
+
+#### ✅ 1、服务器安装 JDK（这里我们演示手动安装）
+
+服务器要想运行 Java 程序，必须安装 JDK
+
+- JDK 下载地址：https://www.oracle.com/tw/java/technologies/downloads/，这里选择下载 JDK 21 for Linux（建议和开发时自己电脑上安装的版本保持一致）：https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
+- 下载完成后，把文件上传到 /usr/local/soft 目录下，没有 soft 目录的话就创建一个：mkdir soft
+- 上传完成后，把压缩包解压到 /usr/local 目录下（-C 用来指定输出目录）：tar -xzvf /usr/local/soft/jdk-21_linux-x64_bin.tar.gz -C /usr/local
+- 解压缩完成后，/usr/local 目录下就能看到类似 jdk-21.0.9 的目录了
+
+* 配置环境变量
+
+  * cd 到 /etc/profile.d 这个目录：cd /etc/profile.d
+
+  * 创建一个专门为 JDK 配置环境变量的脚本文件：touch jdk.sh
+
+  * 打开 jdk.sh 脚本文件，编辑，编辑完记得保存一下
+
+    ```bash
+    # 告诉操作系统使用 /bin/bash 来执行脚本中的命令
+    #!/bin/bash
+    
+    # 指定 JDK 的安装目录
+    export JAVA_HOME=/usr/local/jdk-21.0.9
+    # 指定在终端执行 java 命令时去哪里找命令，优先去 $JAVA_HOME/bin 里找命令，找不到的话再去系统原来的 PATH 里找
+    export PATH=$JAVA_HOME/bin:$PATH
+    ```
+
+  * 保存完成后，重新加载一下配置文件使其生效：source /etc/profile
+
+* 终端执行 java -version 来验证是否安装并配置成功
+
+#### ✅ 2、服务器安装 Tomcat（这里我们演示手动安装）
+
+* Tomcat 下载地址：https://tomcat.apache.org/，这里选择下载 Tomcat 11（建议和开发时自己电脑上安装的版本保持一致）：https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.15/bin/apache-tomcat-11.0.15.tar.gz
+* 下载完成后，把文件上传到 /usr/local/soft 目录下，没有 soft 目录的话就创建一个：mkdir soft
+* 上传完成后，把压缩包解压到 /usr/local 目录下（-C 用来指定输出目录）：tar -xzvf /usr/local/soft/apache-tomcat-11.0.15.tar.gz -C /usr/local
+* 解压缩完成后，/usr/local 目录下就能看到类似 apache-tomcat-11.0.15 的目录了
+* Tomcat 不需要配置环境变量
+* 直接 cd 到 /usr/local/apache-tomcat-11.0.15 目录
+  * 执行 bin/startup.sh，启动 Tomcat，默认监听 8080 端口
+  * 执行 bin/shutdown.sh，关闭 Tomcat
+
+#### ✅ 3、服务器安装 MySQL（这里我们演示 yum 安装）
 
 ```bash
-# sed - 文本替换
-sed -i 's/old/new/g' config.properties      # 批量替换配置
-sed -n '100,200p' file                      # 打印100-200行
+# 在 macOS、Windows 上安装软件，我们双击一下安装包就能安装软件了
+# 而在 Linux 上安装软件，我们得使用包管理工具来安装软件，CentOS 的包管理工具是 yum，Ubuntu 的包管理工具是 apt
+# 这里是 CentOS 和 yum
 
-# awk - 文本分析（强大！）
-awk '{print $1,$3}' file                    # 打印第1和第3列
-awk -F':' '{print $1}' /etc/passwd          # 以:分隔，打印第1列
-
-# grep - 已在前面介绍
+# 查看已安装的软件
+yum list installed
+# 搜索某个软件
+yum search <软件名>
+# 安装某个软件（-y 代表中途有 yes or no 时自动选择 yes）
+yum -y install <软件名>
+# 卸载某个软件（-y 代表中途有 yes or no 时自动选择 yes）
+yum -y remove <软件名>
 ```
 
-## 十、定时任务
+* 前置处理
+  * 先把 postfix 和 mariadb-libs 这两个软件卸载掉，不然的话会跟 MySQL 存在依赖冲突：yum -y remove postfix mariadb-libs
+  * 然后安装 MySQL 的依赖 net-tools 和 perl：yum -y install net-tools perl
+* Yum 仓库及新版 GPG 公钥
+  * 为系统安装 MySQL 官方 Yum 仓库：yum localinstall -y https://dev.mysql.com/get/mysql80-community-release-el7-11.noarch.rpm
+  * 导入 MySQL 2023 GPG 公钥（关键步骤）：sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+* 安装 MySQL
+  * 查询一下 MySQL 的可用版本：yum list mysql-community-server --showduplicates
+  * 这里选择安装 mysql-community-server-8.0.44-1.el7（建议和开发时自己电脑上安装的版本保持一致，没有一致版本的话可以手动安装。注意通过 yum 安装的话，软件没有一个固定的目录，而是按 Linux 标准目录规范分散安装，环境变量也默认放到系统 PATH 里了，我们不需要手动配置环境变量；只有手动安装才可以固定安装目录，才需要配置环境变量）：yum -y install mysql-community-server-8.0.44-1.el7
+* 启动 MySQL 服务器软件
+  * 执行命令来启动 mysql，默认监听 3306 端口：systemctl start mysqld
+  * 然后执行命令来查看 mysql 的运行状态，如果看到 active(running) 就代表启动成功了：systemctl status mysqld
+  * 此外我们还可以执行命令来让服务器重启时自动启动 mysql，免得每次重启系统还得我们主动执行命令来启动 mysql：systemctl enable mysqld
+* 登录 MySQL
+  * 先获取到初始的临时密码：grep 'temporary password' /var/log/mysqld.log
+  * 用 root user 和临时密码登录 MySQL：mysql -uroot -p'lsryU5JqZT(T'
+  * 登录成功后赶紧修改一个自己能记得住的密码（密码要求：至少8位，包含大小写字母、数字、特殊字符）：ALTER USER 'root'@'localhost' IDENTIFIED BY 'MySQLRoot666!';
+  * 以后就用 root user 和自己的密码登录 MySQL：mysql -uroot -p'MySQLRoot666!'
+  * 执行命令退出数据库：exit
+* 授权数据库的远程连接权限（比如通过 Navicat 连接我们的线上数据库，不授权的话是连不上的）
+  * 创建一个用于建立远程连接的用户和密码，也叫 root 和那个密码好了：CREATE USER 'root'@'%' IDENTIFIED BY 'MySQLRoot666!'; 
+  * 授予这组用户和密码可以连接所有数据库：`GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;`
+  * 授权完成后刷新权限，远程就可以连接线上数据库了：FLUSH PRIVILEGES;
+* 修改 mysql 的配置文件
+  * 把 MySQL 的默认时区设置为 0 时区
+    * 找到并打开 /etc/my.cnf 文件
+    * 在 my.cnf 添加“[mysqld]（这里换行）default-time-zone = '+00:00'”，把 MySQL 的默认时区设置为 0 时区，这样才能确保将来通过 SQL 语句自动生成并存储在数据库里的 create_time、update_time 是 0 时区的时间
+  * 把 MySQL 的默认编码设置为 utf-8
+    * 找到并打开 /etc/my.cnf 文件
+    * 在 my.cnf 添加“[mysqld]（这里换行）character_set_server=utf8”，把 MySQL 的默认编码设置为 utf-8
+  * 保存文件后，重启一下 mysql：systemctl restart mysqld
 
-```bash
-# crontab定时任务（定时备份、清理日志等）
-crontab -e                                  # 编辑定时任务
-crontab -l                                  # 查看定时任务
+#### 4、服务器部署我们的 JavaWeb 项目
 
-# 示例：每天凌晨2点清理7天前的日志
-0 2 * * * find /var/log/myapp -name "*.log" -mtime +7 -delete
+```
+war 包类似于 jar 包，都是压缩文件。war 包是 JavaWeb 项目的包，jar 包是普通 Java 项目的包
 ```
 
-## 核心重点总结
+- Build - Build Artifacts - ${项目名}:war（代表把项目打包成 war 包，再部署到 Tomcat 上去，适用于发布阶段）
+- 这样对 JaveWeb 项目打包后，产物是一个 war 压缩包：${项目名}.war，放在 target 目录下
+- 我们需要把产物 war 包名改成 ${Application context}.war，以便将来访问
+- 把产物 war 包上传到 /usr/local/soft/${项目名} 目录下，没有 soft/${项目名} 目录的话就创建一个：mkdir soft、mkdir ${项目名}
 
-### 日常高频使用（必须熟练）
+* 上传完成后，把压缩包解压到 /usr/local/soft/${项目名} 目录下（-C 用来指定输出目录）：unzip ${项目名}:war
+* 解压缩完成后，/usr/local/soft/${项目名} 目录下就能我们的代码了
 
-1. `tail -f` 查看实时日志
-2. `ps -ef | grep java` 查找进程
-3. `kill -9` 杀进程
-4. `netstat/lsof` 查端口
-5. `grep` 搜索日志
-6. `df -h` / `du -sh` 查磁盘空间
-7. `top` / `free` 查资源占用
 
-### 部署相关
 
-- 文件权限管理（chmod/chown）
-- 后台运行应用（nohup）
-- 编写启动停止脚本
-- 环境变量配置
 
-### 故障排查
 
-- 日志分析（grep组合使用）
-- 进程状态检查
-- 资源监控（CPU、内存、磁盘、网络）
 
----
 
-**学习建议：** 先重点掌握日常高频使用的命令，在实际工作中逐步深入学习！
+- 启动 Tomcat
+- 然后我们去浏览器里通过“http://localhost:9999/helloTomcat”来访问，项目默认返回的是 webapp 目录下的 index.jsp 文件，我们还可以通过“http://localhost:9999/helloTomcat/login.html”来访问我们自己创建的登录页面，验证是否部署成功
+
+```
+优点：只需要复制一个 war 压缩包，不容易漏，复制起来也比较快
+缺点：还是得复制来复制去
+```
