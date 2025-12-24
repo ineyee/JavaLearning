@@ -238,7 +238,8 @@ lsof -i:8080 # 查看占用8080端口的进程
 ```bash
 # 日志查看技巧
 tail -f app.log                              # 实时跟踪日志
-tail -n 1000 app.log                         # 查看最后1000行
+tail -n 1000 app.log                         # 查看最后 1000 行日志
+tail -n 1000 -f app.log                      # 先看最后 1000 行日志，再持续跟随
 grep "Exception" app.log | wc -l             # 统计异常数量
 grep "2025-12-22" app.log | grep "ERROR"     # 查看今天的错误日志
 
@@ -273,7 +274,7 @@ nohup java -Xms512m -Xmx2g -jar $JAR_FILE > $LOG_FILE 2>&1 &
 echo "Started, PID: $!"
 ```
 
-## 九、安装软件和配置环境变量
+## ✅ 九、安装软件和配置环境变量
 
 > 阿里云的实例（即服务器）详情页面里有个“远程连接”，点击它即可连接上服务器，接下来在阿里云给我们打开的终端里操作
 
@@ -358,7 +359,8 @@ yum -y remove <软件名>
 * 授权数据库的远程连接权限（比如通过 Navicat 连接我们的线上数据库，不授权的话是连不上的）
   * 创建一个用于建立远程连接的用户和密码，也叫 root 和那个密码好了：CREATE USER 'root'@'%' IDENTIFIED BY 'MySQLRoot666!'; 
   * 授予这组用户和密码可以连接所有数据库：`GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;`
-  * 授权完成后刷新权限，远程就可以连接线上数据库了：FLUSH PRIVILEGES;
+  * 授权完成后刷新权限：FLUSH PRIVILEGES;
+  * 就可以在 Navicat GUI 工具里连接服务器上的数据库了 
 * 修改 mysql 的配置文件
   * 把 MySQL 的默认时区设置为 0 时区
     * 找到并打开 /etc/my.cnf 文件
@@ -368,30 +370,63 @@ yum -y remove <软件名>
     * 在 my.cnf 添加“[mysqld]（这里换行）character_set_server=utf8”，把 MySQL 的默认编码设置为 utf-8
   * 保存文件后，重启一下 mysql：systemctl restart mysqld
 
-#### 4、服务器部署我们的 JavaWeb 项目
+###### 在 Navicat GUI 工具里连接服务器上的数据库
+
+- 首先得确保网络和安全组里添加了3306端口，否则连接不上
+- 其次得做好授权数据库的远程连接权限，否则连接不了
+- 然后就可以去Navicat里连接服务器上的数据库了
+  - 新建一个连接
+  - 连接的类型选择为 MySQL
+  - 输入连接的名字，如 db_mysql
+  - 输入域名和端口号，如 8.136.43.114、3306
+  - 输入账号和密码，root、前面我们设置的数据库密码
+  - 确定后连接就创建好了，此时连接是灰色，代表连接尚未启动
+  - 双击这个连接就可以启动了，此时连接会变成绿色，这个连接下所有的数据库也会被展示出来
+- 这样我们就可以在Navicat里操作服务器上的数据库了，比如创建表、查看表里的数据等等
+
+###### 在 Navicat GUI 工具里做数据库迁移
+
+比如项目刚开始我们的数据库是创建在自己电脑上的一个数据库，现在项目开发完了，本地数据库里已经有各种表结构及关连了，当然也有一些测试数据，现在要把本地这个数据库迁移到服务器上的数据库里，这件事情其实很简单，Navicat GUI 工具就可以帮我们完成
+
+- 选中本地的数据库
+- 右键选中“转储 SQL 文件”，选择“结构和数据”（表结构和测试数据）或“仅结构”（仅表结构），开始转储，等待下载完成
+- 在远程服务器上创建一个跟本地同名的数据库
+- 然后直接把下载好的 SQL 文件直接拖到远程数据库里，根据提示运行一下即可，这样一来，服务器上的数据库就跟本地的一模一样了
+
+#### ✅ 4、服务器 Tomcat 部署我们的 JavaWeb 项目（一般采用方式三）
 
 ```
 war 包类似于 jar 包，都是压缩文件。war 包是 JavaWeb 项目的包，jar 包是普通 Java 项目的包
 ```
 
-- Build - Build Artifacts - ${项目名}:war（代表把项目打包成 war 包，再部署到 Tomcat 上去，适用于发布阶段）
-- 这样对 JaveWeb 项目打包后，产物是一个 war 压缩包：${项目名}.war，放在 target 目录下
-- 我们需要把产物 war 包名改成 ${Application context}.war，以便将来访问
-- 把产物 war 包上传到 /usr/local/soft/${项目名} 目录下，没有 soft/${项目名} 目录的话就创建一个：mkdir soft、mkdir ${项目名}
+* 首先把我们的 JavaWeb 项目搞到服务器上
 
-* 上传完成后，把压缩包解压到 /usr/local/soft/${项目名} 目录下（-C 用来指定输出目录）：unzip ${项目名}:war
-* 解压缩完成后，/usr/local/soft/${项目名} 目录下就能我们的代码了
+  * Build - Build Artifacts - ${项目名}:war（代表把项目打包成 war 包，再部署到 Tomcat 上去，适用于发布阶段）
 
+  - 这样对 JaveWeb 项目打包后，产物是一个 war 压缩包：${项目名}.war，放在 target 目录下
 
+  - 我们需要把产物 war 包名改成 ${Application context}.war，以便将来访问
 
+  - 把产物 war 包上传到 /usr/local/soft/${项目名} 目录下，没有 soft/${项目名} 目录的话就创建一个：mkdir soft、mkdir ${项目名}
 
+  * 上传完成后，把压缩包解压到 /usr/local/soft/${项目名} 目录下（-C 用来指定输出目录）：unzip ${项目名}:war
 
+  * 解压缩完成后，/usr/local/soft/${项目名} 目录下就能看到我们的代码了
 
+  * 我们可以去 /usr/local/soft/${项目名}/WEB-INF/classes/dao.properties 配置文件里确认一下，是不是连接的线上数据库，线上数据库的配置对不对，不正确的话可以直接修改配置文件并保存，不用重新打包项目
 
-- 启动 Tomcat
-- 然后我们去浏览器里通过“http://localhost:9999/helloTomcat”来访问，项目默认返回的是 webapp 目录下的 index.jsp 文件，我们还可以通过“http://localhost:9999/helloTomcat/login.html”来访问我们自己创建的登录页面，验证是否部署成功
+* 然后把我们的 JavaWeb 项目部署到服务器 Tomcat 上
 
-```
-优点：只需要复制一个 war 压缩包，不容易漏，复制起来也比较快
-缺点：还是得复制来复制去
-```
+  * 在 /usr/local/apache-tomcat-11.0.15/conf/Catalina/localhost 文件夹下创建一个 xml 文件，xml 文件名为 ${Application context}，以便将来访问，比如这里就是 ssm.xml，将来如果要部署多个项目就为每个项目都创建一个 xml 文件
+
+  * 在 ssm.xml 文件里新建一个标签：\<Context docBase="产物文件夹或 war 包的绝对路径" /\>
+
+    ```xml
+    <Context docBase="/usr/local/soft/ssm" />
+    ```
+
+  * 添加完标签以后，我们可以杀掉上一次的 Tomcat，先通过 ps aux | grep tomcat 命令找到 Tomcat 的 PID，然后再通过 kill -9 \<PID> 杀掉进程
+  * 然后重启一下 Tomcat， cd 到 /usr/local/apache-tomcat-11.0.15 目录，执行 bin/startup.sh，启动 Tomcat
+  * 此时仍然在 /usr/local/apache-tomcat-11.0.15 目录下，我们可以通过 tail -n 1000 logs/catalina.out 命令来查看 Tomcat 是否成功启动并运行我们的 JavaWeb 项目
+
+  - 然后我们去浏览器里通过“http://8.136.43.114:8080/ssm/”来访问，项目默认返回的是 webapp 目录下的 index.jsp 文件，我们还可以通过访问接口来验证是否部署成功
