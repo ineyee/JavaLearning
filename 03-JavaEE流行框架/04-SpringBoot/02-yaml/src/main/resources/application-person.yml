@@ -1,0 +1,20 @@
+# person 相关配置，这个 person 叫做属性前缀
+# 换行直接写，一行代表一对属性名和属性值（属性名的风格是中划线，对应 Java 代码里的小驼峰）
+person:
+  is-party-member: true
+  age: 18
+  height: 1.88
+  salary: 666666.66
+  name: "张三"
+  # List
+  # 换行直接写，一个横杠代表一个元素
+  nicknames:
+    - "三三"
+    - "老三"
+    - "三儿"
+  # Map
+  # 换行直接写，一行代表一对 key-value
+  food-map:
+    breakfast: "馒头"
+    lunch: "米饭"
+    dinner: "面条"

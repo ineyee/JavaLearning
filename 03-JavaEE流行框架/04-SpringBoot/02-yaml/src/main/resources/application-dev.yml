@@ -1,0 +1,12 @@
+# 服务器相关配置（SpringBoot 内置的 Web 容器 Tomcat）
+# 假设在开发环境下端口号是 8888，Application Context Path 是 /springboot-dev
+server:
+  # 监听的端口，默认是 8080
+  port: 8888
+  # Application Context Path，默认是 /
+  servlet:
+    context-path: "/springboot-dev"
+
+
+
+
