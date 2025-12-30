@@ -5,11 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de499fe2-4ff5-4928-9789-7c32cab2d631" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/Application.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/ineyee/AppTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/filter/CachedBodyFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application-dev.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application-prd.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../03-SpringMVC/13-ssm-pure-annotation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../03-SpringMVC/13-ssm-pure-annotation/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../02-yml 配置文件.md" beforeDir="false" afterPath="$PROJECT_DIR$/../02-yml 配置文件.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../03-SpringBoot整合MyBatis.md" beforeDir="false" afterPath="$PROJECT_DIR$/../03-SpringBoot整合MyBatis.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../SSM与SpringBoot依赖对比.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,9 +41,9 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="37YjEoX0R2qtGndZlsGgEGONW92" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -54,6 +61,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -66,6 +74,21 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/com/ineyee" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="03-springboot-combine-mybatis" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.ineyee.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -82,6 +105,7 @@
       <option name="presentableId" value="Default" />
       <updated>1767086790006</updated>
       <workItem from="1767086791030" duration="2185000" />
+      <workItem from="1767099118476" duration="7104000" />
     </task>
     <servers />
   </component>

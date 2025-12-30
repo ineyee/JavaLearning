@@ -10,49 +10,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="69e4e1ee-dd23-44af-9376-e4e67c6fdf71" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../14-SSM整合（Maven 分模块构建）.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-maven-multi-project/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-maven-multi-project/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-maven-multi-project/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/artifacts/controller.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/dictionaries/project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/HttpResult.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/error/CommonError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/error/Error.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/error/UserError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/api/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/cfg/SpringConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/cfg/SpringMVCConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/cfg/WebInitializer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/controller/FileUploadController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/controller/UserController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/filter/CachedBodyFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/java/com/ineyee/interceptor/HttpLogInterceptor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/controller/src/main/webapp/index.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/java/com/ineyee/cfg/DaoConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/java/com/ineyee/dao/UserDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/java/com/ineyee/domain/BaseDomain.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/java/com/ineyee/domain/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/resources/dao.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/dao/src/main/resources/mappers/user.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/main/java/com/ineyee/api/exception/ServiceException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/main/java/com/ineyee/cfg/ServiceConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/main/java/com/ineyee/service/UserService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/main/java/com/ineyee/service/UserServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../14-ssm-maven-multi-modules/service/src/test/java/com/ineyee/AppTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../13-SSM整合（纯注解）.md" beforeDir="false" afterPath="$PROJECT_DIR$/../13-SSM整合（纯注解）.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/SpringConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/SpringConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/filter/CachedBodyFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application-dev.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application-prd.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/02-yml 配置文件.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/02-yml 配置文件.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-SpringBoot整合MyBatis.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-SpringBoot整合MyBatis.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/.idea/dictionaries/project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/SSM与SpringBoot依赖对比.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -230,6 +198,7 @@
       <workItem from="1766198310699" duration="6358000" />
       <workItem from="1766213099821" duration="966000" />
       <workItem from="1766219406926" duration="9896000" />
+      <workItem from="1767105739315" duration="324000" />
     </task>
     <servers />
   </component>

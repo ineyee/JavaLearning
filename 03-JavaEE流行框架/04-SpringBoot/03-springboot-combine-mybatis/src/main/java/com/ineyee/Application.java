@@ -1,5 +1,9 @@
 package com.ineyee;
 
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 // 创建项目的入口类，我们一般把它命名为 Application
 //
 // 用 @SpringBootApplication 注解修饰一下这个类，来标识它是项目的入口类
