@@ -32,7 +32,7 @@ import java.util.Properties;
 @PropertySource("classpath:dao.properties")
 // 1.4 配置一下 mapper 扫描器即可，这样一来 Spring 就会自动创建所有的 dao 对象并放入父 IoC 容器里了
 @MapperScan("com.ineyee.dao")
-// 2.2 这个注解是“事务管理的注解驱动”的功能，附加代码和切面就不用配置了
+// 2.2 这个注解是“事务管理的注解驱动”的功能，启动事务管理，附加代码和切面就不用配置了
 @EnableTransactionManagement
 public class SpringConfig {
     /*

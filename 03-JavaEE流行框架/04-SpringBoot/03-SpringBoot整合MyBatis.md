@@ -1,6 +1,6 @@
-本篇我们在《03-JavaEE流行框架：03-SpringMVC：13-SSM整合（纯注解）》的基础上，用 SpringBoot + MyBatis 重新实现一遍，对比感受下用 SpringBoot + MyBatis 开发项目比用 SSM 开发项目爽多少
+本篇我们在《03-JavaEE流行框架：03-SpringMVC：13-SSM整合（纯注解）》的基础上，用 SpringBoot + MyBatis 重新实现一遍，对比感受下用 SpringBoot + MyBatis 开发项目比用 SSM 开发项目爽多少：的确是少了一大堆的依赖 + 一大堆的配置
 
-## 一、项目目录结构划分
+## ✅ 一、项目目录结构划分
 
 ```
 ├─${project-name}/(项目名)
@@ -8,13 +8,7 @@
 │  │  ├─main/
 │  │  │  ├─java/(我们编写的 Java 代码都放在这个文件夹里)
 │  │  │  │  ├─com.ineyee/(公司唯一标识)
-│  │  │  │  │  ├─Application.java(项目的入口类)
-│  │  │  │  │  ├─cfg/(之前的 xml 文件现在都变成了 Java 配置类)
-│  │  │  │  │  │  ├─WebInitializer.java(对应之前的 web.xml 配置文件)
-│  │  │  │  │  │  ├─SpringConfig.java(对应之前的 applicationContext.xml 配置文件)
-│  │  │  │  │  │  ├─SpringMVCConfig.java(对应之前的 dispatchServlet.xml 配置文件)
 │  │  │  │  │  ├─api/(给客户端响应数据和错误)
-│  │  │  │  │  │  ├─HttpResult.java(给客户端响应数据和错误的包装类)
 │  │  │  │  │  │  ├─error/(错误码和错误信息的枚举常量)
 │  │  │  │  │  │  │  ├─Error.java(父接口)
 │  │  │  │  │  │  │  ├─CommonError implements Error(通用错误码及错误信息)
@@ -22,25 +16,30 @@
 │  │  │  │  │  │  ├─exception/(业务异常和全局异常处理)
 │  │  │  │  │  │  │  ├─ServiceException.java(业务异常)
 │  │  │  │  │  │  │  ├─GlobalExceptionHandler.java(全局异常处理)
+│  │  │  │  │  │  ├─HttpResult.java(给客户端响应数据和错误的包装类)
+│  │  │  │  │  ├─config/(仍需手动配置的东西)
+│  │  │  │  │  │  ├─FilterConfig.java(过滤器配置类)
+│  │  │  │  │  │  ├─SpringMVCConfig.java(拦截器配置类)
+│  │  │  │  │  ├─controller/(表现层之控制器层)
+│  │  │  │  │  │  ├─UserController
+│  │  │  │  │  ├─dao/(数据层的接口)
+│  │  │  │  │  │  ├─UserDao
 │  │  │  │  │  ├─domain/(表现层之模型层)
 │  │  │  │  │  │  ├─BaseDomain
 │  │  │  │  │  │  ├─User extends BaseDomain
-│  │  │  │  │  ├─dao/(数据层的接口)
-│  │  │  │  │  │  ├─UserDao
-│  │  │  │  │  ├─service/(业务层)
-│  │  │  │  │  │  ├─UserService
-│  │  │  │  │  │  ├─UserServiceImpl implements UserService
-│  │  │  │  │  ├─controller/(表现层之控制器层)
-│  │  │  │  │  │  ├─UserController
 │  │  │  │  │  ├─dto/(接收客户端的请求参数)
 │  │  │  │  │  │  ├─UserSaveDto
 │  │  │  │  │  │  ├─UserRemoveDto
 │  │  │  │  │  │  ├─UserUpdateDto
 │  │  │  │  │  │  ├─UserGetDto、UserListDto
-│  │  │  │  │  ├─interceptor/(各种拦截器)
-│  │  │  │  │  │  ├─HttpLogInterceptor(HTTP 请求日志拦截器)
 │  │  │  │  │  ├─filter/(各种过滤器)
 │  │  │  │  │  │  ├─CachedBodyFilter(HTTP 请求体缓存过滤器)
+│  │  │  │  │  ├─interceptor/(各种拦截器)
+│  │  │  │  │  │  ├─HttpLogInterceptor(HTTP 请求日志拦截器)
+│  │  │  │  │  ├─service/(业务层)
+│  │  │  │  │  │  ├─UserService
+│  │  │  │  │  │  ├─UserServiceImpl implements UserService
+│  │  │  │  │  ├─Application.java(项目的入口类)
 │  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
 │  │  │  │  ├─mappers/(数据层的实现)
 │  │  │  │  │  ├─user.xml
@@ -50,33 +49,11 @@
 │  │  │  │  ├─application.yml(项目的主配置文件)
 │  │  │  │  ├─application-dev.yml(项目的子配置文件、开发环境)
 │  │  │  │  ├─application-prd.yml(项目的主配置文件、生产环境)
-│  │  │  │  ├─dao.properties(数据层 dao 相关配置的值都写在这个配置文件里)
 │  ├─target/(项目的打包产物)
 │  ├─pom.xml(项目的配置文件，里面记录着项目的很多信息)
 ```
 
-## ✅ 二、创建项目的入口类和入口方法，跟 controller、service 目录平级
-
-```java
-// 创建项目的入口类，我们一般把它命名为 Application
-//
-// 用 @SpringBootApplication 注解修饰一下这个类，来标识它是项目的入口类
-// 并且 @SpringBootApplication 注解还包含了 @ComponentScan 注解的功能，它默认的扫描路径就是当前类所在包及其子包下所有的类，扫描到用 @Component 注解修饰的类后就会自动创建对象并放到 IoC 容器中
-// 所以 controller 层、service 层、其它目录里的众多类，都会被自动创建对象并放到 IoC 容器中
-//
-// dao 层是通过 @MapperScan 注解来扫描的，Spring 会自动创建所有的 dao 对象并放入 IoC 容器中
-@SpringBootApplication
-@MapperScan("com.ineyee.dao")
-public class Application {
-    // 为项目的入口类添加 main 方法，作为项目的入口方法
-    public static void main(String[] args) {
-        // 固定写法，启动项目
-        SpringApplication.run(Application.class, args);
-    }
-}
-```
-
-## ✅ 三、创建 yml 配置文件，Tomcat 部署配置
+## ✅ 二、创建 yml 配置文件，Tomcat 部署配置
 
 ```yaml
 # application.yml
@@ -92,10 +69,10 @@ spring:
 # application-dev.yml
 
 # 服务器相关配置（SpringBoot 内置的 Web 容器 Tomcat）
-# 假设在开发环境下端口号是 8888，Application Context Path 是 /springboot-dev
+# 假设在开发环境下端口号是 9999，Application Context Path 是 /springboot-dev
 server:
   # 监听的端口，默认是 8080
-  port: 8888
+  port: 9999
   # Application Context Path，默认是 /，注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的
   servlet:
     context-path: "/sbm-dev"
@@ -105,16 +82,16 @@ server:
 # application-prd.yml
 
 # 服务器相关配置（SpringBoot 内置的 Web 容器 Tomcat）
-# 假设在生产环境下端口号是 9999，Application Context Path 是 /springboot
+# 假设在生产环境下端口号是 8888，Application Context Path 是 /springboot
 server:
   # 监听的端口，默认是 8080
-  port: 9999
+  port: 8080
   # Application Context Path，默认是 /，注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的
   servlet:
     context-path: "/sbm"
 ```
 
-## ✅ 四、编辑 pom.xml 文件，Maven 项目配置
+## ✅ 三、编辑 pom.xml 文件，Maven 项目配置
 
 ```xml
 <!-- pom.xml -->
@@ -160,6 +137,23 @@ server:
             <artifactId>spring-boot-devtools</artifactId>
         </dependency>
     </dependencies>
+  
+    <!--
+        属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
+        在编译期间帮助生成 setter、getter、toString 等代码
+    -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+    <!--
+        属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
+        在 application-*.yml 配置文件里编写属性名时能提示
+    -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+    </dependency>
 
     <!-- 属性信息 -->
     <properties>
@@ -194,7 +188,9 @@ server:
 </project>
 ```
 
-## ✅ 五、添加依赖
+## ✅ 四、添加依赖
+
+> SpringBoot 官方提供的 starter 都是以 spring-boot-starter-xxx 开头，非 SpringBoot 官方提供的 starter 都是以 xxx-spring-boot-starter 结尾
 
 #### ✅ 1、Spring、SpringMVC 相关依赖
 
@@ -209,7 +205,7 @@ server:
     spring-webmvc
     spring-boot-starter-tomcat、jakarta.servlet-api
     jackson-databind
-    logback-classic 
+    logback-classic
 -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -231,7 +227,7 @@ server:
 </dependency>
 ```
 
-* （可选）把所有参数都获取到一个请求参数模型里时，添加校验参数是否必传相关的库
+* （可选）SpringMVC 把所有参数都获取到一个请求参数模型里时，添加校验参数是否必传相关的库
 
 ```xml
 <!--
@@ -268,7 +264,7 @@ server:
 * （必选）然后我们知道 MyBatis 对应的是之前的 JDBC API，所以我们还需要安装数据库驱动、连接池
 
 ```xml
-<!-- 可以不指定版本号（推荐），因为 spring-boot-starter-parent 会管理它的版本 -->
+<!-- 可以不指定版本号，因为 MySQL 太常用了、spring-boot-starter-parent 会管理它的版本 -->
 <dependency>
     <groupId>com.mysql</groupId>
     <artifactId>mysql-connector-j</artifactId>
@@ -298,7 +294,7 @@ server:
 
 ```xml
 <!--
-    单元测试
+    单元测试：
     JUnit Jupiter（JUnit 5）
     Mockito（Mock 框架）
     AssertJ（断言库）
@@ -312,11 +308,34 @@ server:
 </dependency>
 ```
 
-## 七、api 目录里的东西
+## ✅ 五、创建项目的入口类和入口方法，跟 controller、service、dao 目录平级
+
+```java
+// Application.java
+
+// 创建项目的入口类，我们一般把它命名为 Application
+//
+// 用 @SpringBootApplication 注解修饰一下这个类，来标识它是项目的入口类
+// 并且 @SpringBootApplication 注解还包含了 @ComponentScan 注解的功能，它默认的扫描路径就是当前类所在包及其子包下所有的类，扫描到用 @Component 注解修饰的类后就会自动创建对象并放到 IoC 容器中
+// 所以 controller 层、service 层、其它目录里的众多类，都会被自动创建对象并放到 IoC 容器中
+//
+// dao 层是通过 @MapperScan 注解来扫描的，Spring 会自动创建所有的 dao 对象并放入 IoC 容器中
+@SpringBootApplication
+@MapperScan("com.ineyee.dao")
+public class Application {
+    // 为项目的入口类添加 main 方法，作为项目的入口方法
+    public static void main(String[] args) {
+        // 固定写法，启动项目
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+## ✅ 六、api 目录里的东西
 
 api 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## 八、表现层之模型层 domain
+## ✅ 七、表现层之模型层 domain
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -324,46 +343,113 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。
 
-## 九、数据层 dao
+## ✅ 八、数据层 dao
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 dao、service、domain、controller，比如 UserDao、UserService、User、UserController、ProductDao、ProductService、Product、ProductController 这两组
 
-#### 1、Java 代码
+#### ✅ 1、Java 代码
 
 先定义一个 dao 接口，然后再定义一个 mapper 文件、这个 mapper 文件其实就是 dao 接口的实现。
 
-#### 2、配置
+#### ✅ 2、配置
 
-首先创建一个 dao.properties 文件，把数据层 dao 相关配置的值都写在这个配置文件里。
+把数据层 dao 相关配置的值都写在 application.yml（MyBatis）、application-dev.yml（开发环境的数据源） 和 application-prd.yml（生产环境的数据源） 这三个配置文件里。
 
-然后去 Spring 主配置类里配置一堆数据层 dao 的相关配置（当然我们也可以抽取成单独的配置类来为主配置类减负）。
+只要我们在前面“添加依赖”那里引入了相应的 starter，并且在 yml 配置文件里做好配置，SpringBoot 就会自动创建 DruidDataSource、SqlSessionFactoryBean 等对象，并通过属性绑定技术把 yml 配置文件里的值自动绑定到这些对象上去，其它的我们啥也不用再干，不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。
 
-## 十、业务层 service
+## ✅ 九、业务层 service
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 dao、service、domain、controller，比如 UserDao、UserService、User、UserController、ProductDao、ProductService、Product、ProductController 这两组
 
-#### 1、Java 代码
+#### ✅ 1、Java 代码
 
 先定义一个 service 接口，然后再定义一个 service 接口的实现类、用 @Service 修饰一下放入父 IoC 容器里、自动注入 dao。
 
-#### 2、配置
+#### ✅ 2、配置
 
-去 Spring 主配置类里配置一堆业务层 service 的相关配置（当然我们也可以抽取成单独的配置类来为主配置类减负）。
+只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动创建和配置事务管理器 DataSourceTransactionManager 对象，并自动启动事务管理 @EnableTransactionManagement，我们同样不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。只需要在想使用事务管理的 Service 类上加一个 @Transactional 注解就完事了，这样一来这个业务类里所有的方法都会自动加上事务管理的代码，当然我们也可以只在某一个方法上加上一个 @Transactional 注解，其它的我们啥也不用再干。
 
-## 十一、控制器层 controller
+## ✅ 十、控制器层 controller
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 dao、service、domain、controller，比如 UserDao、UserService、User、UserController、ProductDao、ProductService、Product、ProductController 这两组
 
-#### 1、Java 代码
+#### ✅ 1、Java 代码
 
 定义一个 controller 类、用 @Controller 修饰一下放入子 IoC 容器里、自动注入 service。
 
-#### 2、配置
+#### ✅ 2、配置
 
-去 Spring 子配置文件里配置一堆控制器层 controller 的相关配置。
+只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动配置消息转换器（String 和 JSON 响应体的编码方式、默认就是 UTF-8，LocalDateTime 序列化为 ISO-8601 字符串格式等），自动配置参数是否必传的验证器，我们同样不再需要像以前一样“在 Spring 的子配置文件里配置一大堆东西”。controller 里该用啥用啥，其它的我们啥也不用再干。
+
+## ✅ 十一、仍需手动配置的东西
+
+#### ✅ 1、拦截器
+
+创建配置类添加拦截器
+
+```java
+@Configuration
+public class SpringMVCConfig implements WebMvcConfigurer {
+    // 自动注入拿到 HTTP 请求日志拦截器
+    @Autowired
+    private HttpLogInterceptor httpLogInterceptor;
+
+    // 添加拦截器
+    //
+    // 设置拦截器能拦截那些请求：这里的请求就是我们通过 / 设置了 DispatcherServlet 会拦截接口型请求 + 会拦截静态资源型请求这两种
+    // 虽然 DispatcherServlet 把静态资源型请求转交给服务器默认的处理了，但拦截它肯定是会先拦截下来的，也就是说先拦截后转交，而不是直接转交
+    // /*：代表 http://xxx/applicationContext/xxx 这种一级路径的请求才会被拦截
+    // /**：代表 http://xxx/applicationContext/xxx、http://xxx/applicationContext/xxx/xxx 这种一级路径或 N 级路径的请求都会被拦截
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(httpLogInterceptor)
+                .addPathPatterns("/**");
+    }
+}
+```
+
+#### ✅ 2、过滤器
+
+创建配置类添加过滤器（HTTP 请求参数编码方式的过滤器已经被 SpringBoot 自动配置了、默认就是 UTF-8，我们只需要手动配置自定义的过滤器即可）
+
+```java
+/**
+ * 过滤器配置类，只需要创建这个配置类就行了，其它地方不需要配置，SpringBoot 会自动完成其它工作
+ * 用于注册自定义过滤器到 Spring 容器
+ */
+@Configuration
+public class FilterConfig {
+    /**
+     * 注册请求体缓存过滤器
+     * 当 Spring 容器启动时，Spring 会调用这个方法，拿到返回的 FilterRegistrationBean，自动注册到 Servlet 容器中
+     */
+    @Bean
+    public FilterRegistrationBean<CachedBodyFilter> cachedBodyFilter() {
+        FilterRegistrationBean<CachedBodyFilter> registration = new FilterRegistrationBean<>();
+
+        // 设置过滤器实例
+        registration.setFilter(new CachedBodyFilter());
+
+        // 设置拦截路径
+        // /* 拦截所有请求：接口型请求 + 静态资源请求 + 动态资源请求
+        registration.addUrlPatterns("/*");
+
+        // 设置过滤器执行顺序（非常重要！）
+        // HIGHEST_PRECEDENCE = Integer.MIN_VALUE，表示最高优先级，最先执行
+        // 确保在 HTTP 请求日志拦截器之前包装请求
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+
+        // 设置过滤器名称（可选，用于日志和调试）
+        registration.setName("cachedBodyFilter");
+
+        return registration;
+    }
+}
+```
+

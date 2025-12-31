@@ -40,6 +40,23 @@
         </dependency>
 
         <!--
+            属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
+            在编译期间帮助生成 setter、getter、toString 等代码
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <!--
+            属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
+            在 application-*.yml 配置文件里编写属性名时能提示
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+
+        <!--
             添加一个 spring-boot-starter-web 依赖，不用指定版本号，因为上面 spring-boot-starter-parent 项目里已经帮我们锁定好了
             这个库里已经帮我们添加了 Spring、SpringMVC 常用的依赖，还有 Tomcat 和日志打印相关依赖，就不用我们自己手动添加一大堆依赖了
 
@@ -85,7 +102,7 @@
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>3.0.5</version>
         </dependency>
-        <!-- 可以不指定版本号（推荐），因为 spring-boot-starter-parent 会管理它的版本 -->
+        <!-- 可以不指定版本号，因为 MySQL 太常用了、因为 spring-boot-starter-parent 会管理它的版本 -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
@@ -94,7 +111,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.2.23</version>
+            <version>1.2.27</version>
         </dependency>
         <!-- 必须指定版本号，因为 PageHelper 是第三方库，SpringBoot 不管理它的版本 -->
         <dependency>
@@ -104,7 +121,7 @@
         </dependency>
 
         <!--
-            单元测试
+            单元测试：
             JUnit Jupiter（JUnit 5）
             Mockito（Mock 框架）
             AssertJ（断言库）

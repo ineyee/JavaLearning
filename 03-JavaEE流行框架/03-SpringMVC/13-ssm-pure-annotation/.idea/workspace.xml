@@ -10,17 +10,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="69e4e1ee-dd23-44af-9376-e4e67c6fdf71" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/filter/CachedBodyFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application-dev.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application-prd.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/02-yml 配置文件.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/02-yml 配置文件.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/api/HttpResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/api/error/CommonError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/api/error/Error.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/api/error/UserError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/api/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/api/exception/ServiceException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/config/SpringMVCConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/controller/UserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/dao/UserDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/domain/BaseDomain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/domain/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/interceptor/HttpLogInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/service/UserServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/mappers/user.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/SpringConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/cfg/SpringConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-SpringBoot整合MyBatis.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-SpringBoot整合MyBatis.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/.idea/dictionaries/project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/SSM与SpringBoot依赖对比.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application-prd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application-prd.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/test/java/com/ineyee/AppTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../04-SpringBoot/03-springboot-combine-mybatis/src/test/java/com/ineyee/AppTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,29 +63,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Tomcat Server.Tomcat 11.0.10.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/03-SpringMVC/13-ssm-pure-annotation/src/main/java/com/ineyee&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Tomcat Server.Tomcat 11.0.10.executor": "Debug",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/03-SpringMVC/13-ssm-pure-annotation/src/main/java/com/ineyee",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "File.Encoding",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java/com/ineyee" />

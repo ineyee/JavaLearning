@@ -5,18 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de499fe2-4ff5-4928-9789-7c32cab2d631" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/filter/CachedBodyFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-dev.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-prd.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/HttpResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/error/CommonError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/error/Error.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/error/UserError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/api/exception/ServiceException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/config/SpringMVCConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/controller/UserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/dao/UserDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/domain/BaseDomain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/domain/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/interceptor/HttpLogInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/service/UserServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/mappers/user.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/DragonBall.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../03-SpringMVC/13-ssm-pure-annotation/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../03-SpringMVC/13-ssm-pure-annotation/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../03-SpringMVC/13-ssm-pure-annotation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../03-SpringMVC/13-ssm-pure-annotation/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../02-yml 配置文件.md" beforeDir="false" afterPath="$PROJECT_DIR$/../02-yml 配置文件.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../03-SpringMVC/13-ssm-pure-annotation/src/main/java/com/ineyee/cfg/SpringConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../03-SpringMVC/13-ssm-pure-annotation/src/main/java/com/ineyee/cfg/SpringConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../03-SpringBoot整合MyBatis.md" beforeDir="false" afterPath="$PROJECT_DIR$/../03-SpringBoot整合MyBatis.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ineyee/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ineyee/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SSM与SpringBoot依赖对比.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prd.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/ineyee/AppTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/ineyee/AppTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,12 +71,17 @@
   "keyToString": {
     "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.Application.executor": "Debug",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/ineyee/Desktop/JavaLearning/03-JavaEE流行框架/04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee",
+    "last_opened_file_path": "/Users/yiyi/Desktop/JavaLearning/03-JavaEE流行框架/04-SpringBoot/03-springboot-combine-mybatis/src/main/java/com/ineyee",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -77,6 +97,10 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java/com/ineyee" />
+      <recent name="$PROJECT_DIR$/src/main/resources" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/static" />
     </key>
   </component>
   <component name="RunManager">
@@ -111,5 +135,16 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ineyee/controller/UserController.java</url>
+          <line>62</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
