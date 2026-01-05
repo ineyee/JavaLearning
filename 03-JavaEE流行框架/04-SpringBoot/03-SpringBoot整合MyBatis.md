@@ -136,24 +136,24 @@ server:
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
         </dependency>
+      
+        <!--
+            属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
+            在编译期间帮助生成 setter、getter、toString 等代码
+        -->
+        <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+        </dependency>
+        <!--
+            属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
+            在 application-*.yml 配置文件里编写属性名时能提示
+        -->
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
     </dependencies>
-  
-    <!--
-        属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
-        在编译期间帮助生成 setter、getter、toString 等代码
-    -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-    </dependency>
-    <!--
-        属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
-        在 application-*.yml 配置文件里编写属性名时能提示
-    -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-configuration-processor</artifactId>
-    </dependency>
 
     <!-- 属性信息 -->
     <properties>
