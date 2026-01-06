@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ineyee</groupId>
-    <artifactId>04-logger</artifactId>
+    <artifactId>01-slf4j-logback</artifactId>
     <version>1.0.0</version>
 
     <parent>
