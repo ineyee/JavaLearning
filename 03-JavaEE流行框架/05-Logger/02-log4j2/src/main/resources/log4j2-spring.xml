@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- log4j2 的配置文件只能使用大驼峰，不能使用小驼峰 -->
+<!--
+    monitorInterval="30"
+    让 log4j2 每隔 30 秒重新扫描一下配置文件，并应用最新的配置文件
+-->
+<Configuration monitorInterval="30">
+    <!--
+        使用 Property 标签定义变量，抽取日志文件所在目录
+            测试 macOS 系统，我们输出到 /Users/yiyi/Desktop/log/app.log 文件中
+            线上 Linux 系统，我们输出到 /var/log/${AppName}/app.log 文件中
+    -->
+    <Properties>
+        <SpringProfile name="dev">
+            <Property name="LOG_FILE_HOME">/Users/yiyi/Desktop/log</Property>
+        </SpringProfile>
+        <SpringProfile name="prd">
+            <Property name="LOG_FILE_HOME">/var/log/log4j2</Property>
+        </SpringProfile>
+
+        <!--
+            控制台输出格式
+                %highlight：彩色输出
+                %d：时间
+                %p：日志级别
+                %t：线程
+                %c：消息是在哪个类里输出的
+                %m：消息
+                %n：换行
+        -->
+        <Property name="CONSOLE_PATTERN">%highlight{[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5p] [%t] [%c]: %m%n}</Property>
+        <!--
+            文件输出格式
+        -->
+        <Property name="FILE_PATTERN">[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5p] [%t] [%c]: %m%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- 定义一个输出目标：控制台 -->
+        <Console name="consoleAppender">
+            <!-- 控制台的输出格式与编码方式 -->
+            <PatternLayout pattern="${CONSOLE_PATTERN}" charset="UTF-8"/>
+        </Console>
+
+        <!-- 定义一个输出目标：文件 -->
+        <RollingFile name="rollingFileAppender" fileName="${LOG_FILE_HOME}/app.log"
+                     filePattern="${LOG_FILE_HOME}/app.log.%d{yyyy-MM-dd}.%i.gz">
+            <!-- 文件的输出格式与编码方式 -->
+            <PatternLayout pattern="${FILE_PATTERN}" charset="UTF-8"/>
+            <!--
+                文件的滚动策略，基于文件大小和时间
+                    每隔一天，自动生成新文件，以当天日期命名
+                    同一天内单个文件最大 100M，超过 100M 时自动生成新文件，以当天日期命名
+                    所有文件总大小最大 10G，超过 10G 时自动清理最早的文件
+                    自动清理超过 30 天的文件
+
+                /var/log/${AppName}/
+                ├─app.log                 <- 当前
+                ├─app.log.2026.01.06.0.gz <- 今天的第 1 个文件（100M）
+                ├─app.log.2026.01.06.1.gz <- 今天的第 2 个文件（100M）
+                ├─app.log.2026.01.05.0.gz <- 昨天的文件
+            -->
+            <Policies>
+                <!-- 基于时间的滚动策略：每天生成新文件 -->
+                <TimeBasedTriggeringPolicy/>
+                <!-- 基于文件大小的滚动策略：单个文件最大 100M -->
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <!-- 文件索引，最多 100 个文件 -->
+            <DefaultRolloverStrategy max="100">
+                <!-- 删除策略：删除超过 30 天的文件，或者所有文件总大小超过 10G 时删除最早的文件 -->
+                <Delete basePath="${LOG_FILE_HOME}" maxDepth="1">
+                    <IfFileName glob="app.log.*.gz"/>
+                    <IfAny>
+                        <!-- 删除超过 30 天的文件 -->
+                        <IfLastModified age="30d"/>
+                        <!-- 所有文件总大小超过 10G 时删除最早的文件 -->
+                        <IfAccumulatedFileSize exceeds="10GB"/>
+                    </IfAny>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- 把 rollingFileAppender 搞成异步的，这样一来把日志写入到文件的操作就会变成异步的 -->
+        <Async name="asyncRollingFileAppender">
+            <AppenderRef ref="rollingFileAppender"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <!--
+            开发环境的 logger 配置
+            application.yml 里的 active: - dev | - prd 会自动匹配这里的环境
+        -->
+        <SpringProfile name="dev">
+            <!--
+                项目里所有 logger 的配置都写在这个 Root 标签里
+                    日志级别为：DEBUG
+                    输出目标为：控制台
+            -->
+            <Root level="DEBUG">
+                <AppenderRef ref="consoleAppender"/>
+            </Root>
+
+            <!--
+                如果我们想给某个包里的 logger 单独配置，可以新增一个 Logger 标签
+                controller 包里所有 logger 的配置都写在这个 Logger 标签里，会覆盖 Root 标签里的配置
+                    日志级别为：DEBUG
+                    是否给父 logger 传递日志事件：false（默认 true，会把日志事件传递给 rootLogger，导致打印多遍，所以总应设置为 false）
+                    输出目标为：控制台
+            -->
+            <Logger name="com.ineyee.controller" level="DEBUG" additivity="false">
+                <AppenderRef ref="consoleAppender"/>
+            </Logger>
+            <!--
+                如果我们想给某个类里的 logger 单独配置，可以新增一个 Logger 标签
+                TestService 类里 logger 的配置都写在这个 Logger 标签里，会覆盖 Root 标签里的配置
+                    日志级别为：WARN
+                    是否给父 logger 传递日志事件：false（默认 true，会把日志事件传递给 rootLogger，导致打印多遍，所以总应设置为 false）
+                    输出目标为：控制台
+            -->
+            <Logger name="com.ineyee.service.TestService" level="WARN" additivity="false">
+                <AppenderRef ref="consoleAppender"/>
+            </Logger>
+        </SpringProfile>
+
+        <!--
+            生产环境的 logger 配置
+            application.yml 里的 active: - dev | - prd 会自动匹配这里的环境
+        -->
+        <SpringProfile name="prd">
+            <Root level="INFO">
+                <AppenderRef ref="asyncRollingFileAppender"/>
+            </Root>
+        </SpringProfile>
+    </Loggers>
+</Configuration>
