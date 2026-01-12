@@ -24,9 +24,9 @@
 │  │  │  │  │  │  ├─UserController
 │  │  │  │  │  ├─mapper/(数据层的接口)
 │  │  │  │  │  │  ├─UserDao
-│  │  │  │  │  ├─domain/(表现层之模型层)
-│  │  │  │  │  │  ├─BaseDomain
-│  │  │  │  │  │  ├─User extends BaseDomain
+│  │  │  │  │  ├─pojo/(表现层之模型层)
+│  │  │  │  │  │  ├─po/(持久化对象)
+│  │  │  │  │  │  │  ├─User
 │  │  │  │  │  ├─dto/(接收客户端的请求参数)
 │  │  │  │  │  │  ├─UserSaveDto
 │  │  │  │  │  │  ├─UserRemoveDto
@@ -590,20 +590,26 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 #### 1、domain -> pojo
 
-之前的表现层之模型层，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是一个 domain 走遍天下：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。
+之前的表现层之模型层，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。
 
-但是实际开发中“一个 domain 走遍天下”可能并不太合适，而是会有各种模型：
+但是实际开发中“一个 domain 走天下”可能并不太合适，而是会有各种模型、这些模型统称为 POJO（Plain Ordinary Java Object、简单的 Java 对象）：
 
 ![image-20260112170830372](第 02 步-编写 Java 代码/img/image-20260112170830372.png)
 
-| 模型                                  | 职责                                                         | 阶段                                                       | 是否必须有                                                   |
-| ------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------ |
-| PO：Persistent Object<br />持久化对象 | po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应 | 从数据库表映射出 po，模型层要的是 po                       | po 必须有                                                    |
-| BO：Business Object<br />业务对象     | po 的很多字段可能跟业务并没有关系                            | 把 po 转换成 bo，把 bo 从数据层传到业务层，业务层要的是 bo | 当一个业务只需要一张表就能完成时，bo 就不是必须有，直接使用 po 即可<br />当一个业务需要联合多张表才能完成时，bo 就是必须有 |
-|                                       |                                                              |                                                            |                                                              |
-|                                       |                                                              |                                                            |                                                              |
+| 模型                                        | 职责                                                         | 阶段                                                | 是否必须有                                                   |
+| ------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------ |
+| PO：Persistent Object<br />持久化对象       | 关注数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量**（成员变量的类型更加注重方便数据库存储）**、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                 | po 必须有                                                    |
+| BO：Business Object<br />业务对象           | 关注业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表——也就是一个 po ——就能完成，也可能需要联合多张表——也就是多个 po ——才能完成<br /><br />这个类内部一般就是编写构造方法、成员变量**（成员变量的类型更加注重业务语义）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法都写在这里** | 把 po 转换成 bo、把 bo 从数据层传到业务层           | bo 可以没有<br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
+| DTO：Data Transfer Object<br />数据传输对象 | 关注数据传输效率<br /><br />po 和 bo 的属性其实都还是对数据库表里字段的映射，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
+| VO：View Object<br />视图对象               | 关注前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象，比如 dto 里的数据是没有国际化的、而 vo 里的数据就是经过国际化后的数据<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br />但有的话，前端的界面展示会更加动态化        |
 
 #### 2、MyBatis Generator 自动生成 po
+
+之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得麻烦。好在 MyBatis 提供了一个插件 MyBatis Generator 来自动生成 po：
+
+
+
+
 
 ## 九、数据层 dao
 
@@ -640,6 +646,8 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
+
+#### 数据查询对象 Query 补充在这里吧，毕竟是在写接口的时候才会去创建
 
 #### 1、Java 代码
 
@@ -715,62 +723,15 @@ public class FilterConfig {
 }
 ```
 
+
+
 ***
 
-\> 为什么要区分 po、bo、dto、vo？以文档里的订单状态为例解释 
-
-
-
-⏺ 我来解释为什么要区分 PO、BO、DTO、VO 这些对象，并用订单状态作为例子说明。
-
-
-
- **为什么要区分这些对象？**
-
-
-
- **核心原因：不同层次有不同的关注点和职责**
-
-
-
- \1. **PO (Persistent Object)** - 持久化对象
-
-  \- 对应数据库表结构
-
-  \- 关注：数据存储、字段映射、数据库约束
-
- \2. **BO (Business Object)** - 业务对象
-
-  \- 承载业务逻辑
-
-  \- 关注：业务规则、状态流转、领域模型
-
- \3. **DTO (Data Transfer Object)** - 数据传输对象
-
-  \- 用于系统间或层间传输
-
-  \- 关注：接口契约、序列化、网络传输效率
-
- \4. **VO (View Object)** - 视图对象
-
-  \- 用于前端展示
-
-  \- 关注：用户体验、展示格式、国际化
-
-
-
- **以订单状态为例**
-
-
-
- 假设有一个电商订单系统：
-
-
+## 临时
 
  **PO - 数据库层面**
 
-
-
+```java
  @Entity
 
  @Table(name = "orders")
@@ -798,6 +759,9 @@ public class FilterConfig {
    private Timestamp createdAt;
 
  }
+```
+
+
 
 
 
@@ -805,7 +769,8 @@ public class FilterConfig {
 
 
 
- public class OrderBO {
+```java
+public class OrderBO {
 
    private Long id;
 
@@ -870,14 +835,16 @@ public class FilterConfig {
    PENDING_PAYMENT, PAID, SHIPPED, COMPLETED, CANCELLED
 
  }
+```
+
+
 
 
 
  **DTO - 接口传输层面**
 
-
-
- // 给第三方物流系统的 DTO
+```java
+// 给第三方物流系统的 DTO
 
  public class OrderShipmentDTO {
 
@@ -910,11 +877,17 @@ public class FilterConfig {
  }
 
 
+```
+
+
+
+ 
+
+
 
  **VO - 前端展示层面**
 
-
-
+```java
  public class OrderVO {
 
    private String orderId;
@@ -948,67 +921,4 @@ public class FilterConfig {
    private String createdTime; // "2026-01-12 14:30:25"
 
  }
-
-
-
- **实际转换流程**
-
-
-
- 用户点击"支付订单"
-
-   ↓
-
- Controller 接收请求 (VO → DTO)
-
-   ↓
-
- Service 处理业务 (DTO → BO)
-
-   ↓
-
- BO.pay() 执行状态流转和业务校验
-
-   ↓
-
- Repository 持久化 (BO → PO)
-
-   ↓
-
- 数据库更新 status = 1
-
-   ↓
-
- 返回结果 (PO → BO → DTO → VO)
-
-   ↓
-
- 前端展示"已支付"（绿色标签）
-
-
-
- **好处总结**
-
-
-
- \1. **解耦**：数据库改字段不影响前端，前端改展示不影响业务逻辑
-
- \2. **安全**：VO 不暴露敏感字段，DTO 只传输必要数据
-
- \3. **灵活**：同一个订单可以给不同系统返回不同的 DTO
-
- \4. **清晰**：每层职责明确，代码易维护
-
- \5. **复用**：业务逻辑集中在 BO，避免重复代码
-
-
-
- 如果不区分，所有层都用一个对象，会导致：
-
- \- 数据库字段变更影响所有层
-
- \- 业务逻辑散落各处
-
- \- 前端拿到不需要的数据
-
- \- 接口暴露内部实现细节
+```
