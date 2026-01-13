@@ -582,7 +582,7 @@ public class TestService {
 
 api 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## 八、表现层之模型层 pojo
+## ✅ 八、表现层之模型层 pojo
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -603,13 +603,83 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 | DTO：Data Transfer Object<br />数据传输对象 | 关注数据传输效率<br /><br />po 和 bo 的属性其实都还是对数据库表里字段的映射，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
 | VO：View Object<br />视图对象               | 关注前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象，比如 dto 里的数据是没有国际化的、而 vo 里的数据就是经过国际化后的数据<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br />但有的话，前端的界面展示会更加动态化        |
 
-#### 2、MyBatis Generator 自动生成 po
+#### 2、mybatis-generator 自动生成 po
 
-之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得麻烦。好在 MyBatis 提供了一个插件 MyBatis Generator 来自动生成 po：
+之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得效率非常低，好在 MyBatis 提供了一个插件 mybatis-generator 来帮我们自动生成 po`（建议先把 po 生成到 test 目录下，然后再把需要的 po 复制一份到 main 目录下，因为每次自动生成 po 都会覆盖上一次生成的，所以如果直接生成到 main 目录下，就有可能覆盖掉我们自己手动增加的一些改动）`：
 
+* 在 test/resources 目录下创建一个 generatorConfig.xml 配置文件
 
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
+<generatorConfiguration>
+    <!--
+        id：值随便写，一个上下文标识，只要在同一个 generatorConfig.xml 里唯一即可
+        targetRuntime：决定了 MBG 生成代码的“风格和能力”，MyBatis3、生成的代码臃肿，MyBatis3Simple、生成的代码精简
+    -->
+    <context id="POGenerator" targetRuntime="MyBatis3Simple">
+        <commentGenerator>
+            <!-- 不要生成注释 -->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <!-- 数据库连接，提供一个本地的就行了，反正就是用来生成一下 po -->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/test_db?serverTimezone=UTC"
+                        userId="root"
+                        password="mysqlroot"/>
+        <!-- 数据库里的日期类型，对应到 Java 代码里强制使用 LocalDateTime 而不是 Date -->
+        <javaTypeResolver type="org.mybatis.generator.internal.types.JavaTypeResolverDefaultImpl">
+            <property name="useJSR310Types" value="true"/>
+        </javaTypeResolver>
+        <!-- 生成的 po 要放在什么位置：最终生成路径 = targetProject + targetPackage -->
+        <javaModelGenerator targetProject="src/test/java" targetPackage="com.ineyee.pojo.po"/>
+        <!--
+            要为哪个表里生成 PO
+                %：代表所有表
+                具体的表名：代表指定表
+            catalog、schema：代表哪个数据库
+        -->
+        <table tableName="%" catalog="test_db" schema="test_db"/>
+        <!--        <table tableName="dict_type" catalog="test_db" schema="test_db"/>-->
+        <!--        <table tableName="dict_item" catalog="test_db" schema="test_db"/>-->
+        <!--        <table tableName="dict_i18n" catalog="test_db" schema="test_db"/>-->
+    </context>
+</generatorConfiguration>
+```
 
+* 添加 mybatis-generator 插件
+
+```xml
+<!-- 自动生成 po -->
+<plugin>
+  <groupId>org.mybatis.generator</groupId>
+  <artifactId>mybatis-generator-maven-plugin</artifactId>
+  <version>1.4.2</version>
+  <configuration>
+    <!-- 配置文件的位置 -->
+    <configurationFile>src/test/resources/generatorConfig.xml</configurationFile>
+    <!-- 覆盖已生成的 po 文件 -->
+    <overwrite>true</overwrite>
+    <!-- 打印日志信息 -->
+    <verbose>true</verbose>
+  </configuration>
+  <dependencies>
+    <!-- MBG 要通过数据库驱动去读取数据库里的各种信息 -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.3.0</version>
+    </dependency>
+  </dependencies>
+</plugin>
+```
+
+* 自动生成 po
+
+![image-20260113122203302](第 02 步-编写 Java 代码/img/image-20260113122203302.png)
 
 ## 九、数据层 dao
 

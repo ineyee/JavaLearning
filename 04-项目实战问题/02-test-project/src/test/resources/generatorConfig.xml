@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!--
+        id：值随便写，一个上下文标识，只要在同一个 generatorConfig.xml 里唯一即可
+        targetRuntime：决定了 MBG 生成代码的“风格和能力”，MyBatis3、生成的代码臃肿，MyBatis3Simple、生成的代码精简
+    -->
+    <context id="POGenerator" targetRuntime="MyBatis3Simple">
+        <commentGenerator>
+            <!-- 不要生成注释 -->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <!-- 数据库连接，提供一个本地的就行了，反正就是用来生成一下 po -->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/test_db?serverTimezone=UTC"
+                        userId="root"
+                        password="mysqlroot"/>
+        <!-- 数据库里的日期类型，对应到 Java 代码里强制使用 LocalDateTime 而不是 Date -->
+        <javaTypeResolver type="org.mybatis.generator.internal.types.JavaTypeResolverDefaultImpl">
+            <property name="useJSR310Types" value="true"/>
+        </javaTypeResolver>
+        <!-- 生成的 po 要放在什么位置：最终生成路径 = targetProject + targetPackage -->
+        <javaModelGenerator targetProject="src/test/java" targetPackage="com.ineyee.pojo.po"/>
+        <!--
+            要为哪个表里生成 PO
+                %：代表所有表
+                具体的表名：代表指定表
+            catalog、schema：代表哪个数据库
+        -->
+        <table tableName="%" catalog="test_db" schema="test_db"/>
+        <!--        <table tableName="dict_type" catalog="test_db" schema="test_db"/>-->
+        <!--        <table tableName="dict_item" catalog="test_db" schema="test_db"/>-->
+        <!--        <table tableName="dict_i18n" catalog="test_db" schema="test_db"/>-->
+    </context>
+</generatorConfiguration>
