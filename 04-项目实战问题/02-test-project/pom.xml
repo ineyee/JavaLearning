@@ -103,11 +103,12 @@
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.2.23</version>
         </dependency>
-        <!-- 必须指定版本号，因为 PageHelper 是第三方库，SpringBoot 不管理它的版本 -->
+        <!-- mybatis-plus，自动生成 mapper 接口类的方法和 mapper 实现 -->
         <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <version>2.1.0</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.16</version>
+            <scope>compile</scope>
         </dependency>
         <!--
             单元测试：
@@ -136,7 +137,7 @@
     <!-- 构建信息，比如输出产物的名字、插件配置等 -->
     <build>
         <!-- 输出产物的名字 -->
-        <finalName>sbm</finalName>
+        <finalName>tp</finalName>
         <!-- 插件配置 -->
         <plugins>
             <!-- 开发结束后把项目打包成 runnable jar 的插件 -->

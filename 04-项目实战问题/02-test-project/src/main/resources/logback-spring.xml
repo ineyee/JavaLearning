@@ -92,27 +92,6 @@
         <root level="DEBUG" additivity="false">
             <appender-ref ref="consoleAppender"/>
         </root>
-
-        <!--
-            如果我们想给某个包里的 logger 单独配置，可以新增一个 logger 标签
-            controller 包里所有 logger 的配置都写在这个 logger 标签里，会覆盖 root 标签里的配置
-                日志级别为：DEBUG
-                是否给父 logger 传递日志事件：false（默认 true，会把日志事件传递给 rootLogger，导致打印多遍，所以总应设置为 false）
-                输出目标为：控制台
-        -->
-        <logger name="com.ineyee.controller" level="DEBUG" additivity="false">
-            <appender-ref ref="consoleAppender"/>
-        </logger>
-        <!--
-            如果我们想给某个类里的 logger 单独配置，可以新增一个 logger 标签
-            TestService 类里 logger 的配置都写在这个 logger 标签里，会覆盖 root 标签里的配置
-                日志级别为：WARN
-                是否给父 logger 传递日志事件：false（默认 true，会把日志事件传递给 rootLogger，导致打印多遍，所以总应设置为 false）
-                输出目标为：控制台
-        -->
-        <logger name="com.ineyee.service.TestService" level="WARN" additivity="false">
-            <appender-ref ref="consoleAppender"/>
-        </logger>
     </springProfile>
 
     <!--

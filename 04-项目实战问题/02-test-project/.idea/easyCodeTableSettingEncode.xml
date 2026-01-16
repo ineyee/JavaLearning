@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EasyCodeTableSetting">
+    <option name="tableInfoMap">
+      <map>
+        <entry key="test_db.singer" value="eyJuYW1lIjoiU2luZ2VyIiwicHJlTmFtZSI6IiIsInRlbXBsYXRlR3JvdXBOYW1lIjoiIiwiZnVsbENvbHVtbiI6W3sibmFtZSI6ImlkIiwidHlwZSI6ImphdmEubGFuZy5Mb25nIiwiY3VzdG9tIjpmYWxzZSwiZXh0Ijoie30ifSx7Im5hbWUiOiJuYW1lIiwidHlwZSI6ImphdmEubGFuZy5TdHJpbmciLCJjdXN0b20iOmZhbHNlLCJleHQiOiJ7fSJ9LHsibmFtZSI6InNleCIsInR5cGUiOiJqYXZhLmxhbmcuU3RyaW5nIiwiY3VzdG9tIjpmYWxzZSwiZXh0Ijoie30ifV0sInNhdmVQYWNrYWdlTmFtZSI6IiIsInNhdmVQYXRoIjoiIiwic2F2ZU1vZGVsTmFtZSI6IiJ9" />
+      </map>
+    </option>
+  </component>
+</project>

@@ -8,3 +8,19 @@ spring:
       # DispatcherServlet 的加载时机：默认是 -1（延迟加载，第一次请求接口时才初始化）
       # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
       load-on-startup: 0
+
+# mybatis-plus 相关配置（MyBatis 的配置转交给 mybatis-plus 了）
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.ineyee.pojo
+  # 建议优先使用 mybatis-plus 提供的 SQL 实现，所以这个暂时就不需要了
+  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 mybatis-plus 一起使用
+#  mapper-locations: classpath:mappers/*.xml
+
+# PageHelper 相关配置
+pagehelper:
+  # reasonable 设置为 true，代表使分页查询合理化：
+  #      当 pageNum <= 0 时，自动返回第一页的数据
+  #      当 pageNum > totalPage 时，自动返回最后一页的数据
+  reasonable: true

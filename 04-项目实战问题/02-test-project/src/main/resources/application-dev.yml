@@ -1,11 +1,11 @@
 # 服务器相关配置（SpringBoot 内置的 Web 容器 Tomcat）
-# 假设在开发环境下端口号是 9999，Application Context Path 是 /springboot-dev
+# 假设在开发环境下端口号是 9999，Application Context Path 是 /tp-dev
 server:
   # 监听的端口，默认是 8080
   port: 9999
   # Application Context Path，默认是 /，注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的
   servlet:
-    context-path: "/tp"
+    context-path: "/tp-dev"
 
 # 数据源相关配置（数据库连接池、连接、数据库）
 # com.mysql.cj.jdbc.Driver：MySQL 数据库驱动库的类名

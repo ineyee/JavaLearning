@@ -1,5 +1,5 @@
 # 服务器相关配置（SpringBoot 内置的 Web 容器 Tomcat）
-# 假设在生产环境下端口号是 8888，Application Context Path 是 /springboot
+# 假设在生产环境下端口号是 8888，Application Context Path 是 /tp
 server:
   # 监听的端口，默认是 8080
   port: 8080
@@ -19,7 +19,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://8.136.43.114:3306/db_mysql?serverTimezone=UTC
+    url: jdbc:mysql://8.136.43.114:3306/test_db?serverTimezone=UTC
     username: root
     password: MySQLRoot666!
     druid:

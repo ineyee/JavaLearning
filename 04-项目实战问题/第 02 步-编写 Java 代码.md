@@ -69,20 +69,36 @@ spring:
       # DispatcherServlet 的加载时机：默认是 -1（延迟加载，第一次请求接口时才初始化）
       # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
       load-on-startup: 0
+
+# mybatis-plus 相关配置（MyBatis 的配置转交给 mybatis-plus 了）
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.ineyee.pojo
+  # 建议优先使用 mybatis-plus 提供的 SQL 实现，所以这个暂时就不需要了
+  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 mybatis-plus 一起使用
+#  mapper-locations: classpath:mappers/*.xml
+  
+# PageHelper 相关配置
+pagehelper:
+  # reasonable 设置为 true，代表使分页查询合理化：
+  #      当 pageNum <= 0 时，自动返回第一页的数据
+  #      当 pageNum > totalPage 时，自动返回最后一页的数据
+  reasonable: true
 ```
 
 ```yaml
 # application-dev.yml
 
 # 服务器相关配置（SpringBoot 内置的 Web 容器 Tomcat）
-# 假设在开发环境下端口号是 9999，Application Context Path 是 /springboot-dev
+# 假设在开发环境下端口号是 9999，Application Context Path 是 /tp-dev
 server:
   # 监听的端口，默认是 8080
   port: 9999
   # Application Context Path，默认是 /，注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的
   servlet:
-    context-path: "/sbm-dev"
-    
+    context-path: "/tp-dev"
+
 # 数据源相关配置（数据库连接池、连接、数据库）
 # com.mysql.cj.jdbc.Driver：MySQL 数据库驱动库的类名
 # jdbc:mysql://：MySQL 的固定写法
@@ -95,7 +111,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/db_hello_mysql?serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/test_db?serverTimezone=UTC
     username: root
     password: mysqlroot
     druid:
@@ -107,14 +123,14 @@ spring:
 # application-prd.yml
 
 # 服务器相关配置（SpringBoot 内置的 Web 容器 Tomcat）
-# 假设在生产环境下端口号是 8888，Application Context Path 是 /springboot
+# 假设在生产环境下端口号是 8888，Application Context Path 是 /tp
 server:
   # 监听的端口，默认是 8080
   port: 8080
   # Application Context Path，默认是 /，注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的
   servlet:
-    context-path: "/sbm"
-    
+    context-path: "/tp"
+
 # 数据源相关配置（数据库连接池、连接、数据库）
 # com.mysql.cj.jdbc.Driver：MySQL 数据库驱动库的类名
 # jdbc:mysql://：MySQL 的固定写法
@@ -127,7 +143,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://8.136.43.114:3306/db_mysql?serverTimezone=UTC
+    url: jdbc:mysql://8.136.43.114:3306/test_db?serverTimezone=UTC
     username: root
     password: MySQLRoot666!
     druid:
@@ -211,7 +227,7 @@ spring:
     <!-- 构建信息，比如输出产物的名字、插件配置等 -->
     <build>
         <!-- 输出产物的名字 -->
-        <finalName>sbm</finalName>
+        <finalName>tp</finalName>
         <!-- 插件配置 -->
         <plugins>
             <!-- 开发结束后把项目打包成 runnable jar 的插件 -->
@@ -352,7 +368,7 @@ spring:
 </dependency>
 ```
 
-## ✅ 五、创建项目的入口类和入口方法，跟 controller、service、dao 目录平级
+## ✅ 五、创建项目的入口类和入口方法，跟 controller、service、mapper 目录平级
 
 ```java
 // Application.java
@@ -363,9 +379,9 @@ spring:
 // 并且 @SpringBootApplication 注解还包含了 @ComponentScan 注解的功能，它默认的扫描路径就是当前类所在包及其子包下所有的类，扫描到用 @Component 注解修饰的类后就会自动创建对象并放到 IoC 容器中
 // 所以 controller 层、service 层、其它目录里的众多类，都会被自动创建对象并放到 IoC 容器中
 //
-// dao 层是通过 @MapperScan 注解来扫描的，Spring 会自动创建所有的 dao 对象并放入 IoC 容器中
+// mapper 层是通过 @MapperScan 注解来扫描的，Spring 会自动创建所有的 mapper 对象并放入 IoC 容器中
 @SpringBootApplication
-@MapperScan("com.ineyee.dao")
+@MapperScan("com.ineyee.mapper")
 public class Application {
     // 为项目的入口类添加 main 方法，作为项目的入口方法
     public static void main(String[] args) {
@@ -480,27 +496,6 @@ SpringBoot 项目的 spring-boot-starter-web 会默认添加 Logback 依赖，�
         <root level="DEBUG" additivity="false">
             <appender-ref ref="consoleAppender"/>
         </root>
-
-        <!--
-            如果我们想给某个包里的 logger 单独配置，可以新增一个 logger 标签
-            controller 包里所有 logger 的配置都写在这个 logger 标签里，会覆盖 root 标签里的配置
-                日志级别为：DEBUG
-                是否给父 logger 传递日志事件：false（默认 true，会把日志事件传递给 rootLogger，导致打印多遍，所以总应设置为 false）
-                输出目标为：控制台
-        -->
-        <logger name="com.ineyee.controller" level="DEBUG" additivity="false">
-            <appender-ref ref="consoleAppender"/>
-        </logger>
-        <!--
-            如果我们想给某个类里的 logger 单独配置，可以新增一个 logger 标签
-            TestService 类里 logger 的配置都写在这个 logger 标签里，会覆盖 root 标签里的配置
-                日志级别为：WARN
-                是否给父 logger 传递日志事件：false（默认 true，会把日志事件传递给 rootLogger，导致打印多遍，所以总应设置为 false）
-                输出目标为：控制台
-        -->
-        <logger name="com.ineyee.service.TestService" level="WARN" additivity="false">
-            <appender-ref ref="consoleAppender"/>
-        </logger>
     </springProfile>
 
     <!--
@@ -605,7 +600,34 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 #### 2、mybatis-generator 自动生成 po
 
-之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得效率非常低，好在 MyBatis 提供了一个插件 mybatis-generator 来帮我们自动生成 po`（建议先把 po 生成到 test 目录下，然后再把需要的 po 复制一份到 main 目录下，因为每次自动生成 po 都会覆盖上一次生成的，所以如果直接生成到 main 目录下，就有可能覆盖掉我们自己手动增加的一些改动）`：
+之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得效率非常低，好在 MyBatis 官方提供了一个插件 mybatis-generator 来帮我们自动生成 po`（建议先把 po 生成到 test 目录下，然后再把需要的 po 复制一份到 main 目录下，因为每次自动生成 po 都会覆盖上一次生成的，所以如果直接生成到 main 目录下，就有可能覆盖掉我们自己手动增加的一些改动）`：
+
+* 添加 mybatis-generator 插件
+
+```xml
+<!-- 自动生成 po -->
+<plugin>
+  <groupId>org.mybatis.generator</groupId>
+  <artifactId>mybatis-generator-maven-plugin</artifactId>
+  <version>1.4.2</version>
+  <configuration>
+    <!-- 配置文件的位置 -->
+    <configurationFile>src/test/resources/generatorConfig.xml</configurationFile>
+    <!-- 覆盖已生成的 po 文件 -->
+    <overwrite>true</overwrite>
+    <!-- 打印日志信息 -->
+    <verbose>true</verbose>
+  </configuration>
+  <dependencies>
+    <!-- MBG 要通过数据库驱动去读取数据库里的各种信息 -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.3.0</version>
+    </dependency>
+  </dependencies>
+</plugin>
+```
 
 * 在 test/resources 目录下创建一个 generatorConfig.xml 配置文件
 
@@ -650,50 +672,58 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 </generatorConfiguration>
 ```
 
-* 添加 mybatis-generator 插件
-
-```xml
-<!-- 自动生成 po -->
-<plugin>
-  <groupId>org.mybatis.generator</groupId>
-  <artifactId>mybatis-generator-maven-plugin</artifactId>
-  <version>1.4.2</version>
-  <configuration>
-    <!-- 配置文件的位置 -->
-    <configurationFile>src/test/resources/generatorConfig.xml</configurationFile>
-    <!-- 覆盖已生成的 po 文件 -->
-    <overwrite>true</overwrite>
-    <!-- 打印日志信息 -->
-    <verbose>true</verbose>
-  </configuration>
-  <dependencies>
-    <!-- MBG 要通过数据库驱动去读取数据库里的各种信息 -->
-    <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>8.3.0</version>
-    </dependency>
-  </dependencies>
-</plugin>
-```
-
 * 自动生成 po
 
 ![image-20260113122203302](第 02 步-编写 Java 代码/img/image-20260113122203302.png)
 
-## 九、数据层 dao
+## ✅ 九、数据层 mapper
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-#### 1、Java 代码
+#### 1、Java 代码：mybatis-plus 自动生成 mapper 接口类的方法和 mapper 实现
 
-先定义一个 dao 接口，然后再定义一个 mapper 文件、这个 mapper 文件其实就是 dao 接口的实现。
+之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，我们手动创建的接口类和实现的内容其实都差不多，所以我们国内开发者搞了一个库 mybatis-plus 来帮我们自动生成 mapper 接口类的方法和 mapper 实现：
+
+* 添加 mybatis-plus 依赖
+
+```xml
+<!-- mybatis-plus，自动生成 mapper 接口类的方法和 mapper 实现 -->
+<dependency>
+  <groupId>com.baomidou</groupId>
+  <artifactId>mybatis-plus-boot-starter</artifactId>
+  <version>3.5.16</version>
+  <scope>compile</scope>
+</dependency>
+```
+
+* 在 application.yml 文件里添加 mybatis-plus 的配置（MyBatis 的配置转交给 mybatis-plus 了）
+
+```yml
+# mybatis-plus 相关配置（MyBatis 的配置转交给 mybatis-plus 了）
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.ineyee.pojo
+  # 建议优先使用 mybatis-plus 提供的 SQL 实现，所以这个暂时就不需要了
+  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 mybatis-plus 一起使用
+#  mapper-locations: classpath:mappers/*.xml
+```
+
+* 在 mapper 目录下创建一个 XxxMapper 的空接口类即可，这样 mapper 层的 Java 代码就算完成了
+
+```java
+// 在 mapper 目录下创建一个 XxxMapper 的空接口类即可
+// 只要让接口类继承自 BaseMapper，那么该 mapper 层就自动实现了众多接口方法和 mapper 实现
+// 泛型指定一下对应的 po 类
+public interface SingerMapper extends BaseMapper<Singer> {
+}
+```
 
 #### 2、配置
 
-把数据层 dao 相关配置的值都写在 application.yml（MyBatis）、application-dev.yml（开发环境的数据源） 和 application-prd.yml（生产环境的数据源） 这三个配置文件里。
+把数据层 mapper 相关配置的值都写在 application.yml（mybatis-plus）、application-dev.yml（开发环境的数据源） 和 application-prd.yml（生产环境的数据源） 这三个配置文件里。
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，并且在 yml 配置文件里做好配置，SpringBoot 就会自动创建 DruidDataSource、SqlSessionFactoryBean 等对象，并通过属性绑定技术把 yml 配置文件里的值自动绑定到这些对象上去，其它的我们啥也不用再干，不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。
 
@@ -703,7 +733,9 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-#### 1、Java 代码
+#### 1、Java 代码：mybatis-plus 自动生成 service 接口类的方法和 mapper 实现
+
+之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，我们手动创建的接口类和实现的内容其实都差不多，所以我们国内开发者搞了一个库 mybatis-plus 来帮我们自动生成 mapper 接口类的方法和 mapper 实现：
 
 先定义一个 service 接口，然后再定义一个 service 接口的实现类、用 @Service 修饰一下放入父 IoC 容器里、自动注入 dao。
 
