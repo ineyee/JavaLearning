@@ -14,8 +14,8 @@ myBatis-plus:
   configuration:
     map-underscore-to-camel-case: true
   type-aliases-package: com.ineyee.pojo
-  # 建议优先使用 MyBatis-Plus 提供的 SQL 实现，所以这个暂时就不需要了
-  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 MyBatis-Plus 一起使用
+  # 单表 CRUD 一般用 MyBatis-Plus 提供的 SQL 实现就足够了，所以这个暂时就不需要了
+  # 多表查询才有自定义 SQL 的必要，打开这个，去自定义 mapper.xml 实现，跟 MyBatis-Plus 一起使用不会冲突
 #  mapper-locations: classpath:mappers/*.xml
 
 # PageHelper 相关配置

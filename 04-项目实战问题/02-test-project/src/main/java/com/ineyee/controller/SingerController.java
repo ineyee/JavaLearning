@@ -24,27 +24,27 @@ public class SingerController {
     /*
      url = http://localhost:9999/tp-dev/singer/get?id=21
      */
-    @GetMapping("/get")
-    @ResponseBody
-    public HttpResult<Singer> get(@RequestParam(value = "id", required = true) Integer id) throws ServiceException {
-        Singer user = singerService.get(Long.valueOf(id));
-        if (user != null) {
-            return HttpResult.ok(user);
-        } else {
-            throw new ServiceException(UserError.USER_NOT_EXIST.getCode(), UserError.USER_NOT_EXIST.getMessage());
-        }
-    }
-
-//    /*
-//     url = http://localhost:9999/tp-dev/singer/list?pageSize=3&pageNum=2
-//     */
-//    @GetMapping("/list")
+//    @GetMapping("/get")
 //    @ResponseBody
-//    public HttpResult<List<Singer>> list(@RequestParam(value = "pageSize", required = true) Integer pageSize,
-//                                       @RequestParam(value = "pageNum", required = true) Integer pageNum) throws ServiceException {
-//        List<Singer> userList = singerService.list(pageSize, pageNum);
-//        return HttpResult.ok(userList);
+//    public HttpResult<Singer> get(@RequestParam(value = "id", required = true) Integer id) throws ServiceException {
+//        Singer user = singerService.get(Long.valueOf(id));
+//        if (user != null) {
+//            return HttpResult.ok(user);
+//        } else {
+//            throw new ServiceException(UserError.USER_NOT_EXIST.getCode(), UserError.USER_NOT_EXIST.getMessage());
+//        }
 //    }
+
+    /*
+     url = http://localhost:9999/tp-dev/singer/list?pageSize=3&pageNum=2
+     */
+    @GetMapping("/list")
+    @ResponseBody
+    public HttpResult<List<Singer>> list(@RequestParam(value = "pageSize", required = true) Integer pageSize,
+                                         @RequestParam(value = "pageNum", required = true) Integer pageNum) throws ServiceException {
+        List<Singer> userList = singerService.list();
+        return HttpResult.ok(userList);
+    }
 //
 //    /*
 //     url = http://localhost:9999/tp-dev/singer/list?pageSize=3&pageNum=2

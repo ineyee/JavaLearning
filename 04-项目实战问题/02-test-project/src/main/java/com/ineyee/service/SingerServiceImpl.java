@@ -15,11 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//@Service
-//@Transactional
-//public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> implements SingerService {
-//
-//}
+// 在 service 目录下创建一个 XxxServiceImpl 的空实现类即可
+// 需要让我们的接口类继承自 MyBatis-Plus 的 ServiceImpl 接口，这样一来当前实现类就自动拥有了众多接口方法的实现
+// 泛型需要指定一下对应的 mapper 类 和 po 类
+@Service
+@Transactional
+public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> implements SingerService {
+}
 
 // 出于演示简单起见，这个业务层就不做业务规则校验了，直接调用 dao 的 API
 //
@@ -43,65 +45,65 @@ import java.util.Map;
 // 注意：业务层绝对不是数据层的马甲层，它有存在的意义，比如同样都是 save 方法，数据层里的 save 就是直接往数据库里写数据
 // 而业务层里的 save 则需要首先判断数据库里存不存在这个用户邮箱，存在的话就跳过，不存在的话再往数据库里写，因为用户邮箱是不允许重复的
 // 也就是说，业务层的一个方法里可能会调用数据层里的多个方法来共同完成一个业务
-@Service
-@Transactional
-public class SingerServiceImpl implements SingerService {
-    @Autowired
-    private SingerMapper singerMapper;
-
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public Singer get(Long id) {
-        return singerMapper.selectById(id);
-    }
-
+//@Service
+//@Transactional
+//public class SingerServiceImpl implements SingerService {
+//    @Autowired
+//    private SingerMapper singerMapper;
+//
 //    @Override
 //    @Transactional(propagation = Propagation.SUPPORTS)
-//    public List<Singer> list(Integer pageSize, Integer pageNum) {
-//        return singerMapper.selectPage(Map.of(
-//                "limit", pageSize,
-//                "offset", (pageNum - 1) * pageSize
-//        ));
+//    public Singer get(Long id) {
+//        return singerMapper.selectById(id);
+//    }
+//
+/// /    @Override
+/// /    @Transactional(propagation = Propagation.SUPPORTS)
+/// /    public List<Singer> list(Integer pageSize, Integer pageNum) {
+/// /        return singerMapper.selectPage(Map.of(
+/// /                "limit", pageSize,
+/// /                "offset", (pageNum - 1) * pageSize
+/// /        ));
+/// /    }
+/// /
+/// /    @Override
+/// /    public List<Singer> listPageHelper(Integer pageSize, Integer pageNum) {
+/// /        PageHelper.startPage(pageNum, pageSize);
+/// /        return singerMapper.listPageHelper();
+/// /    }
+//
+//    @Override
+//    public Singer save(Singer singer) {
+//        int ret = singerMapper.insert(singer);
+//        return ret > 0 ? singer : null;
 //    }
 //
 //    @Override
-//    public List<Singer> listPageHelper(Integer pageSize, Integer pageNum) {
-//        PageHelper.startPage(pageNum, pageSize);
-//        return singerMapper.listPageHelper();
+//    public List<Long> saveBatch(List<Singer> singerList) {
+//        List<BatchResult> ret = singerMapper.insert(singerList);
+//        return !ret.isEmpty() ? singerList.stream().map(Singer::getId).toList() : new ArrayList<>();
 //    }
-
-    @Override
-    public Singer save(Singer singer) {
-        int ret = singerMapper.insert(singer);
-        return ret > 0 ? singer : null;
-    }
-
-    @Override
-    public List<Long> saveBatch(List<Singer> singerList) {
-        List<BatchResult> ret = singerMapper.insert(singerList);
-        return !ret.isEmpty() ? singerList.stream().map(Singer::getId).toList() : new ArrayList<>();
-    }
-
-    @Override
-    public Boolean remove(Long id) {
-        int ret = singerMapper.deleteById(id);
-        return ret > 0;
-    }
-
-    @Override
-    public Boolean removeBatch(List<Long> idList) {
-        int ret = singerMapper.deleteByIds(idList);
-        return ret > 0;
-    }
-
-    @Override
-    public Boolean update(Singer singer) {
-        return singerMapper.insertOrUpdate(singer);
-    }
-
-    @Override
-    public Boolean updateBatch(List<Singer> singerList) {
-        List<BatchResult> ret = singerMapper.insertOrUpdate(singerList);
-        return !ret.isEmpty();
-    }
-}
+//
+//    @Override
+//    public Boolean remove(Long id) {
+//        int ret = singerMapper.deleteById(id);
+//        return ret > 0;
+//    }
+//
+//    @Override
+//    public Boolean removeBatch(List<Long> idList) {
+//        int ret = singerMapper.deleteByIds(idList);
+//        return ret > 0;
+//    }
+//
+//    @Override
+//    public Boolean update(Singer singer) {
+//        return singerMapper.insertOrUpdate(singer);
+//    }
+//
+//    @Override
+//    public Boolean updateBatch(List<Singer> singerList) {
+//        List<BatchResult> ret = singerMapper.insertOrUpdate(singerList);
+//        return !ret.isEmpty();
+//    }
+//}

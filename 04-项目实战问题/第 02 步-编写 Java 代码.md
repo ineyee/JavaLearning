@@ -75,8 +75,8 @@ myBatis-plus:
   configuration:
     map-underscore-to-camel-case: true
   type-aliases-package: com.ineyee.pojo
-  # 建议优先使用 MyBatis-Plus 提供的 SQL 实现，所以这个暂时就不需要了
-  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 MyBatis-Plus 一起使用
+  # 单表 CRUD 一般用 MyBatis-Plus 提供的 SQL 实现就足够了，所以这个暂时就不需要了
+  # 多表查询才有自定义 SQL 的必要，打开这个，去自定义 mapper.xml 实现，跟 MyBatis-Plus 一起使用不会冲突
 #  mapper-locations: classpath:mappers/*.xml
   
 # PageHelper 相关配置
@@ -944,7 +944,7 @@ public class OrderBO {
 
 ## 九九、补充
 
-#### ✅ 1、表现层之模型层：domain -> pojo
+#### ✅ 1、domain -> pojo（表现层之模型层）
 
 之前的表现层之模型层，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。
 
@@ -959,11 +959,11 @@ public class OrderBO {
 | DTO：Data Transfer Object<br />数据传输对象 | 关注数据传输效率<br /><br />po 和 bo 的属性其实都还是对数据库表里字段的映射，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
 | VO：View Object<br />视图对象               | 关注前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象，比如 dto 里的数据是没有国际化的、而 vo 里的数据就是经过国际化后的数据<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br />但有的话，前端的界面展示会更加动态化        |
 
-#### 2、数据层 & 业务层：MyBatis-Plus
+#### 2、MyBatis-Plus（数据层 & 业务层）
 
 一看到 MyBatis-Plus 这个名字里的“MyBatis”，我们可能会认为它跟 MyBatis 一样是个数据层的框架；一看到 MyBatis-Plus 这个名字里的“Plus”，我们可能会认为它是 MyBatis 的增强版、比 MyBatis 的 API 更好用了；换句话说我们可能会认为 MyBatis-Plus 是一个更好用的数据层框架，我们可以用它替换掉 MyBatis 来实现数据层，其实这个理解是错误的。
 
-MyBatis-Plus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架、没有 MyBatis 它也将不复存在；MyBatis-Plus 名字里的“Plus”是指它是一个横跨数据层和业务层的框架；换句话说 MyBatis-Plus 是一个基于 MyBatis、横跨数据层和业务层的数据访问基础设施框架。接下来我们就看看它能帮我们干些啥：
+MyBatis-Plus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架、没有 MyBatis 它也将不复存在；MyBatis-Plus 名字里的“Plus”是指它是一个横跨数据层和业务层的框架；换句话说 **MyBatis-Plus 是一个基于 MyBatis、横跨数据层和业务层的数据访问基础设施框架，它的设计理念是减少单表 CRUD 在数据层和业务层的重复操作，所以多表查询还是得靠我们用老方法自己实现**。接下来我们就看看它能帮我们干些啥：
 
 **MyBatis-Plus 虽然名字叫 mybatis，但它不仅是 mybatis 的xxx，而且还包含了业务层一些重复的、跟业务逻辑没关的、直接调用数据层 api 的操作，这样一来我们在业务层就可以真正专注于写业务相关的代码，这种跟业务无关的重复代码用它提供的就好了**
 
@@ -972,10 +972,10 @@ MyBatis-Plus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架
 ```xml
 <!-- MyBatis-Plus -->
 <dependency>
-  <groupId>com.baomidou</groupId>
-  <artifactId>MyBatis-Plus-boot-starter</artifactId>
-  <version>3.5.16</version>
-  <scope>compile</scope>
+    <groupId>com.baomidou</groupId>
+    <artifactId>mybatis-plus-boot-starter</artifactId>
+    <version>3.5.15</version>
+    <scope>compile</scope>
 </dependency>
 ```
 
@@ -987,12 +987,12 @@ myBatis-plus:
   configuration:
     map-underscore-to-camel-case: true
   type-aliases-package: com.ineyee.pojo
-  # 建议优先使用 MyBatis-Plus 提供的 SQL 实现，所以这个暂时就不需要了
-  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 MyBatis-Plus 一起使用
+  # 单表 CRUD 一般用 MyBatis-Plus 提供的 SQL 实现就足够了，所以这个暂时就不需要了
+  # 多表查询才有自定义 SQL 的必要，打开这个，去自定义 mapper.xml 实现，跟 MyBatis-Plus 一起使用不会冲突
 #  mapper-locations: classpath:mappers/*.xml
 ```
 
-###### 2.1 数据层
+###### 2.1 对数据层的影响
 
 之前我们是根据每张表手动创建一个对应的 mapper 接口类 ①，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法 ②；然后再手动创建一个对应的 mapper 实现 ③，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库 ④。
 
@@ -1006,15 +1006,29 @@ public interface SingerMapper extends BaseMapper<Singer> {
 }
 ```
 
-###### 2.2 业务层
+###### 2.2 对业务层的影响
 
+之前我们是根据每张表手动创建一个对应的 service 接口类 ①，为这个接口类添加 get、list、save、saveBatch、remove、removeBatch、update、updateBatch 等方法 ②；然后再手动创建一个对应的 serviceImpl 实现 ③，在这个 serviceImpl 实现里编写对应业务规则校验 + 调用数据层的 API ④。
 
+但实际开发中有那么多张表，并且我们为每张表手动创建的 service 接口类里的内容和 serviceImpl 实现里的内容其实都差不多，全手动搞的话就显得繁琐了。有了 MyBatis-Plus，我们只需要做“创建一个对应的 service 接口类”和“创建一个对应的 serviceImpl 实现”这两件事即可，其它两件事它都帮我们做了：
 
+```java
+// 在 service 目录下创建一个 XxxService 的空接口类即可
+// 需要让我们的接口类继承自 MyBatis-Plus 的 IService 接口，这样一来当前接口类就自动拥有了众多接口方法
+// 泛型需要指定一下对应的 po 类
+public interface SingerService extends IService<Singer> {
+}
+```
 
-
-#### 1、Java 代码：MyBatis-Plus 自动生成 mapper 接口类的方法和 mapper 实现
-
-#### 2、配置
+```java
+// 在 service 目录下创建一个 XxxServiceImpl 的空实现类即可
+// 需要让我们的接口类继承自 MyBatis-Plus 的 ServiceImpl 接口，这样一来当前实现类就自动拥有了众多接口方法的实现
+// 泛型需要指定一下对应的 mapper 类 和 po 类
+@Service
+@Transactional
+public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> implements SingerService {
+}
+```
 
 
 
