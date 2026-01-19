@@ -70,13 +70,13 @@ spring:
       # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
       load-on-startup: 0
 
-# mybatis-plus 相关配置（MyBatis 的配置转交给 mybatis-plus 了）
-mybatis-plus:
+# MyBatis-Plus 相关配置（MyBatis 的配置转交给 MyBatis-Plus 了）
+myBatis-plus:
   configuration:
     map-underscore-to-camel-case: true
   type-aliases-package: com.ineyee.pojo
-  # 建议优先使用 mybatis-plus 提供的 SQL 实现，所以这个暂时就不需要了
-  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 mybatis-plus 一起使用
+  # 建议优先使用 MyBatis-Plus 提供的 SQL 实现，所以这个暂时就不需要了
+  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 MyBatis-Plus 一起使用
 #  mapper-locations: classpath:mappers/*.xml
   
 # PageHelper 相关配置
@@ -583,23 +583,6 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-#### 1、domain -> pojo
-
-之前的表现层之模型层，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。
-
-但是实际开发中“一个 domain 走天下”可能并不太合适，而是会有各种模型、这些模型统称为 POJO（Plain Ordinary Java Object、简单的 Java 对象）：
-
-![image-20260112170830372](第 02 步-编写 Java 代码/img/image-20260112170830372.png)
-
-| 模型                                        | 职责                                                         | 阶段                                                | 是否必须有                                                   |
-| ------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------ |
-| PO：Persistent Object<br />持久化对象       | 关注数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量**（成员变量的类型更加注重方便数据库存储）**、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                 | po 必须有                                                    |
-| BO：Business Object<br />业务对象           | 关注业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表——也就是一个 po ——就能完成，也可能需要联合多张表——也就是多个 po ——才能完成<br /><br />这个类内部一般就是编写构造方法、成员变量**（成员变量的类型更加注重业务语义）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法都写在这里** | 把 po 转换成 bo、把 bo 从数据层传到业务层           | bo 可以没有<br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
-| DTO：Data Transfer Object<br />数据传输对象 | 关注数据传输效率<br /><br />po 和 bo 的属性其实都还是对数据库表里字段的映射，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
-| VO：View Object<br />视图对象               | 关注前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象，比如 dto 里的数据是没有国际化的、而 vo 里的数据就是经过国际化后的数据<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br />但有的话，前端的界面展示会更加动态化        |
-
-#### 2、mybatis-generator 自动生成 po
-
 之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得效率非常低，好在 MyBatis 官方提供了一个插件 mybatis-generator 来帮我们自动生成 po`（建议先把 po 生成到 test 目录下，然后再把需要的 po 复制一份到 main 目录下，因为每次自动生成 po 都会覆盖上一次生成的，所以如果直接生成到 main 目录下，就有可能覆盖掉我们自己手动增加的一些改动）`：
 
 * 添加 mybatis-generator 插件
@@ -676,38 +659,38 @@ api 目录里的东西基本都是固定的，可以直接拷贝一份到项目�
 
 ![image-20260113122203302](第 02 步-编写 Java 代码/img/image-20260113122203302.png)
 
-## ✅ 九、数据层 mapper
+## 九、数据层 mapper
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-#### 1、Java 代码：mybatis-plus 自动生成 mapper 接口类的方法和 mapper 实现
+#### 1、Java 代码：MyBatis-Plus 自动生成 mapper 接口类的方法和 mapper 实现
 
-之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，我们手动创建的接口类和实现的内容其实都差不多，所以我们国内开发者搞了一个库 mybatis-plus 来帮我们自动生成 mapper 接口类的方法和 mapper 实现：
+之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，我们手动创建的接口类和实现的内容其实都差不多，所以我们国内开发者搞了一个库 MyBatis-Plus 来帮我们自动生成 mapper 接口类的方法和 mapper 实现：
 
-* 添加 mybatis-plus 依赖
+* 添加 MyBatis-Plus 依赖
 
 ```xml
-<!-- mybatis-plus，自动生成 mapper 接口类的方法和 mapper 实现 -->
+<!-- MyBatis-Plus，自动生成 mapper 接口类的方法和 mapper 实现 -->
 <dependency>
   <groupId>com.baomidou</groupId>
-  <artifactId>mybatis-plus-boot-starter</artifactId>
+  <artifactId>MyBatis-Plus-boot-starter</artifactId>
   <version>3.5.16</version>
   <scope>compile</scope>
 </dependency>
 ```
 
-* 在 application.yml 文件里添加 mybatis-plus 的配置（MyBatis 的配置转交给 mybatis-plus 了）
+* 在 application.yml 文件里添加 MyBatis-Plus 的配置（MyBatis 的配置转交给 MyBatis-Plus 了）
 
 ```yml
-# mybatis-plus 相关配置（MyBatis 的配置转交给 mybatis-plus 了）
-mybatis-plus:
+# MyBatis-Plus 相关配置（MyBatis 的配置转交给 MyBatis-Plus 了）
+MyBatis-Plus:
   configuration:
     map-underscore-to-camel-case: true
   type-aliases-package: com.ineyee.pojo
-  # 建议优先使用 mybatis-plus 提供的 SQL 实现，所以这个暂时就不需要了
-  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 mybatis-plus 一起使用
+  # 建议优先使用 MyBatis-Plus 提供的 SQL 实现，所以这个暂时就不需要了
+  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 MyBatis-Plus 一起使用
 #  mapper-locations: classpath:mappers/*.xml
 ```
 
@@ -723,7 +706,7 @@ public interface SingerMapper extends BaseMapper<Singer> {
 
 #### 2、配置
 
-把数据层 mapper 相关配置的值都写在 application.yml（mybatis-plus）、application-dev.yml（开发环境的数据源） 和 application-prd.yml（生产环境的数据源） 这三个配置文件里。
+把数据层 mapper 相关配置的值都写在 application.yml（MyBatis-Plus）、application-dev.yml（开发环境的数据源） 和 application-prd.yml（生产环境的数据源） 这三个配置文件里。
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，并且在 yml 配置文件里做好配置，SpringBoot 就会自动创建 DruidDataSource、SqlSessionFactoryBean 等对象，并通过属性绑定技术把 yml 配置文件里的值自动绑定到这些对象上去，其它的我们啥也不用再干，不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。
 
@@ -733,9 +716,11 @@ public interface SingerMapper extends BaseMapper<Singer> {
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-#### 1、Java 代码：mybatis-plus 自动生成 service 接口类的方法和 mapper 实现
+#### 1、Java 代码：MyBatis-Plus 自动生成 service 接口类的方法和 service 实现
 
-之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，我们手动创建的接口类和实现的内容其实都差不多，所以我们国内开发者搞了一个库 mybatis-plus 来帮我们自动生成 mapper 接口类的方法和 mapper 实现：
+会自动生成众多业务层方法，如果满足我们的需要那就直接使用提供的就好了，如果不满足我们的需要（如需要做很多业务规则校验），那就重写提供的接口方法自己实现即可。
+
+之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，我们手动创建的接口类和实现的内容其实都差不多，所以我们国内开发者搞了一个库 MyBatis-Plus 来帮我们自动生成 mapper 接口类的方法和 mapper 实现：
 
 先定义一个 service 接口，然后再定义一个 service 接口的实现类、用 @Service 修饰一下放入父 IoC 容器里、自动注入 dao。
 
@@ -758,74 +743,6 @@ public interface SingerMapper extends BaseMapper<Singer> {
 #### 2、配置
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动配置消息转换器（String 和 JSON 响应体的编码方式、默认就是 UTF-8，LocalDateTime 序列化为 ISO-8601 字符串格式等），自动配置参数是否必传的验证器，我们同样不再需要像以前一样“在 Spring 的子配置文件里配置一大堆东西”。controller 里该用啥用啥，其它的我们啥也不用再干。
-
-## 十二、仍需手动配置的东西
-
-#### 1、拦截器
-
-创建配置类添加拦截器
-
-```java
-@Configuration
-public class SpringMVCConfig implements WebMvcConfigurer {
-    // 自动注入拿到 HTTP 请求日志拦截器
-    @Autowired
-    private HttpLogInterceptor httpLogInterceptor;
-
-    // 添加拦截器
-    //
-    // 设置拦截器能拦截那些请求：这里的请求就是我们通过 / 设置了 DispatcherServlet 会拦截接口型请求 + 会拦截静态资源型请求这两种
-    // 虽然 DispatcherServlet 把静态资源型请求转交给服务器默认的处理了，但拦截它肯定是会先拦截下来的，也就是说先拦截后转交，而不是直接转交
-    // /*：代表 http://xxx/applicationContext/xxx 这种一级路径的请求才会被拦截
-    // /**：代表 http://xxx/applicationContext/xxx、http://xxx/applicationContext/xxx/xxx 这种一级路径或 N 级路径的请求都会被拦截
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(httpLogInterceptor)
-                .addPathPatterns("/**");
-    }
-}
-```
-
-#### 2、过滤器
-
-创建配置类添加过滤器（HTTP 请求参数编码方式的过滤器已经被 SpringBoot 自动配置了、默认就是 UTF-8，我们只需要手动配置自定义的过滤器即可）
-
-```java
-/**
- * 过滤器配置类，只需要创建这个配置类就行了，其它地方不需要配置，SpringBoot 会自动完成其它工作
- * 用于注册自定义过滤器到 Spring 容器
- */
-@Configuration
-public class FilterConfig {
-    /**
-     * 注册请求体缓存过滤器
-     * 当 Spring 容器启动时，Spring 会调用这个方法，拿到返回的 FilterRegistrationBean，自动注册到 Servlet 容器中
-     */
-    @Bean
-    public FilterRegistrationBean<CachedBodyFilter> cachedBodyFilter() {
-        FilterRegistrationBean<CachedBodyFilter> registration = new FilterRegistrationBean<>();
-
-        // 设置过滤器实例
-        registration.setFilter(new CachedBodyFilter());
-
-        // 设置拦截路径
-        // /* 拦截所有请求：接口型请求 + 静态资源请求 + 动态资源请求
-        registration.addUrlPatterns("/*");
-
-        // 设置过滤器执行顺序（非常重要！）
-        // HIGHEST_PRECEDENCE = Integer.MIN_VALUE，表示最高优先级，最先执行
-        // 确保在 HTTP 请求日志拦截器之前包装请求
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
-
-        // 设置过滤器名称（可选，用于日志和调试）
-        registration.setName("cachedBodyFilter");
-
-        return registration;
-    }
-}
-```
-
-
 
 ***
 
@@ -1024,3 +941,80 @@ public class OrderBO {
 
  }
 ```
+
+## 九九、补充
+
+#### ✅ 1、表现层之模型层：domain -> pojo
+
+之前的表现层之模型层，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。
+
+但是实际开发中“一个 domain 走天下”可能并不太合适，而是会有各种模型、这些模型统称为 POJO（Plain Ordinary Java Object、简单的 Java 对象）：
+
+![image-20260112170830372](第 02 步-编写 Java 代码/img/image-20260112170830372.png)
+
+| 模型                                        | 职责                                                         | 阶段                                                | 是否必须有                                                   |
+| ------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------ |
+| PO：Persistent Object<br />持久化对象       | 关注数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量**（成员变量的类型更加注重方便数据库存储）**、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                 | po 必须有                                                    |
+| BO：Business Object<br />业务对象           | 关注业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表——也就是一个 po ——就能完成，也可能需要联合多张表——也就是多个 po ——才能完成<br /><br />这个类内部一般就是编写构造方法、成员变量**（成员变量的类型更加注重业务语义）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法都写在这里** | 把 po 转换成 bo、把 bo 从数据层传到业务层           | bo 可以没有<br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
+| DTO：Data Transfer Object<br />数据传输对象 | 关注数据传输效率<br /><br />po 和 bo 的属性其实都还是对数据库表里字段的映射，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
+| VO：View Object<br />视图对象               | 关注前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象，比如 dto 里的数据是没有国际化的、而 vo 里的数据就是经过国际化后的数据<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br />但有的话，前端的界面展示会更加动态化        |
+
+#### 2、数据层 & 业务层：MyBatis-Plus
+
+一看到 MyBatis-Plus 这个名字里的“MyBatis”，我们可能会认为它跟 MyBatis 一样是个数据层的框架；一看到 MyBatis-Plus 这个名字里的“Plus”，我们可能会认为它是 MyBatis 的增强版、比 MyBatis 的 API 更好用了；换句话说我们可能会认为 MyBatis-Plus 是一个更好用的数据层框架，我们可以用它替换掉 MyBatis 来实现数据层，其实这个理解是错误的。
+
+MyBatis-Plus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架、没有 MyBatis 它也将不复存在；MyBatis-Plus 名字里的“Plus”是指它是一个横跨数据层和业务层的框架；换句话说 MyBatis-Plus 是一个基于 MyBatis、横跨数据层和业务层的数据访问基础设施框架。接下来我们就看看它能帮我们干些啥：
+
+**MyBatis-Plus 虽然名字叫 mybatis，但它不仅是 mybatis 的xxx，而且还包含了业务层一些重复的、跟业务逻辑没关的、直接调用数据层 api 的操作，这样一来我们在业务层就可以真正专注于写业务相关的代码，这种跟业务无关的重复代码用它提供的就好了**
+
+* 添加 MyBatis-Plus 依赖
+
+```xml
+<!-- MyBatis-Plus -->
+<dependency>
+  <groupId>com.baomidou</groupId>
+  <artifactId>MyBatis-Plus-boot-starter</artifactId>
+  <version>3.5.16</version>
+  <scope>compile</scope>
+</dependency>
+```
+
+* 在 application.yml 文件里添加 MyBatis-Plus 的配置（MyBatis 的配置转交给 MyBatis-Plus 了）
+
+```yml
+# MyBatis-Plus 相关配置（MyBatis 的配置转交给 MyBatis-Plus 了）
+myBatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.ineyee.pojo
+  # 建议优先使用 MyBatis-Plus 提供的 SQL 实现，所以这个暂时就不需要了
+  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 MyBatis-Plus 一起使用
+#  mapper-locations: classpath:mappers/*.xml
+```
+
+###### 2.1 数据层
+
+之前我们是根据每张表手动创建一个对应的 mapper 接口类 ①，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法 ②；然后再手动创建一个对应的 mapper 实现 ③，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库 ④。
+
+但实际开发中有那么多张表，并且我们为每张表手动创建的 mapper 接口类里的内容和 mapper 实现里的内容其实都差不多，全手动搞的话就显得繁琐了。有了 MyBatis-Plus，我们只需要做“创建一个对应的 mapper 接口类”这一件事即可，其它三件事它都帮我们做了：
+
+```java
+// 在 mapper 目录下创建一个 XxxMapper 的空接口类即可
+// 只要让接口类继承自 BaseMapper，那么该 mapper 层就自动实现了众多接口方法和 mapper 实现
+// 泛型指定一下对应的 po 类
+public interface SingerMapper extends BaseMapper<Singer> {
+}
+```
+
+###### 2.2 业务层
+
+
+
+
+
+#### 1、Java 代码：MyBatis-Plus 自动生成 mapper 接口类的方法和 mapper 实现
+
+#### 2、配置
+
+
+

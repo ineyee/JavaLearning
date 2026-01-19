@@ -9,13 +9,13 @@ spring:
       # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
       load-on-startup: 0
 
-# mybatis-plus 相关配置（MyBatis 的配置转交给 mybatis-plus 了）
-mybatis-plus:
+# MyBatis-Plus 相关配置（MyBatis 的配置转交给 MyBatis-Plus 了）
+myBatis-plus:
   configuration:
     map-underscore-to-camel-case: true
   type-aliases-package: com.ineyee.pojo
-  # 建议优先使用 mybatis-plus 提供的 SQL 实现，所以这个暂时就不需要了
-  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 mybatis-plus 一起使用
+  # 建议优先使用 MyBatis-Plus 提供的 SQL 实现，所以这个暂时就不需要了
+  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 MyBatis-Plus 一起使用
 #  mapper-locations: classpath:mappers/*.xml
 
 # PageHelper 相关配置

@@ -1,8 +1,11 @@
 package com.ineyee.pojo.po;
 
+import jakarta.validation.constraints.NotNull;
+
 public class Singer {
     private Long id;
 
+    @NotNull
     private String name;
 
     private String sex;
