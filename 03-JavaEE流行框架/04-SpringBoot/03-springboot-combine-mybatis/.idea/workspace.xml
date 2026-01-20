@@ -5,21 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de499fe2-4ff5-4928-9789-7c32cab2d631" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/controller/SingerController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/mapper/SingerMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/po/Singer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/cfg/MyBatisPlusCfg.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/query/ListQuery.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/query/SingerGetQuery.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/query/SingerListQuery.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerCreateBatchReq.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerCreateReq.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerDeleteBatchReq.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerDeleteReq.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerUpdateBatchReq.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerUpdateReq.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/po/DictI18n.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/po/DictItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/po/DictType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/application-dev.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/application-prd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/application-prd.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/logback-spring.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/logback-spring.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/controller/SingerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/controller/SingerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/mapper/SingerMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/mapper/SingerMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/第 02 步-编写 Java 代码.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/第 02 步-编写 Java 代码.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -124,21 +125,11 @@
       <workItem from="1767664772563" duration="20000" />
       <workItem from="1768549033349" duration="950000" />
       <workItem from="1768550955663" duration="5709000" />
+      <workItem from="1768905136080" duration="400000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/ineyee/controller/UserController.java</url>
-          <line>62</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

@@ -944,20 +944,184 @@ public class OrderBO {
 
 ## 九九、补充
 
-#### ✅ 1、domain -> pojo（表现层之模型层）
+#### 1、domain -> pojo（表现层之模型层）
 
-之前的表现层之模型层，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。
+响应体模型和请求参数模型统称为 POJO（Plain Ordinary Java Object、简单的 Java 对象）。
 
-但是实际开发中“一个 domain 走天下”可能并不太合适，而是会有各种模型、这些模型统称为 POJO（Plain Ordinary Java Object、简单的 Java 对象）：
+###### ✅ 1.1 响应体模型
+
+之前的响应体模型，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。但是实际开发中“一个 domain 走天下”可能并不太合适，而是会有各种模型：
 
 ![image-20260112170830372](第 02 步-编写 Java 代码/img/image-20260112170830372.png)
 
 | 模型                                        | 职责                                                         | 阶段                                                | 是否必须有                                                   |
 | ------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------ |
-| PO：Persistent Object<br />持久化对象       | 关注数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量**（成员变量的类型更加注重方便数据库存储）**、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                 | po 必须有                                                    |
-| BO：Business Object<br />业务对象           | 关注业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表——也就是一个 po ——就能完成，也可能需要联合多张表——也就是多个 po ——才能完成<br /><br />这个类内部一般就是编写构造方法、成员变量**（成员变量的类型更加注重业务语义）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法都写在这里** | 把 po 转换成 bo、把 bo 从数据层传到业务层           | bo 可以没有<br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
-| DTO：Data Transfer Object<br />数据传输对象 | 关注数据传输效率<br /><br />po 和 bo 的属性其实都还是对数据库表里字段的映射，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
-| VO：View Object<br />视图对象               | 关注前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象，比如 dto 里的数据是没有国际化的、而 vo 里的数据就是经过国际化后的数据<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br />但有的话，前端的界面展示会更加动态化        |
+| PO：Persistent Object<br />持久化对象       | po 关注的是数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                 | po 必须有                                                    |
+| BO：Business Object<br />业务对象           | bo 关注的是业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表、也就是一个 po 就能完成，也可能需要联合多张表、也就是多个 po 才能完成（比如个人简介是一个 po、技术栈是一个 po、项目经验是一个 po，而个人简历则是一个 bo，由三个 po 联合完成）<br /><br />这个类内部一般就是编写构造方法、成员变量**（但是成员变量的类型可以跟数据库里不一样了，应该更加注重业务语义，比如数据库里用 0、1、2 这种整型来代表枚举，这个类里就可以用枚举类型了）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法** | 把 po 转换成 bo、把 bo 从数据层传到业务层           | bo 可以没有<br /><br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
+| DTO：Data Transfer Object<br />数据传输对象 | dto 关注的是数据传输效率<br /><br />po 和 bo 的属性其实都还是跟数据库表里的字段一一对应，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 里的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br /><br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
+| VO：View Object<br />视图对象               | vo 关注的是前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象（比如 dto 里的数据是没有国际化的，而 vo 里的数据就是经过国际化后的数据）<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br /><br />但有的话，前端的界面展示会更加动态化  |
+
+###### 1.2 请求参数模型
+
+之前我们学习了很多种接收请求参数的方式，现在汇总敲定一下规范：
+
+* get 请求时，不需要注解修饰、把所有参数都接收到一个请求参数模型里
+* post 请求
+  * 表单提交时，不需要注解修饰、把所有参数都接收到一个请求参数模型里
+  * JSON 提交时，使用 @RequestBody 注解修饰、把所有参数都接收到一个请求参数模型里
+
+把所有参数都接收到一个请求参数模型里的好处是可以设置参数是否必传、参数统一管理 & 扩展参数方便，所以该创建类就创建类、不要觉得累赘。请求参数模型一般有下面几种：
+
+```
+├─pojo/
+│  ├─req/
+│  │  ├─XxxCreateReq
+│  │  ├─XxxCreateBatchReq
+│  │  ├─XxxDeleteReq
+│  │  ├─XxxDeleteBatchReq
+│  │  ├─XxxUpdateReq
+│  │  ├─XxxUpdateBatchReq
+│  ├─query/
+│  │  ├─param/(公共查询条件，可被多个业务复用)
+│  │  │  ├─PageParam(分页查询条件)
+│  │  │  ├─SortParam(排序查询条件)
+│  │  │  ├─KeywordParam(模糊查询条件)
+│  │  │  ├─
+│  │  ├─XxxQuery(特有业务条件 + 选择性持有上面的公共查询条件)
+
+为什么 XxxQuery 没有 Req 后缀？因为 Create、Update、Delete 跟 Controller 强绑定，语义绝对是“这是一次 HTTP 请求”；而 Query 则可能被 Controller 以外的其它地方使用，所以它的语义不绝对是“这是一次 HTTP 请求”，而仅仅是一个查询条件模型。
+```
+
+```java
+/*
+ 单个保存：请求参数直接用对象
+
+ url = http://localhost:9999/tp-dev/singer/save
+ body = {
+    "name": "库里",
+    "sex": "男"
+ }
+ */
+@Data
+public class SingerCreateReq {
+    // @NotNull name 字段必填
+    @NotNull
+    private String name;
+    private String sex;
+}
+
+/*
+ 批量保存：请求参数最好包一层对象，而不是直接用数组
+
+ url = http://localhost:9999/tp-dev/singer/save
+ body = {
+    "singerList": [
+        { "name": "三三", "sex": "女" },
+        { "name": "四四", "sex": "男" },
+        { "name": "五五" }
+    ]
+ }
+ */
+@Data
+public class SingerCreateBatchReq {
+    // @NotEmpty 保证至少有一条，不是 null、不是 []
+    // @Valid 触发内部 name 必填校验
+    @NotEmpty
+    private List<@Valid SingerCreateReq> singerList;
+}
+```
+
+```java
+/*
+ 单个删除：请求参数直接用对象
+
+ url = http://localhost:9999/tp-dev/singer/remove
+ body = {
+    "id": 1
+ }
+ */
+@Data
+public class SingerDeleteReq {
+    // @NotNull id 字段必填
+    @NotNull
+    private Long id;
+}
+
+/*
+ 批量删除：请求参数最好包一层对象，而不是直接用数组
+
+ url = http://localhost:9999/tp-dev/singer/removeBatch
+ body = {
+    "idList": [1, 2, 3]
+ }
+ */
+@Data
+public class SingerDeleteBatchReq {
+    // @NotEmpty 保证至少有一条，不是 null、不是 []
+    // @NotNull 数组里的 id 不能是 null
+    @NotEmpty
+    private List<@NotNull Long> idList;
+}
+```
+
+```java
+/*
+ 单个更新：请求参数直接用对象
+
+ url = http://localhost:9999/tp-dev/singer/update
+ body = {
+    "id": 1,
+    "name": "Curry"
+ }
+ */
+@Data
+public class SingerUpdateReq {
+    // @NotNull id 字段必填
+    @NotNull
+    private Long id;
+
+    private String name;
+    private String sex;
+}
+
+/*
+ 批量更新：请求参数最好包一层对象，而不是直接用数组
+
+ url = http://localhost:9999/tp-dev/singer/updateBatch
+ body = {
+    "singerList": [
+        { "id": 1, "name": "三三" },
+        { "id": 2, "sex": "男" },
+        { "id": 3, "name": "五五", "sex": "女" }
+    ]
+ }
+ */
+@Data
+public class SingerUpdateBatchReq {
+    // @NotEmpty 保证至少有一条，不是 null、不是 []
+    // @Valid 触发内部 id 必填校验
+    @NotEmpty
+    private List<@Valid SingerUpdateReq> singerList;
+}
+```
+
+```java
+// 单个查询：url = http://localhost:9999/tp-dev/singer/get?id=1
+@Data
+public class SingerGetQuery {
+    // @NotNull id 字段必填
+    @NotNull
+    private Long id;
+}
+```
+
+
+
+
+
+
+
+
 
 #### 2、MyBatis-Plus（数据层 & 业务层）
 
