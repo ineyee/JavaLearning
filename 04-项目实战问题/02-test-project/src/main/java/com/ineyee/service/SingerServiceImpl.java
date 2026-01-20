@@ -3,7 +3,6 @@ package com.ineyee.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.PageHelper;
 import com.ineyee.api.exception.ServiceException;
 import com.ineyee.mapper.SingerMapper;
 import com.ineyee.pojo.po.Singer;
@@ -119,15 +118,14 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
                 .orderByDesc(Singer::getId);
 
         // 有模糊搜索参数
-        if (StringUtils.hasText(query.getKeyword())) {
+        if (query.getKeyword() != null && !query.getKeyword().isEmpty()) {
             // 在姓名和性别中字段中模糊搜索
             wrapper.like(Singer::getName, query.getKeyword())
                     .or()
                     .like(Singer::getSex, query.getKeyword());
         }
 
-
-        if (query.getPageNum() != null && query.getPageSize() != null) { // 要搞分页，记得添加下 MyBatis-Plus 的分页插件
+        if (query.getPageNum() != null && query.getPageSize() != null) { // 要搞分页，别忘了在 MyBatisPlusConfig 里添加一下 MyBatis-Plus 的分页插件
             Page<Singer> page = new Page<>(query.getPageNum(), query.getPageSize());
 
             // 这里调用 MyBatis-Plus 在 service 层提供的 page 方法，不再直接调用 mapper 层的 selectPage 方法

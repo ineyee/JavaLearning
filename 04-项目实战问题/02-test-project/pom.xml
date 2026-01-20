@@ -129,6 +129,12 @@
             <version>3.5.15</version>
             <scope>compile</scope>
         </dependency>
+        <!-- MyBatis-Plus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+            <version>3.5.15</version>
+        </dependency>
     </dependencies>
 
     <!-- 属性信息 -->

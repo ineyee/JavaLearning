@@ -1113,6 +1113,46 @@ public class SingerGetQuery {
     @NotNull
     private Long id;
 }
+
+@Data
+public class ListQuery {
+    // 分页参数（可选）
+    // 如果数据量巨大时
+    // 一页一条数据，那么 pageNum 就会很大，所以用 Long
+    // 一页多条数据，那么 pageSize 就会很大，所以用 Long
+    private Long pageNum;
+    private Long pageSize;
+
+    public Long getPageNum() {
+        if (pageNum == null) {
+            // null 是有意义的，代表不搞分页
+            return null;
+        }
+
+        // 最小是 1，上不封顶
+        return Math.max(pageNum, 1L);
+    }
+
+    public Long getPageSize() {
+        if (pageSize == null) {
+            // null 是有意义的，代表不搞分页
+            return null;
+        }
+
+        // 最小是 10，上不封顶
+        return Math.max(pageSize, 10L);
+    }
+
+    // 模糊搜索参数（可选）
+    private String keyword;
+}
+// 列表查询：url = http://localhost:9999/tp-dev/singer/list?pageNum=1&pageSize=10
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class SingerListQuery extends ListQuery {
+    // 可按需增加其它参数，如根据性别查询、根据起始日期和结束日期查询等
+    // ......
+}
 ```
 
 
@@ -1141,6 +1181,12 @@ MyBatis-Plus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架
     <version>3.5.15</version>
     <scope>compile</scope>
 </dependency>
+<!-- MyBatis-Plus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
+<dependency>
+    <groupId>com.baomidou</groupId>
+    <artifactId>mybatis-plus-jsqlparser</artifactId>
+    <version>3.5.15</version>
+</dependency> 
 ```
 
 * 在 application.yml 文件里添加 MyBatis-Plus 的配置（MyBatis 的配置转交给 MyBatis-Plus 了）

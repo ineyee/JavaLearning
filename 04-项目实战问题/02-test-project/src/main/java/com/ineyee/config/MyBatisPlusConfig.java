@@ -1,4 +1,4 @@
-package com.ineyee.cfg;
+package com.ineyee.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -7,15 +7,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MyBatisPlusCfg {
+public class MyBatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-
-        // 分页插件拦截器（如果配置多个插件, 切记分页最后添加）
-        PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor(DbType.MYSQL);
-        interceptor.addInnerInterceptor(paginationInnerInterceptor);
-
+        // 添加分页插件，指定数据库类型为 MySQL（如果配置多个插件, 切记分页最后添加）
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
         return interceptor;
     }
 }

@@ -17,10 +17,3 @@ myBatis-plus:
   # 单表 CRUD 一般用 MyBatis-Plus 提供的 SQL 实现就足够了，所以这个暂时就不需要了
   # 多表查询才有自定义 SQL 的必要，打开这个，去自定义 mapper.xml 实现，跟 MyBatis-Plus 一起使用不会冲突
 #  mapper-locations: classpath:mappers/*.xml
-
-# PageHelper 相关配置
-pagehelper:
-  # reasonable 设置为 true，代表使分页查询合理化：
-  #      当 pageNum <= 0 时，自动返回第一页的数据
-  #      当 pageNum > totalPage 时，自动返回最后一页的数据
-  reasonable: true
