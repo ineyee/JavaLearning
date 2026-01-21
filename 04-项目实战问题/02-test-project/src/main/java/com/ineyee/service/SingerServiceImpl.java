@@ -11,6 +11,7 @@ import com.ineyee.pojo.req.SingerCreateBatchReq;
 import com.ineyee.pojo.req.SingerCreateReq;
 import com.ineyee.pojo.req.SingerUpdateBatchReq;
 import com.ineyee.pojo.req.SingerUpdateReq;
+import com.ineyee.pojo.vo.ListData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.BatchResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +110,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
     }
 
     @Override
-    public List<Singer> list(SingerListQuery query) throws ServiceException {
+    public ListData<Singer> list(SingerListQuery query) throws ServiceException {
         // wrapper 用来添加查询条件
         LambdaQueryWrapper<Singer> wrapper = new LambdaQueryWrapper<>();
 
@@ -131,10 +132,22 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
             // 这里调用 MyBatis-Plus 在 service 层提供的 page 方法，不再直接调用 mapper 层的 selectPage 方法
             Page<Singer> queryedPage = page(page, wrapper);
 
-            return queryedPage.getRecords();
+            // 组装查询结果
+            ListData<Singer> listData = new ListData<>();
+            listData.setList(queryedPage.getRecords());
+            listData.setPageNum(query.getPageNum());
+            listData.setPageSize(query.getPageSize());
+            listData.setTotal(queryedPage.getTotal());
+            listData.setTotalPages(queryedPage.getPages());
+            return listData;
         } else { // 不搞分页
             // 这里调用 MyBatis-Plus 在 service 层提供的 list 方法，不再直接调用 mapper 层的 selectList 方法
-            return list(wrapper);
+            List<Singer> singerList = list(wrapper);
+
+            // 组装查询结果
+            ListData<Singer> listData = new ListData<>();
+            listData.setList(singerList);
+            return listData;
         }
     }
 }

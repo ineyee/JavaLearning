@@ -1,0 +1,40 @@
+package com.ineyee.pojo.vo;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class ListData<T> {
+    /**
+     * pojo 数据列表
+     * ① [pojo] 代表本次查询有数据
+     * ② [] 代表本次查询没有数据
+     */
+    private List<T> list;
+
+    /**
+     * 当前第几页
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)  // null 时不序列化
+    private Long pageNum;
+
+    /**
+     * 一页多少条
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long pageSize;
+
+    /**
+     * 数据总条数
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long total;
+
+    /**
+     * 数据总页数
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long totalPages;
+}

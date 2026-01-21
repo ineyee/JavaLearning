@@ -8,6 +8,7 @@ import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerGetQuery;
 import com.ineyee.pojo.query.SingerListQuery;
 import com.ineyee.pojo.req.*;
+import com.ineyee.pojo.vo.ListData;
 import com.ineyee.service.SingerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller()
 @RequestMapping("/singer")
@@ -106,8 +106,8 @@ public class SingerController {
 
     @GetMapping("/list")
     @ResponseBody
-    public HttpResult<List<Singer>> list(@Valid SingerListQuery query) throws ServiceException {
-        List<Singer> userList = singerService.list(query);
-        return HttpResult.ok(userList);
+    public HttpResult<ListData<Singer>> list(@Valid SingerListQuery query) throws ServiceException {
+        ListData<Singer> singerListData = singerService.list(query);
+        return HttpResult.ok(singerListData);
     }
 }
