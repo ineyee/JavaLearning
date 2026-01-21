@@ -7,7 +7,11 @@
       "Bash(mvn dependency:tree)",
       "Bash(jar -tf ~/.m2/repository/com/baomidou/mybatis-plus-extension/3.5.15/mybatis-plus-extension-3.5.15.jar)",
       "Bash(jar -tf ~/.m2/repository/com/baomidou/mybatis-plus-core/3.5.15/mybatis-plus-core-3.5.15.jar)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(mysql:*)",
+      "Bash(mvn spring-boot:run:*)",
+      "Bash(cat:*)",
+      "Bash(lsof:*)"
     ]
   }
 }

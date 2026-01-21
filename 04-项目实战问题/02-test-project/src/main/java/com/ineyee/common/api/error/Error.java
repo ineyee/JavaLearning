@@ -1,4 +1,4 @@
-package com.ineyee.api.error;
+package com.ineyee.common.api.error;
 
 public interface Error {
     Integer getCode();

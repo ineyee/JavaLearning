@@ -1,4 +1,4 @@
-package com.ineyee.api.error;
+package com.ineyee.common.api.error;
 
 /// 用户模块错误码及错误信息
 /// 错误码范围 -200000 ~ -299999

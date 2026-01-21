@@ -1,4 +1,4 @@
-package com.ineyee.config;
+package com.ineyee.common.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

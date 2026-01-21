@@ -1,8 +1,7 @@
 package com.ineyee.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ineyee.api.exception.ServiceException;
+import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerListQuery;
 import com.ineyee.pojo.req.SingerCreateBatchReq;
@@ -12,7 +11,6 @@ import com.ineyee.pojo.req.SingerUpdateReq;
 import com.ineyee.pojo.vo.ListData;
 
 import java.util.List;
-import java.util.Map;
 
 // 1、在 service 目录下创建一个 XxxService 的空接口类即可
 // 需要让我们的接口类继承自 MyBatis-Plus 的 IService 接口，这样一来当前接口类就自动拥有了众多接口方法

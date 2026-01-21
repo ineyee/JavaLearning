@@ -1,7 +1,7 @@
-package com.ineyee.api.exception;
+package com.ineyee.common.api.exception;
 
-import com.ineyee.api.HttpResult;
-import com.ineyee.api.error.CommonError;
+import com.ineyee.common.api.HttpResult;
+import com.ineyee.common.api.error.CommonError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

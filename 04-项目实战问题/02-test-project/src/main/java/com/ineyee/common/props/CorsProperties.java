@@ -1,4 +1,4 @@
-package com.ineyee.props;
+package com.ineyee.common.props;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

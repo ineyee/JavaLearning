@@ -1,4 +1,4 @@
-package com.ineyee.api.error;
+package com.ineyee.common.api.error;
 
 /// 通用错误码及错误信息
 /// 成功码 0

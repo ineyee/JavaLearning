@@ -1,9 +1,9 @@
 package com.ineyee.controller;
 
-import com.ineyee.api.HttpResult;
-import com.ineyee.api.error.CommonError;
-import com.ineyee.api.error.UserError;
-import com.ineyee.api.exception.ServiceException;
+import com.ineyee.common.api.HttpResult;
+import com.ineyee.common.api.error.CommonError;
+import com.ineyee.common.api.error.UserError;
+import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerGetQuery;
 import com.ineyee.pojo.query.SingerListQuery;

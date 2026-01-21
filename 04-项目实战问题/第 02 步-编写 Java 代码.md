@@ -1240,5 +1240,125 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
 }
 ```
 
+#### 3、EasyCode 插件的配置
 
+###### 3.1 代码模板
 
+![image-20260121223011159](第 02 步-编写 Java 代码/img/image-20260121223011159.png)
+
+* pojo
+
+```velocity
+##导入宏定义
+$!{define.vm}
+##保存文件（宏定义）
+#save("/pojo/po", ".java")
+##包路径（宏定义）
+#setPackageSuffix("pojo.po")
+##自动导入包（全局变量）
+$!{autoImport.vm}
+import lombok.Data;
+
+@Data
+public class $!{tableInfo.name} {
+#foreach($column in $tableInfo.fullColumn)
+    #if(${column.comment})//${column.comment}#end
+    private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
+#end
+}
+```
+
+* mapper
+
+```velocity
+##导入宏定义
+$!{define.vm}
+##设置表后缀（宏定义）
+#setTableSuffix("Mapper")
+##保存文件（宏定义）
+#save("/mapper", "Mapper.java")
+##包路径（宏定义）
+#setPackageSuffix("mapper")
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import $!{tableInfo.savePackageName}.pojo.po.$!tableInfo.name;
+
+public interface $!{tableName} extends BaseMapper<$!tableInfo.name> {
+
+}
+```
+
+* service & serviceImpl
+
+```velocity
+##导入宏定义
+$!{define.vm}
+##设置表后缀（宏定义）
+#setTableSuffix("Service")
+##保存文件（宏定义）
+#save("/service", "Service.java")
+##包路径（宏定义）
+#setPackageSuffix("service")
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import $!{tableInfo.savePackageName}.pojo.po.$!tableInfo.name;
+
+public interface $!{tableName} extends IService<$!tableInfo.name> {
+
+}
+```
+
+```velocity
+##导入宏定义
+$!{define.vm}
+##设置表后缀（宏定义）
+#setTableSuffix("ServiceImpl")
+##保存文件（宏定义）
+#save("/service", "ServiceImpl.java")
+##包路径（宏定义）
+#setPackageSuffix("service")
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import $!{tableInfo.savePackageName}.mapper.$!{tableInfo.name}Mapper;
+import $!{tableInfo.savePackageName}.pojo.po.$!{tableInfo.name};
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+public class $!{tableName} extends ServiceImpl<$!{tableInfo.name}Mapper, $!{tableInfo.name}> implements $!{tableInfo.name}Service {
+
+}
+```
+
+* controller
+
+```velocity
+##导入宏定义
+$!{define.vm}
+##设置表后缀（宏定义）
+#setTableSuffix("Controller")
+##保存文件（宏定义）
+#save("/controller", "Controller.java")
+##包路径（宏定义）
+#setPackageSuffix("controller")
+##定义服务名
+#set($serviceName = $!tool.append($!tool.firstLowerCase($!tableInfo.name), "Service"))
+
+import $!{tableInfo.savePackageName}.service.$!{tableInfo.name}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/$!tool.firstLowerCase($!tableInfo.name)")
+public class $!{tableName} {
+    @Autowired
+    private $!{tableInfo.name}Service $!{serviceName};
+    
+    
+}
+```
+
+###### 3.2 数据库数据类型和 Java 数据类型映射
+
+![image-20260121223652500](第 02 步-编写 Java 代码/img/image-20260121223652500.png)

@@ -1,4 +1,4 @@
-package com.ineyee.api;
+package com.ineyee.common.api;
 
 import lombok.Getter;
 

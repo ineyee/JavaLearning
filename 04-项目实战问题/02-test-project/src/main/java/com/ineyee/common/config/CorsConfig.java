@@ -1,6 +1,6 @@
-package com.ineyee.config;
+package com.ineyee.common.config;
 
-import com.ineyee.props.CorsProperties;
+import com.ineyee.common.props.CorsProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

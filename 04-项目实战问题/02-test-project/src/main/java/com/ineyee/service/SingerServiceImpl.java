@@ -3,7 +3,7 @@ package com.ineyee.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ineyee.api.exception.ServiceException;
+import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.SingerMapper;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerListQuery;
@@ -12,13 +12,8 @@ import com.ineyee.pojo.req.SingerCreateReq;
 import com.ineyee.pojo.req.SingerUpdateBatchReq;
 import com.ineyee.pojo.req.SingerUpdateReq;
 import com.ineyee.pojo.vo.ListData;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.executor.BatchResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -44,7 +39,6 @@ import java.util.*;
 // 注意：业务层绝对不是数据层的马甲层，它有存在的意义，比如同样都是 save 方法，数据层里的 save 就是直接往数据库里写数据
 // 而业务层里的 save 则需要首先判断数据库里存不存在这个用户邮箱，存在的话就跳过，不存在的话再往数据库里写，因为用户邮箱是不允许重复的
 // 也就是说，业务层的一个方法里可能会调用数据层里的多个方法来共同完成一个业务
-@Slf4j
 @Service
 @Transactional
 public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> implements SingerService {
