@@ -25,13 +25,13 @@
 │  │  │  │  │  ├─mapper/(数据层的接口)
 │  │  │  │  │  │  ├─UserDao
 │  │  │  │  │  ├─pojo/(表现层之模型层)
-│  │  │  │  │  │  ├─po/(持久化对象)
+│  │  │  │  │  │  ├── po/(持久化对象)        # 数据库模型（Mapper 专用）
 │  │  │  │  │  │  │  ├─User
-│  │  │  │  │  ├─dto/(接收客户端的请求参数)
-│  │  │  │  │  │  ├─UserSaveDto
-│  │  │  │  │  │  ├─UserRemoveDto
-│  │  │  │  │  │  ├─UserUpdateDto
-│  │  │  │  │  │  ├─UserGetDto、UserListDto
+│  │  │  │  │  │  ├── bo        # 业务模型（Service 内部）
+│  │  │  │  │  │  ├── dto       # 服务/接口传输模型（可进可出）
+│  │  │  │  │  │  ├── query     # 查询条件（分页 / 筛选）
+│  │  │  │  │  │  ├── req       # 请求体（新增 / 修改）
+│  │  │  │  │  │  └── vo        # 接口返回模型
 │  │  │  │  │  ├─filter/(各种过滤器)
 │  │  │  │  │  │  ├─CachedBodyFilter(HTTP 请求体缓存过滤器)
 │  │  │  │  │  ├─interceptor/(各种拦截器)

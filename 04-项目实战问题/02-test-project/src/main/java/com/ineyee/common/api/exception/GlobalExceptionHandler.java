@@ -22,14 +22,13 @@ public class GlobalExceptionHandler {
         return HttpResult.error(e.getCode(), e.getMessage());
     }
 
-    // 这个方法专门用来处理业务异常以外的系统异常
-    // 这里是系统异常 Exception，系统异常是没有 code 的，而且系统异常五花八门、我们也不知道它们什么时候会抛出、抛出的错误信息对用户来说也没有提示意义
-    // 所以我们把系统异常的错误码统一为 -100000，错误信息统一为请求失败
+    // 用 @ExceptionHandler 注解修饰一下这个方法，表明这个方法专门用来处理业务异常以外的系统异常
+    // 这里是系统异常 Exception，系统异常是没有 code 的、所以我们把系统异常的错误码统一为 -100000，错误信息自动获取、当然客户端不一定会把这个信息展示给用户看、但在联调接口时非常有用
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public HttpResult<Void> handleException(Exception e) {
         // 给客户端响应错误
-        log.error("系统异常：{}", e.toString());
-        return HttpResult.error();
+        log.error("系统异常：{}", e.getMessage());
+        return HttpResult.error(e.getMessage());
     }
 }

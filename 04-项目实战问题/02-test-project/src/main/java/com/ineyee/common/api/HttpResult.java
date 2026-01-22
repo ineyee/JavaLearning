@@ -29,11 +29,11 @@ public class HttpResult<T> {
     }
 
     /**
-     * 用于响应错误时业务异常以外的系统异常 {"code": -100000, "message": "Request Failed"}
-     * 我们把系统异常的错误码统一为 -100000，错误信息统一为"Request Failed"
+     * 用于响应错误时业务异常以外的系统异常 {"code": -100000, "message": xxx}
+     * 我们把系统异常的错误码统一为 -100000，错误信息自动获取
      */
-    public static <T> HttpResult<T> error() {
-        return error(CommonError.REQUEST_ERROR.getCode(), CommonError.REQUEST_ERROR.getMessage());
+    public static <T> HttpResult<T> error(String msg) {
+        return error(CommonError.REQUEST_ERROR.getCode(), msg);
     }
 
     private HttpResult(Integer code, String message, T data) {
