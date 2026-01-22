@@ -157,28 +157,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <!-- 自动生成 po -->
-            <plugin>
-                <groupId>org.mybatis.generator</groupId>
-                <artifactId>mybatis-generator-maven-plugin</artifactId>
-                <version>1.4.2</version>
-                <configuration>
-                    <!-- 配置文件的位置 -->
-                    <configurationFile>src/test/resources/generatorConfig.xml</configurationFile>
-                    <!-- 覆盖已生成的 po 文件 -->
-                    <overwrite>true</overwrite>
-                    <!-- 打印日志信息 -->
-                    <verbose>true</verbose>
-                </configuration>
-                <dependencies>
-                    <!-- MBG 要通过数据库驱动去读取数据库里的各种信息 -->
-                    <dependency>
-                        <groupId>com.mysql</groupId>
-                        <artifactId>mysql-connector-j</artifactId>
-                        <version>8.3.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
         </plugins>
     </build>
 

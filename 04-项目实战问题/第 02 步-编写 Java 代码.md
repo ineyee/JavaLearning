@@ -577,87 +577,23 @@ public class TestService {
 
 api 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## ✅ 八、表现层之模型层 pojo
+## 八、表现层之模型层 pojo
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得效率非常低，好在 MyBatis 官方提供了一个插件 mybatis-generator 来帮我们自动生成 po`（建议先把 po 生成到 test 目录下，然后再把需要的 po 复制一份到 main 目录下，因为每次自动生成 po 都会覆盖上一次生成的，所以如果直接生成到 main 目录下，就有可能覆盖掉我们自己手动增加的一些改动）`：
+之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成 po：
 
-* 添加 mybatis-generator 插件
+![image-20260122081707951](第 02 步-编写 Java 代码/img/image-20260122081707951.png)
 
-```xml
-<!-- 自动生成 po -->
-<plugin>
-  <groupId>org.mybatis.generator</groupId>
-  <artifactId>mybatis-generator-maven-plugin</artifactId>
-  <version>1.4.2</version>
-  <configuration>
-    <!-- 配置文件的位置 -->
-    <configurationFile>src/test/resources/generatorConfig.xml</configurationFile>
-    <!-- 覆盖已生成的 po 文件 -->
-    <overwrite>true</overwrite>
-    <!-- 打印日志信息 -->
-    <verbose>true</verbose>
-  </configuration>
-  <dependencies>
-    <!-- MBG 要通过数据库驱动去读取数据库里的各种信息 -->
-    <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>8.3.0</version>
-    </dependency>
-  </dependencies>
-</plugin>
-```
+***
 
-* 在 test/resources 目录下创建一个 generatorConfig.xml 配置文件
+![image-20260122081820056](第 02 步-编写 Java 代码/img/image-20260122081820056.png)
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE generatorConfiguration
-        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
-        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+***
 
-<generatorConfiguration>
-    <!--
-        id：值随便写，一个上下文标识，只要在同一个 generatorConfig.xml 里唯一即可
-        targetRuntime：决定了 MBG 生成代码的“风格和能力”，MyBatis3、生成的代码臃肿，MyBatis3Simple、生成的代码精简
-    -->
-    <context id="POGenerator" targetRuntime="MyBatis3Simple">
-        <commentGenerator>
-            <!-- 不要生成注释 -->
-            <property name="suppressAllComments" value="true"/>
-        </commentGenerator>
-        <!-- 数据库连接，提供一个本地的就行了，反正就是用来生成一下 po -->
-        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/test_db?serverTimezone=UTC"
-                        userId="root"
-                        password="mysqlroot"/>
-        <!-- 数据库里的日期类型，对应到 Java 代码里强制使用 LocalDateTime 而不是 Date -->
-        <javaTypeResolver type="org.mybatis.generator.internal.types.JavaTypeResolverDefaultImpl">
-            <property name="useJSR310Types" value="true"/>
-        </javaTypeResolver>
-        <!-- 生成的 po 要放在什么位置：最终生成路径 = targetProject + targetPackage -->
-        <javaModelGenerator targetProject="src/test/java" targetPackage="com.ineyee.pojo.po"/>
-        <!--
-            要为哪个表里生成 PO
-                %：代表所有表
-                具体的表名：代表指定表
-            catalog、schema：代表哪个数据库
-        -->
-        <table tableName="%" catalog="test_db" schema="test_db"/>
-        <!--        <table tableName="dict_type" catalog="test_db" schema="test_db"/>-->
-        <!--        <table tableName="dict_item" catalog="test_db" schema="test_db"/>-->
-        <!--        <table tableName="dict_i18n" catalog="test_db" schema="test_db"/>-->
-    </context>
-</generatorConfiguration>
-```
-
-* 自动生成 po
-
-![image-20260113122203302](第 02 步-编写 Java 代码/img/image-20260113122203302.png)
+![image-20260122082626043](第 02 步-编写 Java 代码/img/image-20260122082626043.png)
 
 ## 九、数据层 mapper
 
@@ -1240,9 +1176,17 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
 }
 ```
 
-#### 3、EasyCode 插件的配置
+#### 3、EasyCode
 
-###### 3.1 代码模板
+###### 3.1 安装 EasyCode
+
+* 是一款基于 IntelliJ IDEA 开发的**代码生成插件**
+* 支持**同时生成多张表的代码，每张表可以有独立的配置信息**
+* 支持**自定义代码模板**，支持**自定义数据库类型与 Java 类型映射**
+
+![image-20260122075736397](第 02 步-编写 Java 代码/img/image-20260122075736397.png)
+
+###### 3.2 自定义代码模板
 
 ![image-20260121223011159](第 02 步-编写 Java 代码/img/image-20260121223011159.png)
 
@@ -1359,6 +1303,6 @@ public class $!{tableName} {
 }
 ```
 
-###### 3.2 数据库数据类型和 Java 数据类型映射
+###### 3.3 自定义数据库类型与 Java 类型映射
 
 ![image-20260121223652500](第 02 步-编写 Java 代码/img/image-20260121223652500.png)
