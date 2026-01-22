@@ -1,11 +1,13 @@
 package com.ineyee.common.api;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
 @Getter
 public class HttpResult<T> {
     private Integer code;
     private String message;
+    @JsonInclude(JsonInclude.Include.NON_NULL)  // null 时不序列化
     private T data;
 
     private HttpResult() {

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller()
+@RestController()
 @RequestMapping("/singer")
 public class SingerController {
     private SingerService singerService;
@@ -28,7 +28,6 @@ public class SingerController {
     }
 
     @PostMapping("/save")
-    @ResponseBody
     public HttpResult<Singer> save(@Valid @RequestBody SingerCreateReq req) throws ServiceException {
         Singer fullSinger = singerService.save(req);
         if (fullSinger != null) {
@@ -39,7 +38,6 @@ public class SingerController {
     }
 
     @PostMapping("/saveBatch")
-    @ResponseBody
     public HttpResult<List<Long>> saveBatch(@Valid @RequestBody SingerCreateBatchReq req) throws ServiceException {
         List<Long> singerIdList = singerService.saveBatch(req);
         if (!singerIdList.isEmpty()) {
@@ -50,29 +48,28 @@ public class SingerController {
     }
 
     @PostMapping("/remove")
-    @ResponseBody
     public HttpResult<Void> remove(@Valid @RequestBody SingerDeleteReq req) throws ServiceException {
         boolean ret = singerService.removeById(req.getId());
         if (ret) {
             return HttpResult.ok();
         } else {
+            // 删除失败，肯定是因为用户不存在？
             throw new ServiceException(UserError.USER_NOT_EXIST.getCode(), UserError.USER_NOT_EXIST.getMessage());
         }
     }
 
     @PostMapping("/removeBatch")
-    @ResponseBody
     public HttpResult<Void> removeBatch(@Valid @RequestBody SingerDeleteBatchReq req) throws ServiceException {
         boolean ret = singerService.removeBatchByIds(req.getIdList());
         if (ret) {
             return HttpResult.ok();
         } else {
+            // 删除失败，肯定是因为有某个用户不存在？
             throw new ServiceException(UserError.USER_NOT_EXIST.getCode(), UserError.USER_NOT_EXIST.getMessage());
         }
     }
 
     @PostMapping("/update")
-    @ResponseBody
     public HttpResult<Void> update(@Valid @RequestBody SingerUpdateReq req) throws ServiceException {
         Boolean ret = singerService.update(req);
         if (ret) {
@@ -83,7 +80,6 @@ public class SingerController {
     }
 
     @PostMapping("/updateBatch")
-    @ResponseBody
     public HttpResult<Void> updateBatch(@Valid @RequestBody SingerUpdateBatchReq req) throws ServiceException {
         Boolean ret = singerService.updateBatch(req);
         if (ret) {
@@ -94,7 +90,6 @@ public class SingerController {
     }
 
     @GetMapping("/get")
-    @ResponseBody
     public HttpResult<Singer> get(@Valid SingerGetQuery query) throws ServiceException {
         Singer singer = singerService.getById(query.getId());
         if (singer != null) {
@@ -105,7 +100,6 @@ public class SingerController {
     }
 
     @GetMapping("/list")
-    @ResponseBody
     public HttpResult<ListData<Singer>> list(@Valid SingerListQuery query) throws ServiceException {
         ListData<Singer> singerListData = singerService.list(query);
         return HttpResult.ok(singerListData);

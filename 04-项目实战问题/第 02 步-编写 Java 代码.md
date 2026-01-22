@@ -78,13 +78,12 @@ myBatis-plus:
   # 单表 CRUD 一般用 MyBatis-Plus 提供的 SQL 实现就足够了，所以这个暂时就不需要了
   # 多表查询才有自定义 SQL 的必要，打开这个，去自定义 mapper.xml 实现，跟 MyBatis-Plus 一起使用不会冲突
 #  mapper-locations: classpath:mappers/*.xml
-  
-# PageHelper 相关配置
-pagehelper:
-  # reasonable 设置为 true，代表使分页查询合理化：
-  #      当 pageNum <= 0 时，自动返回第一页的数据
-  #      当 pageNum > totalPage 时，自动返回最后一页的数据
-  reasonable: true
+  # 主键生成策略：
+  # MyBatis-Plus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
+  # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
+  global-config:
+    db-config:
+      id-type: AUTO
 ```
 
 ```yaml
@@ -1136,6 +1135,12 @@ myBatis-plus:
   # 单表 CRUD 一般用 MyBatis-Plus 提供的 SQL 实现就足够了，所以这个暂时就不需要了
   # 多表查询才有自定义 SQL 的必要，打开这个，去自定义 mapper.xml 实现，跟 MyBatis-Plus 一起使用不会冲突
 #  mapper-locations: classpath:mappers/*.xml
+  # 主键生成策略：
+  # MyBatis-Plus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
+  # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
+  global-config:
+    db-config:
+      id-type: AUTO
 ```
 
 ###### 2.1 对数据层的影响
