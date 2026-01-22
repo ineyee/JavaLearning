@@ -115,9 +115,11 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
         // 有模糊搜索参数
         if (query.getKeyword() != null && !query.getKeyword().isEmpty()) {
             // 在姓名和性别字段中模糊搜索
-            wrapper.like(Singer::getName, query.getKeyword())
-                    .or()
-                    .like(Singer::getSex, query.getKeyword());
+            wrapper.and(w ->
+                    w.like(Singer::getName, query.getKeyword())
+                            .or()
+                            .like(Singer::getSex, query.getKeyword())
+            );
         }
 
         if (query.getPageNum() != null && query.getPageSize() != null) { // 要搞分页，别忘了在 MyBatisPlusConfig 里添加一下 MyBatis-Plus 的分页插件
