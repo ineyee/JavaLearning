@@ -114,7 +114,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
 
         // 有模糊搜索参数
         if (query.getKeyword() != null && !query.getKeyword().isEmpty()) {
-            // 在姓名和性别中字段中模糊搜索
+            // 在姓名和性别字段中模糊搜索
             wrapper.like(Singer::getName, query.getKeyword())
                     .or()
                     .like(Singer::getSex, query.getKeyword());
@@ -122,26 +122,17 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
 
         if (query.getPageNum() != null && query.getPageSize() != null) { // 要搞分页，别忘了在 MyBatisPlusConfig 里添加一下 MyBatis-Plus 的分页插件
             Page<Singer> page = new Page<>(query.getPageNum(), query.getPageSize());
-
             // 这里调用 MyBatis-Plus 在 service 层提供的 page 方法，不再直接调用 mapper 层的 selectPage 方法
             Page<Singer> queryedPage = page(page, wrapper);
 
-            // 组装查询结果
-            ListData<Singer> listData = new ListData<>();
-            listData.setList(queryedPage.getRecords());
-            listData.setPageNum(query.getPageNum());
-            listData.setPageSize(query.getPageSize());
-            listData.setTotal(queryedPage.getTotal());
-            listData.setTotalPages(queryedPage.getPages());
-            return listData;
+            // 组装列表查询结果
+            return new ListData<>(queryedPage);
         } else { // 不搞分页
             // 这里调用 MyBatis-Plus 在 service 层提供的 list 方法，不再直接调用 mapper 层的 selectList 方法
             List<Singer> singerList = list(wrapper);
 
-            // 组装查询结果
-            ListData<Singer> listData = new ListData<>();
-            listData.setList(singerList);
-            return listData;
+            // 组装列表查询结果
+            return new ListData<>(singerList);
         }
     }
 }

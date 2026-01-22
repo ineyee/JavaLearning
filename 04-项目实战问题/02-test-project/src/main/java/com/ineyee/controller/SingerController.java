@@ -12,7 +12,6 @@ import com.ineyee.pojo.vo.ListData;
 import com.ineyee.service.SingerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -101,6 +100,7 @@ public class SingerController {
 
     @GetMapping("/list")
     public HttpResult<ListData<Singer>> list(@Valid SingerListQuery query) throws ServiceException {
+        // 这里不需要判断查询结果吗？
         ListData<Singer> singerListData = singerService.list(query);
         return HttpResult.ok(singerListData);
     }

@@ -1,12 +1,26 @@
 package com.ineyee.pojo.vo;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.List;
 
+// 专门用来组装列表查询结果，返回给客户端
 @Data
 public class ListData<T> {
+    public ListData(Page<T> queryedPage) {
+        list = queryedPage.getRecords();
+        pageNum = queryedPage.getCurrent();
+        pageSize = queryedPage.getSize();
+        total = queryedPage.getTotal();
+        totalPages = queryedPage.getPages();
+    }
+
+    public ListData(List<T> list) {
+        this.list = list;
+    }
+
     /**
      * pojo 数据列表
      * ① [pojo] 代表本次查询有数据
