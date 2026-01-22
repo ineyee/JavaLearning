@@ -1,9 +1,11 @@
 package com.ineyee.common.api.exception;
 
+import com.ineyee.common.api.error.ServiceError;
+
 public class ServiceException extends Exception {
-    public ServiceException(Integer code, String message) {
-        super(message);
-        this.code = code;
+    public ServiceException(ServiceError serviceError) {
+        super(serviceError.getMessage());
+        this.code = serviceError.getCode();
     }
 
     private final Integer code;

@@ -1,6 +1,6 @@
 package com.ineyee.common.api.error;
 
-public interface Error {
+public interface ServiceError {
     Integer getCode();
 
     String getMessage();

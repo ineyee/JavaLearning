@@ -1,8 +1,8 @@
 package com.ineyee.controller;
 
 import com.ineyee.common.api.HttpResult;
-import com.ineyee.common.api.error.CommonError;
-import com.ineyee.common.api.error.UserError;
+import com.ineyee.common.api.error.CommonServiceError;
+import com.ineyee.common.api.error.UserServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerGetQuery;
@@ -16,6 +16,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// 系统异常我们都不管，统一交给全局异常处理器
+// 业务异常我们尽管抛，统一交给全局异常处理器
+// 总的来说，这几层都不做 try-catch 来捕获系统异常和业务异常，业务层抛业务异常、控制器层抛参数校验异常
+// （但是这个参数校验其实交给了 validation 库，也不是我们自己校验，所以控制器层也不需要主动抛异常，就是业务层在抛业务异常）
+// 那 validation 库抛的时候什么异常？系统异常里我们想区分出来，个性化提示，比如用户名不能为空、邮箱格式不正确等，而不是全部请求错误
+// 1、请求路径不存在的话，也是系统异常，会被统一拦截掉，统一返回 -100000 那个错误（如果不拦截的话，服务器会自动返回 404、因为这是客户端搞错路径了）
+// 2、数据库层搞 SQL 语句的异常，都是系统异常，会被统一拦截掉，统一返回 -100000 那个错误（如果不拦截的话，服务器会自动返回 500、因为这是服务器端处理出错了）
+// 3、业务层的异常，是自定义信息
+// 4、控制器层的参数校验异常，也是系统异常，会被统一拦截掉，统一返回 -100000 那个错误（如果不拦截的话，服务器会自动返回  400、因为这是客户端没按服务端的要求传递参数）
+// 5、因为这些异常都被拦截了，所以都能正常响应给客户端（200），而不会响应 400、500 之类的状态码（这种的都是异常没拦截处理掉才会返回的）
+// 6、所以如果像给客户端报 400、404、500 这种错误时，就不要拦截系统异常、只拦截业务异常即可，但实际开发中我们一般都是采取总是返回 200 的方案
+//
 // 用户模块接口的表现层之控制器层
 //
 // 控制器层（controller）的职责就是直接与客户端打交道，即：
@@ -50,7 +62,7 @@ public class SingerController {
         if (fullSinger != null) {
             return HttpResult.ok(fullSinger);
         } else {
-            throw new ServiceException(CommonError.REQUEST_ERROR.getCode(), CommonError.REQUEST_ERROR.getMessage());
+            throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
     }
 
@@ -60,7 +72,7 @@ public class SingerController {
         if (!singerIdList.isEmpty()) {
             return HttpResult.ok(singerIdList);
         } else {
-            throw new ServiceException(CommonError.REQUEST_ERROR.getCode(), CommonError.REQUEST_ERROR.getMessage());
+            throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
     }
 
@@ -78,7 +90,7 @@ public class SingerController {
                 •	成功就是 ok
                 •	失败全部靠异常
             */
-            throw new ServiceException(UserError.USER_NOT_EXIST.getCode(), UserError.USER_NOT_EXIST.getMessage());
+            throw new ServiceException(UserServiceError.USER_NOT_EXIST);
         }
     }
 
@@ -89,7 +101,7 @@ public class SingerController {
             return HttpResult.ok();
         } else {
             // 删除失败，肯定是因为有某个用户不存在？肯定是业务上的失败，所以才跑了业务异常？
-            throw new ServiceException(UserError.USER_NOT_EXIST.getCode(), UserError.USER_NOT_EXIST.getMessage());
+            throw new ServiceException(UserServiceError.USER_NOT_EXIST);
         }
     }
 
@@ -99,7 +111,7 @@ public class SingerController {
         if (ret) {
             return HttpResult.ok();
         } else {
-            throw new ServiceException(CommonError.REQUEST_ERROR.getCode(), CommonError.REQUEST_ERROR.getMessage());
+            throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
     }
 
@@ -109,7 +121,7 @@ public class SingerController {
         if (ret) {
             return HttpResult.ok();
         } else {
-            throw new ServiceException(CommonError.REQUEST_ERROR.getCode(), CommonError.REQUEST_ERROR.getMessage());
+            throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
     }
 
@@ -119,7 +131,7 @@ public class SingerController {
         if (singer != null) {
             return HttpResult.ok(singer);
         } else {
-            throw new ServiceException(UserError.USER_NOT_EXIST.getCode(), UserError.USER_NOT_EXIST.getMessage());
+            throw new ServiceException(UserServiceError.USER_NOT_EXIST);
         }
     }
 

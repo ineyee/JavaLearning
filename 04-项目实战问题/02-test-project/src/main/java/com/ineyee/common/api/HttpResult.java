@@ -1,7 +1,7 @@
 package com.ineyee.common.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ineyee.common.api.error.CommonError;
+import com.ineyee.common.api.error.CommonServiceError;
 import lombok.Data;
 
 @Data
@@ -10,7 +10,7 @@ public class HttpResult<T> {
      * 用于响应成功时有数据 {"code": 0, "message": "Success", "data": xxx}
      */
     public static <T> HttpResult<T> ok(T data) {
-        return new HttpResult<>(CommonError.SUCCESS.getCode(), CommonError.SUCCESS.getMessage(), data);
+        return new HttpResult<>(CommonServiceError.SUCCESS.getCode(), CommonServiceError.SUCCESS.getMessage(), data);
     }
 
     /**
@@ -33,7 +33,7 @@ public class HttpResult<T> {
      * 我们把系统异常的错误码统一为 -100000，错误信息自动获取
      */
     public static <T> HttpResult<T> error(String msg) {
-        return error(CommonError.REQUEST_ERROR.getCode(), msg);
+        return error(CommonServiceError.REQUEST_ERROR.getCode(), msg);
     }
 
     private HttpResult(Integer code, String message, T data) {
