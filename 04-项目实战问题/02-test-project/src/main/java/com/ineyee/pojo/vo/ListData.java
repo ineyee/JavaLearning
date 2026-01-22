@@ -9,16 +9,26 @@ import java.util.List;
 // 专门用来组装列表查询结果，返回给客户端
 @Data
 public class ListData<T> {
-    public ListData(Page<T> queryedPage) {
-        list = queryedPage.getRecords();
-        pageNum = queryedPage.getCurrent();
-        pageSize = queryedPage.getSize();
-        total = queryedPage.getTotal();
-        totalPages = queryedPage.getPages();
+    /**
+     * 分页列表
+     */
+    public static <T> ListData<T> fromPage(Page<T> queryedPage) {
+        return new ListData<>(queryedPage.getRecords(), queryedPage.getCurrent(), queryedPage.getSize(), queryedPage.getTotal(), queryedPage.getPages());
     }
 
-    public ListData(List<T> list) {
+    /**
+     * 非分页列表
+     */
+    public static <T> ListData<T> fromList(List<T> list) {
+        return new ListData<>(list, null, null, null, null);
+    }
+
+    private ListData(List<T> list, Long pageNum, Long pageSize, Long total, Long totalPages) {
         this.list = list;
+        this.pageNum = pageNum;
+        this.pageSize = pageSize;
+        this.total = total;
+        this.totalPages = totalPages;
     }
 
     /**

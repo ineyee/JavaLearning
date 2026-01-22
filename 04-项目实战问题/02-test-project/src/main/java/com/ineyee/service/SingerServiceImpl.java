@@ -126,13 +126,13 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
             Page<Singer> queryedPage = page(page, wrapper);
 
             // 组装列表查询结果
-            return new ListData<>(queryedPage);
+            return ListData.fromPage(queryedPage);
         } else { // 不搞分页
             // 这里调用 MyBatis-Plus 在 service 层提供的 list 方法，不再直接调用 mapper 层的 selectList 方法
             List<Singer> singerList = list(wrapper);
 
             // 组装列表查询结果
-            return new ListData<>(singerList);
+            return ListData.fromList(singerList);
         }
     }
 }

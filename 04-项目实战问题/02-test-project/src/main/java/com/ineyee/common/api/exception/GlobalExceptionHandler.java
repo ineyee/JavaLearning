@@ -1,7 +1,6 @@
 package com.ineyee.common.api.exception;
 
 import com.ineyee.common.api.HttpResult;
-import com.ineyee.common.api.error.CommonError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +30,6 @@ public class GlobalExceptionHandler {
     public HttpResult<Void> handleException(Exception e) {
         // 给客户端响应错误
         log.error("系统异常：{}", e.toString());
-        return HttpResult.error(CommonError.REQUEST_ERROR.getCode(), CommonError.REQUEST_ERROR.getMessage());
+        return HttpResult.error();
     }
 }
