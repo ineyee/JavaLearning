@@ -13,6 +13,7 @@ import com.ineyee.pojo.req.SingerUpdateBatchReq;
 import com.ineyee.pojo.req.SingerUpdateReq;
 import com.ineyee.pojo.vo.ListData;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -89,6 +90,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Boolean updateBatch(SingerUpdateBatchReq req) throws ServiceException {
         List<Singer> singerList = new ArrayList<>();
         req.getSingerList().forEach(item -> {
@@ -104,6 +106,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
     public ListData<Singer> list(SingerListQuery query) throws ServiceException {
         // wrapper 用来添加查询条件
         LambdaQueryWrapper<Singer> wrapper = new LambdaQueryWrapper<>();

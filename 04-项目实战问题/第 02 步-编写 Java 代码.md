@@ -83,7 +83,7 @@ myBatis-plus:
   # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
   global-config:
     db-config:
-      id-type: AUTO
+      id-type: ASSIGN_ID
 ```
 
 ```yaml
@@ -1140,7 +1140,7 @@ myBatis-plus:
   # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
   global-config:
     db-config:
-      id-type: AUTO
+      id-type: ASSIGN_ID
 ```
 
 ###### 2.1 对数据层的影响
