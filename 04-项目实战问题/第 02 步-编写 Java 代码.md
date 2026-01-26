@@ -603,7 +603,7 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-#### ✅ 1、表现层之模型层 pojo 👉🏻 使用 EasyCode 自动生成完整代码
+#### ✅ 1、表现层之模型层 pojo 👉🏻 用 EasyCode 自动生成完整代码
 
 之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，如果我们手动创建每个 po 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成 po 的完整代码：
 
@@ -617,7 +617,7 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 ![image-20260126210000428](第 02 步-编写 Java 代码/img/image-20260126210000428.png)
 
-#### ✅ 2、数据层 mapper 👉🏻 使用 EasyCode + MyBatisPlus 自动生成完整代码
+#### ✅ 2、数据层 mapper 👉🏻 用 EasyCode + MyBatisPlus 自动生成完整代码
 
 ###### ✅ 2.1 Java 代码
 
@@ -631,7 +631,7 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，并且在 yml 配置文件里做好配置，SpringBoot 就会自动创建 DruidDataSource、SqlSessionFactoryBean 等对象，并通过属性绑定技术把 yml 配置文件里的值自动绑定到这些对象上去，其它的我们啥也不用再干，不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。
 
-#### ✅ 3、业务层 service 👉🏻 使用 EasyCode + MyBatisPlus 自动生成 80% 的代码
+#### ✅ 3、业务层 service 👉🏻 用 EasyCode + MyBatisPlus 自动生成 80% 的代码
 
 ###### ✅ 3.1 Java 代码
 
