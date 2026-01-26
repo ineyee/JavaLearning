@@ -353,7 +353,7 @@ cors:
 </dependency>
 ```
 
-* （可选）MyBatisPlus 相关的库，单表 CRUD 利器
+* （可选）MyBatisPlus 相关的库，单表 CRUD 利器、多表 CRUD 不管
 
 ```xml
 <!-- MyBatisPlus -->
@@ -597,7 +597,7 @@ public class TestService {
 
 common 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## 八、单表 CRUD（以 product 表为例）
+## 八、单表 CRUD（可以充分利用 MyBatisPlus、以 product 表为例）
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -631,21 +631,15 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，并且在 yml 配置文件里做好配置，SpringBoot 就会自动创建 DruidDataSource、SqlSessionFactoryBean 等对象，并通过属性绑定技术把 yml 配置文件里的值自动绑定到这些对象上去，其它的我们啥也不用再干，不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。
 
-## 十、业务层 service
+#### ✅ 3、业务层 service 👉🏻 使用 EasyCode + MyBatisPlus 自动生成 80% 的代码
 
-> * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
-> * 一个数据库里可以有多张表，比如 user、product 这两张表
-> * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
+###### ✅ 3.1 Java 代码
 
-#### 1、Java 代码：MyBatis-Plus 自动生成 service 接口类的方法和 service 实现
+之前我们是根据每张表手动创建一个对应的 service 接口类，为这个接口类添加 get、list、save、saveBatch、remove、removeBatch、update、updateBatch 等方法；然后再手动创建一个对应的 serviceImpl 实现，在这个 serviceImpl 实现里调用数据层的 API 来实现业务。但实际开发中有那么多张表，如果我们手动创建每个 service 接口类和 serviceImpl 实现的话就显得效率非常低，所以我们一般都是用 EasyCode + MyBatisPlus 来自动生成 service 接口类和 serviceImpl 实现 80% 的代码：
 
-会自动生成众多业务层方法，如果满足我们的需要那就直接使用提供的就好了，如果不满足我们的需要（如需要做很多业务规则校验），那就重写提供的接口方法自己实现即可。
+![image-20260126220228073](第 02 步-编写 Java 代码/img/image-20260126220228073.png)
 
-之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，我们手动创建的接口类和实现的内容其实都差不多，所以我们国内开发者搞了一个库 MyBatis-Plus 来帮我们自动生成 mapper 接口类的方法和 mapper 实现：
-
-先定义一个 service 接口，然后再定义一个 service 接口的实现类、用 @Service 修饰一下放入父 IoC 容器里、自动注入 dao。
-
-#### 2、配置
+###### ✅ 3.2 配置
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动创建和配置事务管理器 DataSourceTransactionManager 对象，并自动启动事务管理 @EnableTransactionManagement，我们同样不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。只需要在想使用事务管理的 Service 类上加一个 @Transactional 注解就完事了，这样一来这个业务类里所有的方法都会自动加上事务管理的代码，当然我们也可以只在某一个方法上加上一个 @Transactional 注解，其它的我们啥也不用再干。
 
@@ -865,11 +859,11 @@ public class OrderBO {
 
 ## 九九、补充
 
-#### 1、domain -> pojo（模型层）
+#### 1、domain -> pojo
 
 响应体模型和请求参数模型统称为 POJO（Plain Ordinary Java Object、简单的 Java 对象）。
 
-###### ✅ 1.1 响应体模型
+###### 1.1 响应体模型
 
 之前的响应体模型，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。但是实际开发中“一个 domain 走天下”可能并不太合适，而是会有各种模型：
 
@@ -1078,108 +1072,115 @@ public class SingerListQuery extends ListQuery {
 }
 ```
 
+#### ✅ 2、MyBatisPlus（单表 CRUD 利器、多表 CRUD 不管）
 
+一看到 MyBatisPlus 这个名字里的“MyBatis”，我们可能会认为它跟 MyBatis 一样是个数据层的框架；一看到 MyBatisPlus 这个名字里的“Plus”，我们可能会认为它是 MyBatis 的增强版、比 MyBatis 的 API 更好用了；换句话说我们可能会认为 MyBatisPlus 是一个更好用的数据层框架，我们可以用它替换掉 MyBatis 来实现数据层，其实这个理解是错误的。
 
+MyBatisPlus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架、没有 MyBatis 它将不复存在；MyBatisPlus 名字里的“Plus”是指它是一个横跨数据层和业务层的框架、不仅限于数据层；换句话说 **MyBatisPlus 是一个基于 MyBatis、横跨数据层和业务层的数据访问基础设施框架，它的设计理念是：减少单表 CRUD 在数据层和业务层里的重复操作、但是它不管多表 CRUD，所以多表 CRUD 还是得靠我们用老办法自己实现**。接下来我们就看看 MyBatisPlus 能帮我们干些啥：
 
-
-
-
-
-
-#### 2、MyBatis-Plus（数据层 & 业务层）
-
-一看到 MyBatis-Plus 这个名字里的“MyBatis”，我们可能会认为它跟 MyBatis 一样是个数据层的框架；一看到 MyBatis-Plus 这个名字里的“Plus”，我们可能会认为它是 MyBatis 的增强版、比 MyBatis 的 API 更好用了；换句话说我们可能会认为 MyBatis-Plus 是一个更好用的数据层框架，我们可以用它替换掉 MyBatis 来实现数据层，其实这个理解是错误的。
-
-MyBatis-Plus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架、没有 MyBatis 它也将不复存在；MyBatis-Plus 名字里的“Plus”是指它是一个横跨数据层和业务层的框架；换句话说 **MyBatis-Plus 是一个基于 MyBatis、横跨数据层和业务层的数据访问基础设施框架，它的设计理念是减少单表 CRUD 在数据层和业务层的重复操作，所以多表查询还是得靠我们用老方法自己实现**。接下来我们就看看它能帮我们干些啥：
-
-**MyBatis-Plus 虽然名字叫 mybatis，但它不仅是 mybatis 的xxx，而且还包含了业务层一些重复的、跟业务逻辑没关的、直接调用数据层 api 的操作，这样一来我们在业务层就可以真正专注于写业务相关的代码，这种跟业务无关的重复代码用它提供的就好了**
-
-* 添加 MyBatis-Plus 依赖
+* 添加 MyBatisPlus 依赖
 
 ```xml
-<!-- MyBatis-Plus -->
+<!-- MyBatisPlus -->
 <dependency>
-  <groupId>com.baomidou</groupId>
-  <artifactId>mybatis-plus-boot-starter</artifactId>
-  <version>3.5.15</version>
-  <scope>compile</scope>
+    <groupId>com.baomidou</groupId>
+    <artifactId>mybatis-plus-boot-starter</artifactId>
+    <version>3.5.15</version>
+    <scope>compile</scope>
 </dependency>
-<!-- MyBatis-Plus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
+<!-- MyBatisPlus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
 <dependency>
-  <groupId>com.baomidou</groupId>
-  <artifactId>mybatis-plus-jsqlparser</artifactId>
-  <version>3.5.15</version>
+    <groupId>com.baomidou</groupId>
+    <artifactId>mybatis-plus-jsqlparser</artifactId>
+    <version>3.5.15</version>
 </dependency>
 ```
 
-* 在 application.yml 文件里添加 MyBatis-Plus 的配置（MyBatis 的配置转交给 MyBatis-Plus 了）
+* 在 application.yml 文件里添加 MyBatisPlus 相关配置（MyBatis 相关配置转交给了 MyBatisPlus）
 
 ```yml
-# MyBatis-Plus 相关配置（MyBatis 的配置转交给 MyBatis-Plus 了）
+# MyBatisPlus 相关配置（MyBatis 相关配置转交给了 MyBatisPlus）
 myBatis-plus:
   configuration:
+    # 是否开启驼峰命名自动映射，即数据库表自动转 Java Bean 时是否从经典数据库列名 create_time 映射到经典 Java 属性名 createTime
     map-underscore-to-camel-case: true
+  # type-aliases-package，用来给 xml 文件（如 mappers 里的 xml 文件、MyBatis 的配置文件等）里的类型自动取别名、短类名，如 type、parameterType、resultType 这种以 type 结尾的属性都是接收一个类型
+  # 包名.类名，全类名，比较长；我们可以给全类名取个别名，短类名，比较短，写起来更方便；当然如果你偏好于写全类名，那也可以不定义别名
   type-aliases-package: com.ineyee.pojo
-  # 单表 CRUD 一般用 MyBatis-Plus 提供的 SQL 实现就足够了，所以这个暂时就不需要了
-  # 多表查询才有自定义 SQL 的必要，打开这个，去自定义 mapper.xml 实现，跟 MyBatis-Plus 一起使用不会冲突
-#  mapper-locations: classpath:mappers/*.xml
-  # 主键生成策略：
-  # MyBatis-Plus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
-  # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
+  # mapper 层实现的位置
+  # 单表的 mapper 层实现，一般用 MyBatisPlus 自动生成的就够用了
+  # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatisPlus 一起使用不会冲突）
+  mapper-locations: classpath:mappers/*.xml
   global-config:
     db-config:
+      # 主键生成策略：
+      # MyBatisPlus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
+      # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
       id-type: ASSIGN_ID
 ```
 
-###### 2.1 对数据层的影响
+###### ✅ 2.1 对数据层的影响
 
 之前我们是根据每张表手动创建一个对应的 mapper 接口类 ①，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法 ②；然后再手动创建一个对应的 mapper 实现 ③，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库 ④。
 
-但实际开发中有那么多张表，并且我们为每张表手动创建的 mapper 接口类里的内容和 mapper 实现里的内容其实都差不多，全手动搞的话就显得繁琐了。有了 MyBatis-Plus，我们只需要做“创建一个对应的 mapper 接口类”这一件事即可，其它三件事它都帮我们做了：
+但实际开发中有那么多张表，如果我们手动创建每个 mapper 接口类和 mapper 实现的话就显得效率非常低。而有了 MyBatisPlus，我们只需要做“创建一个对应的 mapper 接口类”这一件事即可，其它三件事它帮我们做了 100%：
+
+> 这里的 100% 是指：数据层、我们自己不需要再做任何事情了
 
 ```java
 // 在 mapper 目录下创建一个 XxxMapper 的空接口类即可
-// 只要让接口类继承自 BaseMapper，那么该 mapper 层就自动实现了众多接口方法和 mapper 实现
+// 只要让接口类继承自 BaseMapper，那么该 mapper 层就自动拥有了众多接口方法和 mapper 实现
 // 泛型指定一下对应的 po 类
-public interface SingerMapper extends BaseMapper<Singer> {
+public interface ProductMapper extends BaseMapper<Product> {
+
 }
 ```
 
-###### 2.2 对业务层的影响
+###### ✅ 2.2 对业务层的影响
 
-之前我们是根据每张表手动创建一个对应的 service 接口类 ①，为这个接口类添加 get、list、save、saveBatch、remove、removeBatch、update、updateBatch 等方法 ②；然后再手动创建一个对应的 serviceImpl 实现 ③，在这个 serviceImpl 实现里编写对应业务规则校验 + 调用数据层的 API ④。
+之前我们是根据每张表手动创建一个对应的 service 接口类 ①，为这个接口类添加 get、list、save、saveBatch、remove、removeBatch、update、updateBatch 等方法 ②；然后再手动创建一个对应的 serviceImpl 实现 ③，在这个 serviceImpl 实现里调用数据层的 API 来实现业务 ④。
 
-但实际开发中有那么多张表，并且我们为每张表手动创建的 service 接口类里的内容和 serviceImpl 实现里的内容其实都差不多，全手动搞的话就显得繁琐了。有了 MyBatis-Plus，我们只需要做“创建一个对应的 service 接口类”和“创建一个对应的 serviceImpl 实现”这两件事即可，其它两件事它都帮我们做了：
+但实际开发中有那么多张表，如果我们手动创建每个 service 接口类和 serviceImpl 实现的话就显得效率非常低。而有了 MyBatisPlus，我们只需要做“创建一个对应的 service 接口类”和“创建一个对应的 serviceImpl 实现”这两件事即可，其它两件事它帮我们做了 80%：
+
+> 这里的 80% 是指：
+>
+> * MyBatisPlus 已经把基本的增删改查业务方法都给我们提供好了、而且非常好用，所以 controller 里应该优先用它提供的业务方法、不要轻易自己实现
+> * 并且像排序、模糊搜索、分页之类的操作，我们在业务层用 Java 代码就能快速搞定，不用再去数据层写 SQL 语句了
+> * ......
+>
+> 剩余的 20% 是指：MyBatisPlus 提供的业务方法并非总是完美匹配我们的业务逻辑，此时就需要我们自定义接口方法、自定义实现了（比如有的业务方法需要添加 query 转 po、业务规则校验等，建议【自定义业务方法 = 自定义业务逻辑 + 调用 service 层方法、而非 mapper 层方法】）
 
 ```java
 // 在 service 目录下创建一个 XxxService 的空接口类即可
-// 需要让我们的接口类继承自 MyBatis-Plus 的 IService 接口，这样一来当前接口类就自动拥有了众多接口方法
-// 泛型需要指定一下对应的 po 类
-public interface SingerService extends IService<Singer> {
+// 只要让接口类继承自 IService，那么该接口类就自动拥有了众多接口方法
+// 泛型指定一下对应的 po 类
+public interface ProductService extends IService<Product> {
+
 }
 ```
 
 ```java
 // 在 service 目录下创建一个 XxxServiceImpl 的空实现类即可
-// 需要让我们的接口类继承自 MyBatis-Plus 的 ServiceImpl 接口，这样一来当前实现类就自动拥有了众多接口方法的实现
-// 泛型需要指定一下对应的 mapper 类 和 po 类
+// 只要让实现类继承自 ServiceImpl，那么该实现类就自动拥有了众多接口方法的实现
+// 泛型指定一下对应的 mapper 类 和 po 类
 @Service
 @Transactional
-public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> implements SingerService {
+public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> implements ProductService {
+
 }
 ```
 
-#### 3、EasyCode
+#### ✅ 3、EasyCode（自动生成代码的插件）
 
-###### 3.1 安装 EasyCode
+###### ✅ 3.1 安装 EasyCode
 
 * 是一款基于 IntelliJ IDEA 开发的**代码生成插件**
 * 支持**同时生成多张表的代码，每张表可以有独立的配置信息**
 * 支持**自定义代码模板**，支持**自定义数据库类型与 Java 类型映射**
 
-![image-20260122075736397](第 02 步-编写 Java 代码/img/image-20260122075736397.png)
+![image-20260126230925354](第 02 步-编写 Java 代码/img/image-20260126230925354.png)
 
-###### 3.2 自定义代码模板
+###### ✅ 3.2 自定义代码模板
 
 ![image-20260121223011159](第 02 步-编写 Java 代码/img/image-20260121223011159.png)
 
@@ -1296,6 +1297,6 @@ public class $!{tableName} {
 }
 ```
 
-###### 3.3 自定义数据库类型与 Java 类型映射
+###### ✅ 3.3 自定义数据库类型与 Java 类型映射
 
 ![image-20260121223652500](第 02 步-编写 Java 代码/img/image-20260121223652500.png)
