@@ -172,7 +172,7 @@ server:
     <!-- 构建信息，比如输出产物的名字、插件配置等 -->
     <build>
         <!-- 输出产物的名字 -->
-        <finalName>tp</finalName>
+        <finalName>sbm</finalName>
         <!-- 插件配置 -->
         <plugins>
             <!-- 开发结束后把项目打包成 runnable jar 的插件 -->

@@ -81,8 +81,8 @@
         </dependency>
         <!--
             spring-boot-starter-validation
-                jakarta.validation-api
-                hibernate-validator
+                jakarta.validation-api 是接口库
+                hibernate-validator 是实现库
         -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -112,19 +112,6 @@
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.2.23</version>
         </dependency>
-        <!--
-            单元测试：
-            JUnit Jupiter（JUnit 5）
-            Mockito（Mock 框架）
-            AssertJ（断言库）
-            Hamcrest（匹配器）
-            Spring Test（Spring 测试支持）
-        -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- MyBatis-Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -137,6 +124,19 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
             <version>3.5.15</version>
+        </dependency>
+        <!--
+            单元测试：
+            JUnit Jupiter（JUnit 5）
+            Mockito（Mock 框架）
+            AssertJ（断言库）
+            Hamcrest（匹配器）
+            Spring Test（Spring 测试支持）
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

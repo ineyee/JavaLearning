@@ -308,8 +308,8 @@ cors:
 ```xml
 <!--
     spring-boot-starter-validation
-        jakarta.validation-api
-        hibernate-validator
+        jakarta.validation-api 是接口库
+        hibernate-validator 是实现库
 -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -353,16 +353,25 @@ cors:
 </dependency>
 ```
 
-* （可选）然后我们可以安装分页查询库，以便 MyBatis 能用一份 SQL 语句应对不同的数据库如 MySQL、Oracle、PostgreSQL
+* （可选）MyBatis-Plus 相关的库
 
 ```xml
-<!-- 必须指定版本号，因为 PageHelper 是第三方库，SpringBoot 不管理它的版本 -->
+<!-- MyBatis-Plus -->
 <dependency>
-    <groupId>com.github.pagehelper</groupId>
-    <artifactId>pagehelper-spring-boot-starter</artifactId>
-    <version>2.1.0</version>
+  <groupId>com.baomidou</groupId>
+  <artifactId>mybatis-plus-boot-starter</artifactId>
+  <version>3.5.15</version>
+  <scope>compile</scope>
+</dependency>
+<!-- MyBatis-Plus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
+<dependency>
+  <groupId>com.baomidou</groupId>
+  <artifactId>mybatis-plus-jsqlparser</artifactId>
+  <version>3.5.15</version>
 </dependency>
 ```
+
+
 
 #### 3、其它依赖
 
@@ -1128,17 +1137,17 @@ MyBatis-Plus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架
 ```xml
 <!-- MyBatis-Plus -->
 <dependency>
-    <groupId>com.baomidou</groupId>
-    <artifactId>mybatis-plus-boot-starter</artifactId>
-    <version>3.5.15</version>
-    <scope>compile</scope>
+  <groupId>com.baomidou</groupId>
+  <artifactId>mybatis-plus-boot-starter</artifactId>
+  <version>3.5.15</version>
+  <scope>compile</scope>
 </dependency>
 <!-- MyBatis-Plus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
 <dependency>
-    <groupId>com.baomidou</groupId>
-    <artifactId>mybatis-plus-jsqlparser</artifactId>
-    <version>3.5.15</version>
-</dependency> 
+  <groupId>com.baomidou</groupId>
+  <artifactId>mybatis-plus-jsqlparser</artifactId>
+  <version>3.5.15</version>
+</dependency>
 ```
 
 * 在 application.yml 文件里添加 MyBatis-Plus 的配置（MyBatis 的配置转交给 MyBatis-Plus 了）
