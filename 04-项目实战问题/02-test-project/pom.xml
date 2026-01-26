@@ -1,9 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+      声明 pom.xml 文件的版本，就像 .html 文件里声明是 H5 那样，决定了该文件里能写什么标签不能写什么标签
+      目前都使用 4.0.0，是必要元素
+    -->
     <modelVersion>4.0.0</modelVersion>
 
+    <!--
+      groupId：com.ineyee，公司域名倒写，我们创建项目时填写的
+      artifactId：默认就是项目名，我们创建项目时填写的
+      version：1.0.0，项目版本号，我们创建项目时填写的
+    -->
     <groupId>com.ineyee</groupId>
-    <artifactId>02-test-project</artifactId>
+    <artifactId>03-springboot-combine-mybatis</artifactId>
     <version>1.0.0</version>
 
     <!--
