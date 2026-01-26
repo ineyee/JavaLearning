@@ -26,7 +26,7 @@ spring:
       initial-size: 5
       max-active: 10
 
-# 跨域处理配置，静态资源服务器的源白名单（自定义的属性绑定）
+# 跨域处理配置，静态资源服务器的源白名单（cors 是我们自定义的属性绑定）
 cors:
   allowed-origins:
     - http://8.136.43.114:5500

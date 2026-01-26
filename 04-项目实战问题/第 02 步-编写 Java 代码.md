@@ -62,27 +62,32 @@
 spring:
   profiles:
     # 通过子配置文件名来"引入、激活"子配置文件，这里是个数组
+    # 开发环境用 dev，生产环境用 prd
     active:
-      - dev # 开发环境用 dev，生产环境用 prd
+      - dev
   mvc:
     servlet:
       # DispatcherServlet 的加载时机：默认是 -1（延迟加载，第一次请求接口时才初始化）
       # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
       load-on-startup: 0
 
-# MyBatis-Plus 相关配置（MyBatis 的配置转交给 MyBatis-Plus 了）
+# MyBatis-Plus 相关配置（MyBatis 相关配置转交给了 MyBatis-Plus）
 myBatis-plus:
   configuration:
+    # 是否开启驼峰命名自动映射，即数据库表自动转 Java Bean 时是否从经典数据库列名 create_time 映射到经典 Java 属性名 createTime
     map-underscore-to-camel-case: true
+  # type-aliases-package，用来给 xml 文件（如 mappers 里的 xml 文件、MyBatis 的配置文件等）里的类型自动取别名、短类名，如 type、parameterType、resultType 这种以 type 结尾的属性都是接收一个类型
+  # 包名.类名，全类名，比较长；我们可以给全类名取个别名，短类名，比较短，写起来更方便；当然如果你偏好于写全类名，那也可以不定义别名
   type-aliases-package: com.ineyee.pojo
-  # 单表 CRUD 一般用 MyBatis-Plus 提供的 SQL 实现就足够了，所以这个暂时就不需要了
-  # 多表查询才有自定义 SQL 的必要，打开这个，去自定义 mapper.xml 实现，跟 MyBatis-Plus 一起使用不会冲突
-#  mapper-locations: classpath:mappers/*.xml
-  # 主键生成策略：
-  # MyBatis-Plus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
-  # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
+  # mapper 层实现的位置
+  # 单表的 mapper 层实现，一般用 MyBatis-Plus 自动生成的就够用了
+  # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatis-Plus 一起使用不会冲突）
+  mapper-locations: classpath:mappers/*.xml
   global-config:
     db-config:
+      # 主键生成策略：
+      # MyBatis-Plus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
+      # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
       id-type: ASSIGN_ID
 ```
 
@@ -116,6 +121,12 @@ spring:
     druid:
       initial-size: 5
       max-active: 10
+
+# 跨域处理配置，静态资源服务器的源白名单（cors 是我们自定义的属性绑定）
+cors:
+  allowed-origins:
+    - http://127.0.0.1:5500
+    - http://127.0.0.1:8888
 ```
 
 ```yaml
@@ -148,6 +159,12 @@ spring:
     druid:
       initial-size: 5
       max-active: 10
+
+# 跨域处理配置，静态资源服务器的源白名单（cors 是我们自定义的属性绑定）
+cors:
+  allowed-origins:
+    - http://8.136.43.114:5500
+    - http://8.136.43.114:8888
 ```
 
 ## ✅ 三、编辑 pom.xml 文件，Maven 项目配置
