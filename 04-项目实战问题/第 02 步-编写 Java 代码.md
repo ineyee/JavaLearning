@@ -434,7 +434,7 @@ SpringBoot 项目的 spring-boot-starter-web 会默认添加 Logback 依赖，�
         使用 property 标签定义一个变量，抽取日志文件所在目录
             线上 Linux 系统，我们输出到 /var/log/${AppName}/app.log 文件中
     -->
-    <property name="LOG_FILE_HOME" value="/var/log/slf4j_logback"/>
+    <property name="LOG_FILE_HOME" value="/var/log/test_project"/>
 
     <!-- 定义一个输出目标：控制台 -->
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
