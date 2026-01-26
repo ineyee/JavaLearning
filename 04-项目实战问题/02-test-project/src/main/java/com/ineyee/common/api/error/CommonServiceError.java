@@ -7,13 +7,13 @@ public enum CommonServiceError implements ServiceError {
     SUCCESS(0, "Success"),
     REQUEST_ERROR(-100000, "Request Failed");
 
-    private final Integer code;
-    private final String message;
-
     CommonServiceError(Integer code, String message) {
         this.code = code;
         this.message = message;
     }
+
+    private final Integer code;
+    private final String message;
 
     @Override
     public Integer getCode() {

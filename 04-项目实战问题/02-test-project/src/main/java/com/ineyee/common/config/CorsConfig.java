@@ -1,12 +1,12 @@
 package com.ineyee.common.config;
 
-import com.ineyee.common.props.CorsProperties;
+import com.ineyee.common.prop.CorsProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-// 跨域处理配置
+// 跨域处理相关配置
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
     @Autowired

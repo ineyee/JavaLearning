@@ -2,6 +2,7 @@ package com.ineyee.common.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ineyee.common.api.error.CommonServiceError;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -42,7 +43,9 @@ public class HttpResult<T> {
         this.data = data;
     }
 
+    @NotNull(message = "错误码不能为空")
     private Integer code;
+    @NotNull(message = "错误信息不能为空")
     private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)  // null 时不序列化
     private T data;

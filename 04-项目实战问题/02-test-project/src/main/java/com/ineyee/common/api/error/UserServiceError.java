@@ -8,13 +8,13 @@ public enum UserServiceError implements ServiceError {
     CANT_BATCH_UPDATE_EMAIL(-200002, "Cant Batch Update Email"),
     EMAIL_ALREADY_EXIST(-200003, "Email Already Exist");
 
-    private final Integer code;
-    private final String message;
-
     UserServiceError(Integer code, String message) {
         this.code = code;
         this.message = message;
     }
+
+    private final Integer code;
+    private final String message;
 
     @Override
     public Integer getCode() {

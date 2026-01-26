@@ -21,7 +21,7 @@ myBatis-plus:
   # mapper 层实现的位置
   # 单表的 mapper 层实现，一般用 MyBatis-Plus 自动生成的就够用了
   # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatis-Plus 一起使用不会冲突）
-  mapper-locations: classpath:mappers/*.xml
+  mapper-locations: classpath:mapper/*.xml
   global-config:
     db-config:
       # 主键生成策略：
