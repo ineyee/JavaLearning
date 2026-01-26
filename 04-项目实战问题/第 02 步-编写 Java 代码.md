@@ -71,7 +71,7 @@ spring:
       # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
       load-on-startup: 0
 
-# MyBatis-Plus 相关配置（MyBatis 相关配置转交给了 MyBatis-Plus）
+# MyBatisPlus 相关配置（MyBatis 相关配置转交给了 MyBatisPlus）
 myBatis-plus:
   configuration:
     # 是否开启驼峰命名自动映射，即数据库表自动转 Java Bean 时是否从经典数据库列名 create_time 映射到经典 Java 属性名 createTime
@@ -80,13 +80,13 @@ myBatis-plus:
   # 包名.类名，全类名，比较长；我们可以给全类名取个别名，短类名，比较短，写起来更方便；当然如果你偏好于写全类名，那也可以不定义别名
   type-aliases-package: com.ineyee.pojo
   # mapper 层实现的位置
-  # 单表的 mapper 层实现，一般用 MyBatis-Plus 自动生成的就够用了
-  # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatis-Plus 一起使用不会冲突）
+  # 单表的 mapper 层实现，一般用 MyBatisPlus 自动生成的就够用了
+  # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatisPlus 一起使用不会冲突）
   mapper-locations: classpath:mappers/*.xml
   global-config:
     db-config:
       # 主键生成策略：
-      # MyBatis-Plus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
+      # MyBatisPlus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
       # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
       id-type: ASSIGN_ID
 ```
@@ -353,17 +353,17 @@ cors:
 </dependency>
 ```
 
-* （可选）MyBatis-Plus 相关的库，单表 CRUD 利器
+* （可选）MyBatisPlus 相关的库，单表 CRUD 利器
 
 ```xml
-<!-- MyBatis-Plus -->
+<!-- MyBatisPlus -->
 <dependency>
   <groupId>com.baomidou</groupId>
   <artifactId>mybatis-plus-boot-starter</artifactId>
   <version>3.5.15</version>
   <scope>compile</scope>
 </dependency>
-<!-- MyBatis-Plus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
+<!-- MyBatisPlus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
 <dependency>
   <groupId>com.baomidou</groupId>
   <artifactId>mybatis-plus-jsqlparser</artifactId>
@@ -599,13 +599,13 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 ## 八、单表 CRUD
 
-#### ✅ 1、表现层之模型层 pojo
-
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，我们手动创建每个 po 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成 po：
+#### ✅ 1、表现层之模型层 pojo 👉🏻 使用 EasyCode 自动生成完整代码
+
+之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，如果我们手动创建每个 po 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成 po 的完整代码：
 
 ![image-20260122081707951](第 02 步-编写 Java 代码/img/image-20260122081707951.png)
 
@@ -617,54 +617,15 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 ![image-20260122082626043](第 02 步-编写 Java 代码/img/image-20260122082626043.png)
 
-## 九、数据层 mapper
+#### ✅ 2、数据层 mapper 👉🏻 使用 EasyCode + MyBatisPlus 自动生成完整代码
 
-> * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
-> * 一个数据库里可以有多张表，比如 user、product 这两张表
-> * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
+###### 2.1 Java 代码
 
-#### 1、Java 代码：MyBatis-Plus 自动生成 mapper 接口类的方法和 mapper 实现
+之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，如果我们手动创建每个 mapper 接口类和 mapper 实现的话就显得效率非常低，所以我们一般都是用 EasyCode + MyBatisPlus 来自动生成 mapper 接口类和 mapper 实现的完整代码：
 
-之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，我们手动创建的接口类和实现的内容其实都差不多，所以我们国内开发者搞了一个库 MyBatis-Plus 来帮我们自动生成 mapper 接口类的方法和 mapper 实现：
+###### 2.2 配置
 
-* 添加 MyBatis-Plus 依赖
-
-```xml
-<!-- MyBatis-Plus，自动生成 mapper 接口类的方法和 mapper 实现 -->
-<dependency>
-  <groupId>com.baomidou</groupId>
-  <artifactId>MyBatis-Plus-boot-starter</artifactId>
-  <version>3.5.16</version>
-  <scope>compile</scope>
-</dependency>
-```
-
-* 在 application.yml 文件里添加 MyBatis-Plus 的配置（MyBatis 的配置转交给 MyBatis-Plus 了）
-
-```yml
-# MyBatis-Plus 相关配置（MyBatis 的配置转交给 MyBatis-Plus 了）
-MyBatis-Plus:
-  configuration:
-    map-underscore-to-camel-case: true
-  type-aliases-package: com.ineyee.pojo
-  # 建议优先使用 MyBatis-Plus 提供的 SQL 实现，所以这个暂时就不需要了
-  # 除非我们有自定义 SQL 语句的需要，再打开这个，然后去自定义 mapper.xml，此时依旧可以跟 MyBatis-Plus 一起使用
-#  mapper-locations: classpath:mappers/*.xml
-```
-
-* 在 mapper 目录下创建一个 XxxMapper 的空接口类即可，这样 mapper 层的 Java 代码就算完成了
-
-```java
-// 在 mapper 目录下创建一个 XxxMapper 的空接口类即可
-// 只要让接口类继承自 BaseMapper，那么该 mapper 层就自动实现了众多接口方法和 mapper 实现
-// 泛型指定一下对应的 po 类
-public interface SingerMapper extends BaseMapper<Singer> {
-}
-```
-
-#### 2、配置
-
-把数据层 mapper 相关配置的值都写在 application.yml（MyBatis-Plus）、application-dev.yml（开发环境的数据源） 和 application-prd.yml（生产环境的数据源） 这三个配置文件里。
+把数据层 mapper 相关配置的值都写在 application.yml（MyBatisPlus）、application-dev.yml（开发环境的数据源） 和 application-prd.yml（生产环境的数据源） 这三个配置文件里。
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，并且在 yml 配置文件里做好配置，SpringBoot 就会自动创建 DruidDataSource、SqlSessionFactoryBean 等对象，并通过属性绑定技术把 yml 配置文件里的值自动绑定到这些对象上去，其它的我们啥也不用再干，不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。
 

@@ -1,3 +1,5 @@
+# application.yml
+
 spring:
   profiles:
     # 通过子配置文件名来"引入、激活"子配置文件，这里是个数组
@@ -10,7 +12,7 @@ spring:
       # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
       load-on-startup: 0
 
-# MyBatis-Plus 相关配置（MyBatis 相关配置转交给了 MyBatis-Plus）
+# MyBatisPlus 相关配置（MyBatis 相关配置转交给了 MyBatisPlus）
 myBatis-plus:
   configuration:
     # 是否开启驼峰命名自动映射，即数据库表自动转 Java Bean 时是否从经典数据库列名 create_time 映射到经典 Java 属性名 createTime
@@ -19,12 +21,12 @@ myBatis-plus:
   # 包名.类名，全类名，比较长；我们可以给全类名取个别名，短类名，比较短，写起来更方便；当然如果你偏好于写全类名，那也可以不定义别名
   type-aliases-package: com.ineyee.pojo
   # mapper 层实现的位置
-  # 单表的 mapper 层实现，一般用 MyBatis-Plus 自动生成的就够用了
-  # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatis-Plus 一起使用不会冲突）
-  mapper-locations: classpath:mapper/*.xml
+  # 单表的 mapper 层实现，一般用 MyBatisPlus 自动生成的就够用了
+  # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatisPlus 一起使用不会冲突）
+  mapper-locations: classpath:mappers/*.xml
   global-config:
     db-config:
       # 主键生成策略：
-      # MyBatis-Plus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
+      # MyBatisPlus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
       # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
       id-type: ASSIGN_ID

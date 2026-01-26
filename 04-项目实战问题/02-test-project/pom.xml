@@ -112,14 +112,14 @@
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.2.23</version>
         </dependency>
-        <!-- MyBatis-Plus -->
+        <!-- MyBatisPlus -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.5.15</version>
             <scope>compile</scope>
         </dependency>
-        <!-- MyBatis-Plus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
+        <!-- MyBatisPlus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
