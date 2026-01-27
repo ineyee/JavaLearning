@@ -1141,6 +1141,134 @@ public interface $!{tableName} extends IService<$!{entityName}> {
   void updateBatch($!{entityName}UpdateBatchReq req) throws ServiceException;
 }
 ------------------------------------------------------------------------------------------
+##导入宏定义
+$!{define.vm}
+##设置表后缀（宏定义）
+#setTableSuffix("ServiceImpl")
+##保存文件（宏定义）
+#save("/service", "ServiceImpl.java")
+##包路径（宏定义）
+#setPackageSuffix("service")
+#set($entityName = $!{tableInfo.name})
+#set($entityVar = $!tool.firstLowerCase($entityName))
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import $!{tableInfo.savePackageName}.common.api.error.CommonServiceError;
+import $!{tableInfo.savePackageName}.common.api.exception.ServiceException;
+import $!{tableInfo.savePackageName}.mapper.$!{entityName}Mapper;
+import $!{tableInfo.savePackageName}.pojo.po.$!{entityName};
+import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}GetQuery;
+import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}ListQuery;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}CreateBatchReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}CreateReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteBatchReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateBatchReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateReq;
+import $!{tableInfo.savePackageName}.pojo.vo.ListData;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Transactional
+public class $!{tableName} extends ServiceImpl<$!{entityName}Mapper, $!{entityName}> implements $!{entityName}Service {
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public $!{entityName} get($!{entityName}GetQuery query) throws ServiceException {
+      $!{entityName} data = getById(query.getId());
+      if (data == null) {
+          throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+      }
+      return data;
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ListData<$!{entityName}> list($!{entityName}ListQuery query) {
+      LambdaQueryWrapper<$!{entityName}> wrapper = new LambdaQueryWrapper<>();
+      // TODO: 按需追加查询条件
+
+      wrapper.orderByDesc($!{entityName}::getId);
+
+      if (query.getPageNum() != null && query.getPageSize() != null) {
+          Page<$!{entityName}> page = new Page<>(query.getPageNum(), query.getPageSize());
+          Page<$!{entityName}> queriedPage = page(page, wrapper);
+          return ListData.fromPage(queriedPage);
+      } else {
+          List<$!{entityName}> dataList = list(wrapper);
+          return ListData.fromList(dataList);
+      }
+  }
+
+  @Override
+  public $!{entityName} save($!{entityName}CreateReq req) throws ServiceException {
+      $!{entityName} entity = new $!{entityName}();
+      BeanUtils.copyProperties(req, entity);
+      if (!save(entity)) {
+          throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+      }
+      return entity;
+  }
+
+  @Override
+  public List<Long> saveBatch($!{entityName}CreateBatchReq req) throws ServiceException {
+      List<$!{entityName}> entityList = new ArrayList<>();
+      req.get$!{entityName}List().forEach(item -> {
+          $!{entityName} entity = new $!{entityName}();
+          BeanUtils.copyProperties(item, entity);
+          entityList.add(entity);
+      });
+      if (!saveBatch(entityList)) {
+          throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+      }
+      List<Long> idList = new ArrayList<>();
+      entityList.forEach(item -> idList.add(item.getId()));
+      return idList;
+  }
+
+  @Override
+  public void remove($!{entityName}DeleteReq req) throws ServiceException {
+      if (!removeById(req.getId())) {
+          throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+      }
+  }
+
+  @Override
+  public void removeBatch($!{entityName}DeleteBatchReq req) throws ServiceException {
+      if (!removeBatchByIds(req.getIdList())) {
+          throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+      }
+  }
+
+  @Override
+  public void update($!{entityName}UpdateReq req) throws ServiceException {
+      $!{entityName} entity = new $!{entityName}();
+      BeanUtils.copyProperties(req, entity);
+      if (!updateById(entity)) {
+          throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+      }
+  }
+
+  @Override
+  public void updateBatch($!{entityName}UpdateBatchReq req) throws ServiceException {
+      List<$!{entityName}> entityList = new ArrayList<>();
+      req.get$!{entityName}List().forEach(item -> {
+          $!{entityName} entity = new $!{entityName}();
+          BeanUtils.copyProperties(item, entity);
+          entityList.add(entity);
+      });
+      if (!updateBatchById(entityList)) {
+          throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+      }
+  }
+}
 ```
 
 * controller 简单版和完整版
