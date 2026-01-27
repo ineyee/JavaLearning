@@ -1,13 +1,13 @@
-package com.ineyee.service.singer;
+package com.ineyee.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.po.Singer;
-import com.ineyee.pojo.query.singer.SingerListQuery;
-import com.ineyee.pojo.req.singer.SingerCreateBatchReq;
-import com.ineyee.pojo.req.singer.SingerCreateReq;
-import com.ineyee.pojo.req.singer.SingerUpdateBatchReq;
-import com.ineyee.pojo.req.singer.SingerUpdateReq;
+import com.ineyee.pojo.query.SingerListQuery;
+import com.ineyee.pojo.req.SingerCreateBatchReq;
+import com.ineyee.pojo.req.SingerCreateReq;
+import com.ineyee.pojo.req.SingerUpdateBatchReq;
+import com.ineyee.pojo.req.SingerUpdateReq;
 import com.ineyee.pojo.vo.ListData;
 
 import java.util.List;

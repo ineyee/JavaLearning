@@ -1,4 +1,4 @@
-package com.ineyee.service.product;
+package com.ineyee.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,9 +8,9 @@ import com.ineyee.common.api.error.ProductServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.ProductMapper;
 import com.ineyee.pojo.po.Product;
-import com.ineyee.pojo.query.product.ProductGetQuery;
-import com.ineyee.pojo.query.product.ProductListQuery;
-import com.ineyee.pojo.req.product.*;
+import com.ineyee.pojo.query.ProductGetQuery;
+import com.ineyee.pojo.query.ProductListQuery;
+import com.ineyee.pojo.req.*;
 import com.ineyee.pojo.vo.ListData;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

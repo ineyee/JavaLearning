@@ -1,6 +1,5 @@
-package com.ineyee.pojo.query.product;
+package com.ineyee.pojo.query;
 
-import com.ineyee.pojo.query.ListQuery;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -1,4 +1,4 @@
-package com.ineyee.pojo.query.singer;
+package com.ineyee.pojo.query;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.ineyee.pojo.req.singer;
+package com.ineyee.pojo.req;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;

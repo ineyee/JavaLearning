@@ -3,11 +3,11 @@ package com.ineyee.controller;
 import com.ineyee.common.api.HttpResult;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.po.Product;
-import com.ineyee.pojo.query.product.ProductGetQuery;
-import com.ineyee.pojo.query.product.ProductListQuery;
-import com.ineyee.pojo.req.product.*;
+import com.ineyee.pojo.query.ProductGetQuery;
+import com.ineyee.pojo.query.ProductListQuery;
+import com.ineyee.pojo.req.*;
 import com.ineyee.pojo.vo.ListData;
-import com.ineyee.service.product.ProductService;
+import com.ineyee.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,26 +42,26 @@ public class ProductController {
 
     @GetMapping("/get")
     public HttpResult<Product> get(@Valid ProductGetQuery query) throws ServiceException {
-        Product product = productService.get(query);
-        return HttpResult.ok(product);
+        Product data = productService.get(query);
+        return HttpResult.ok(data);
     }
 
     @GetMapping("/list")
     public HttpResult<ListData<Product>> list(@Valid ProductListQuery query) {
-        ListData<Product> products = productService.list(query);
-        return HttpResult.ok(products);
+        ListData<Product> dataList = productService.list(query);
+        return HttpResult.ok(dataList);
     }
 
     @PostMapping("/save")
     public HttpResult<Product> save(@Valid @RequestBody ProductCreateReq req) throws ServiceException {
-        Product product = productService.save(req);
-        return HttpResult.ok(product);
+        Product data = productService.save(req);
+        return HttpResult.ok(data);
     }
 
     @PostMapping("/saveBatch")
     public HttpResult<List<Long>> saveBatch(@Valid @RequestBody ProductCreateBatchReq req) throws ServiceException {
-        List<Long> productIdList = productService.saveBatch(req);
-        return HttpResult.ok(productIdList);
+        List<Long> idList = productService.saveBatch(req);
+        return HttpResult.ok(idList);
     }
 
     @PostMapping("/remove")

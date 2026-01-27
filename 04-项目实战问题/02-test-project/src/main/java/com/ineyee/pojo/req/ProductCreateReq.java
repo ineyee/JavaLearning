@@ -1,4 +1,4 @@
-package com.ineyee.pojo.req.product;
+package com.ineyee.pojo.req;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

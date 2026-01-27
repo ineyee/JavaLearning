@@ -1055,7 +1055,7 @@ public interface $!{tableName} extends BaseMapper<$!tableInfo.name> {
 }
 ```
 
-* service & serviceImpl
+* service & serviceImpl 简单版和完整版
 
 ```velocity
 ##导入宏定义
@@ -1073,9 +1073,8 @@ import $!{tableInfo.savePackageName}.pojo.po.$!tableInfo.name;
 public interface $!{tableName} extends IService<$!tableInfo.name> {
 
 }
-```
 
-```velocity
+
 ##导入宏定义
 $!{define.vm}
 ##设置表后缀（宏定义）
@@ -1098,7 +1097,11 @@ public class $!{tableName} extends ServiceImpl<$!{tableInfo.name}Mapper, $!{tabl
 }
 ```
 
-* controller
+```velocity
+
+```
+
+* controller 简单版和完整版
 
 ```velocity
 ##导入宏定义
@@ -1123,6 +1126,91 @@ public class $!{tableName} {
     private $!{tableInfo.name}Service $!{serviceName};
     
     
+}
+```
+
+```velocity
+##导入宏定义
+$!{define.vm}
+##设置表后缀（宏定义）
+#setTableSuffix("Controller")
+##保存文件（宏定义）
+#save("/controller", "Controller.java")
+##包路径（宏定义）
+#setPackageSuffix("controller")
+#set($entityName = $!{tableInfo.name})
+#set($entityVar = $!tool.firstLowerCase($!entityName))
+#set($serviceName = $!tool.append($!entityVar, "Service"))
+
+import $!{tableInfo.savePackageName}.common.api.HttpResult;
+import $!{tableInfo.savePackageName}.common.api.exception.ServiceException;
+import $!{tableInfo.savePackageName}.pojo.po.$!{entityName};
+import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}GetQuery;
+import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}ListQuery;
+import $!{tableInfo.savePackageName}.pojo.req.*;
+import $!{tableInfo.savePackageName}.pojo.vo.ListData;
+import $!{tableInfo.savePackageName}.service.$!{entityName}Service;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@Slf4j
+@RestController
+@RequestMapping("/$!entityVar")
+public class $!{tableName} {
+  @Autowired
+  private $!{entityName}Service $!{serviceName};
+
+  @GetMapping("/get")
+  public HttpResult<$!{entityName}> get(@Valid $!{entityName}GetQuery query) throws ServiceException {
+      $!{entityName} data = $!{serviceName}.get(query);
+      return HttpResult.ok(data);
+  }
+
+  @GetMapping("/list")
+  public HttpResult<ListData<$!{entityName}>> list(@Valid $!{entityName}ListQuery query) {
+      ListData<$!{entityName}> dataList = $!{serviceName}.list(query);
+      return HttpResult.ok(dataList);
+  }
+
+  @PostMapping("/save")
+  public HttpResult<$!{entityName}> save(@Valid @RequestBody $!{entityName}CreateReq req) throws ServiceException {
+      $!{entityName} data = $!{serviceName}.save(req);
+      return HttpResult.ok(data);
+  }
+
+  @PostMapping("/saveBatch")
+  public HttpResult<List<Long>> saveBatch(@Valid @RequestBody $!{entityName}CreateBatchReq req) throws ServiceException {
+      List<Long> idList = $!{serviceName}.saveBatch(req);
+      return HttpResult.ok(idList);
+  }
+
+  @PostMapping("/remove")
+  public HttpResult<Void> remove(@Valid @RequestBody $!{entityName}DeleteReq req) throws ServiceException {
+      $!{serviceName}.remove(req);
+      return HttpResult.ok();
+  }
+
+  @PostMapping("/removeBatch")
+  public HttpResult<Void> removeBatch(@Valid @RequestBody $!{entityName}DeleteBatchReq req) throws ServiceException {
+      $!{serviceName}.removeBatch(req);
+      return HttpResult.ok();
+  }
+
+  @PostMapping("/update")
+  public HttpResult<Void> update(@Valid @RequestBody $!{entityName}UpdateReq req) throws ServiceException {
+      $!{serviceName}.update(req);
+      return HttpResult.ok();
+  }
+
+  @PostMapping("/updateBatch")
+  public HttpResult<Void> updateBatch(@Valid @RequestBody $!{entityName}UpdateBatchReq req) throws ServiceException {
+      $!{serviceName}.updateBatch(req);
+      return HttpResult.ok();
+  }
 }
 ```
 
