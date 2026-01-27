@@ -597,7 +597,7 @@ public class TestService {
 
 common 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## 八、单表 CRUD（可以充分利用 MyBatisPlus、以 product 表为例）
+## ✅ 八、单表 CRUD（可以充分利用 MyBatisPlus、以 product 表为例）
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -643,219 +643,17 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动创建和配置事务管理器 DataSourceTransactionManager 对象，并自动启动事务管理 @EnableTransactionManagement，我们同样不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。只需要在想使用事务管理的 Service 类上加一个 @Transactional 注解就完事了，这样一来这个业务类里所有的方法都会自动加上事务管理的代码，当然我们也可以只在某一个方法上加上一个 @Transactional 注解，其它的我们啥也不用再干。
 
-## 十一、表现层之控制器层 controller
+#### ✅ 4、表现层之控制器层 controller 👉🏻 用 EasyCode 自动生成模板代码
 
-> * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
-> * 一个数据库里可以有多张表，比如 user、product 这两张表
-> * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
+###### ✅ 4.1 Java 代码
 
-#### 数据查询对象 Query 补充在这里吧，毕竟是在写接口的时候才会去创建
+之前我们是根据每张表手动创建每个 controller 的，但实际开发中有那么多张表，如果我们手动创建每个 controller 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成 controller 的模板代码、真正的接口我们自己来实现：
 
-#### 1、Java 代码
+![image-20260127081151049](第 02 步-编写 Java 代码/img/image-20260127081151049.png)
 
-定义一个 controller 类、用 @Controller 修饰一下放入子 IoC 容器里、自动注入 service。
+###### ✅ 4.2 配置
 
-#### 2、配置
-
-只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动配置消息转换器（String 和 JSON 响应体的编码方式、默认就是 UTF-8，LocalDateTime 序列化为 ISO-8601 字符串格式等），自动配置参数是否必传的验证器，我们同样不再需要像以前一样“在 Spring 的子配置文件里配置一大堆东西”。controller 里该用啥用啥，其它的我们啥也不用再干。
-
-***
-
-## 临时
-
- **PO - 数据库层面**
-
-```java
- @Entity
-
- @Table(name = "orders")
-
- public class OrderPO {
-
-   @Id
-
-   private Long id;
-
-
-
-   // 数据库存储用整数，节省空间
-
-   @Column(name = "status")
-
-   private Integer status; // 0:待支付 1:已支付 2:已发货 3:已完成 
-
- 4:已取消
-
-
-
-   @Column(name = "created_at")
-
-   private Timestamp createdAt;
-
- }
-```
-
-
-
-
-
- **BO - 业务逻辑层面**
-
-
-
-```java
-public class OrderBO {
-
-   private Long id;
-
-
-
-   // 使用枚举，业务语义清晰
-
-   private OrderStatus status;
-
-
-
-   private LocalDateTime createdAt;
-
-
-
-   // 业务方法：状态流转逻辑
-
-   public void pay() {
-
-​     if (status != OrderStatus.PENDING_PAYMENT) {
-
-​       throw new BusinessException("订单状态不允许支付");
-
-​     }
-
-​     this.status = OrderStatus.PAID;
-
-   }
-
-
-
-   public void ship() {
-
-​     if (status != OrderStatus.PAID) {
-
-​       throw new BusinessException("订单未支付，不能发货");
-
-​     }
-
-​     this.status = OrderStatus.SHIPPED;
-
-   }
-
-
-
-   // 业务规则：是否可以取消
-
-   public boolean canCancel() {
-
-​     return status == OrderStatus.PENDING_PAYMENT
-
-​       || status == OrderStatus.PAID;
-
-   }
-
- }
-
-
-
- enum OrderStatus {
-
-   PENDING_PAYMENT, PAID, SHIPPED, COMPLETED, CANCELLED
-
- }
-```
-
-
-
-
-
- **DTO - 接口传输层面**
-
-```java
-// 给第三方物流系统的 DTO
-
- public class OrderShipmentDTO {
-
-   private String orderId;
-
-
-
-   // 简化状态，物流系统只关心是否需要发货
-
-   private String shipmentStatus; // "TO_SHIP", "SHIPPED"
-
-
-
-   private String recipientAddress;
-
- }
-
-
-
- // 给支付系统的 DTO
-
- public class OrderPaymentDTO {
-
-   private String orderId;
-
-   private String paymentStatus; // "UNPAID", "PAID"
-
-   private BigDecimal amount;
-
- }
-
-
-```
-
-
-
- 
-
-
-
- **VO - 前端展示层面**
-
-```java
- public class OrderVO {
-
-   private String orderId;
-
-
-
-   // 前端展示用中文描述
-
-   private String statusText; // 
-
- "待支付"、"已支付"、"已发货"、"已完成"、"已取消"
-
-
-
-   // 前端需要的状态颜色
-
-   private String statusColor; // "warning", "success", "info", 
-
- "default", "error"
-
-
-
-   // 前端需要的可操作按钮
-
-   private List<String> availableActions; // ["支付", "取消订单"]
-
-
-
-   // 格式化的时间
-
-   private String createdTime; // "2026-01-12 14:30:25"
-
- }
-```
+只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动配置参数是否必传的验证器、响应体自动转 JSON 字符串、请求参数和响应体的编码方式消息转换器（String 和 JSON 响应体的编码方式、默认就是 UTF-8，LocalDateTime 序列化为 ISO-8601 字符串格式等），我们同样不再需要像以前一样“在 Spring 的子配置文件里配置一大堆东西”。controller 里该用啥用啥，其它的我们啥也不用再干。
 
 ## 九九、补充
 
@@ -1300,3 +1098,199 @@ public class $!{tableName} {
 ###### ✅ 3.3 自定义数据库类型与 Java 类型映射
 
 ![image-20260121223652500](第 02 步-编写 Java 代码/img/image-20260121223652500.png)
+
+## 临时：几个 o 的转换
+
+ **PO - 数据库层面**
+
+```java
+ @Entity
+
+ @Table(name = "orders")
+
+ public class OrderPO {
+
+   @Id
+
+   private Long id;
+
+
+
+   // 数据库存储用整数，节省空间
+
+   @Column(name = "status")
+
+   private Integer status; // 0:待支付 1:已支付 2:已发货 3:已完成 
+
+ 4:已取消
+
+
+
+   @Column(name = "created_at")
+
+   private Timestamp createdAt;
+
+ }
+```
+
+
+
+
+
+ **BO - 业务逻辑层面**
+
+
+
+```java
+public class OrderBO {
+
+   private Long id;
+
+
+
+   // 使用枚举，业务语义清晰
+
+   private OrderStatus status;
+
+
+
+   private LocalDateTime createdAt;
+
+
+
+   // 业务方法：状态流转逻辑
+
+   public void pay() {
+
+​     if (status != OrderStatus.PENDING_PAYMENT) {
+
+​       throw new BusinessException("订单状态不允许支付");
+
+​     }
+
+​     this.status = OrderStatus.PAID;
+
+   }
+
+
+
+   public void ship() {
+
+​     if (status != OrderStatus.PAID) {
+
+​       throw new BusinessException("订单未支付，不能发货");
+
+​     }
+
+​     this.status = OrderStatus.SHIPPED;
+
+   }
+
+
+
+   // 业务规则：是否可以取消
+
+   public boolean canCancel() {
+
+​     return status == OrderStatus.PENDING_PAYMENT
+
+​       || status == OrderStatus.PAID;
+
+   }
+
+ }
+
+
+
+ enum OrderStatus {
+
+   PENDING_PAYMENT, PAID, SHIPPED, COMPLETED, CANCELLED
+
+ }
+```
+
+
+
+
+
+ **DTO - 接口传输层面**
+
+```java
+// 给第三方物流系统的 DTO
+
+ public class OrderShipmentDTO {
+
+   private String orderId;
+
+
+
+   // 简化状态，物流系统只关心是否需要发货
+
+   private String shipmentStatus; // "TO_SHIP", "SHIPPED"
+
+
+
+   private String recipientAddress;
+
+ }
+
+
+
+ // 给支付系统的 DTO
+
+ public class OrderPaymentDTO {
+
+   private String orderId;
+
+   private String paymentStatus; // "UNPAID", "PAID"
+
+   private BigDecimal amount;
+
+ }
+
+
+```
+
+
+
+ 
+
+
+
+ **VO - 前端展示层面**
+
+```java
+ public class OrderVO {
+
+   private String orderId;
+
+
+
+   // 前端展示用中文描述
+
+   private String statusText; // 
+
+ "待支付"、"已支付"、"已发货"、"已完成"、"已取消"
+
+
+
+   // 前端需要的状态颜色
+
+   private String statusColor; // "warning", "success", "info", 
+
+ "default", "error"
+
+
+
+   // 前端需要的可操作按钮
+
+   private List<String> availableActions; // ["支付", "取消订单"]
+
+
+
+   // 格式化的时间
+
+   private String createdTime; // "2026-01-12 14:30:25"
+
+ }
+```
