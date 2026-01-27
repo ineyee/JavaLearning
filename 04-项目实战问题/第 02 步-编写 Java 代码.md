@@ -1073,8 +1073,7 @@ import $!{tableInfo.savePackageName}.pojo.po.$!tableInfo.name;
 public interface $!{tableName} extends IService<$!tableInfo.name> {
 
 }
-
-
+------------------------------------------------------------------------------------------
 ##导入宏定义
 $!{define.vm}
 ##设置表后缀（宏定义）
@@ -1098,7 +1097,50 @@ public class $!{tableName} extends ServiceImpl<$!{tableInfo.name}Mapper, $!{tabl
 ```
 
 ```velocity
+##导入宏定义
+$!{define.vm}
+##设置表后缀（宏定义）
+#setTableSuffix("Service")
+##保存文件（宏定义）
+#save("/service", "Service.java")
+##包路径（宏定义）
+#setPackageSuffix("service")
+#set($entityName = $!{tableInfo.name})
+#set($entityVar = $!tool.firstLowerCase($entityName))
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import $!{tableInfo.savePackageName}.common.api.exception.ServiceException;
+import $!{tableInfo.savePackageName}.pojo.po.$!{entityName};
+import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}GetQuery;
+import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}ListQuery;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}CreateReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}CreateBatchReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteBatchReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateBatchReq;
+import $!{tableInfo.savePackageName}.pojo.vo.ListData;
+
+import java.util.List;
+
+public interface $!{tableName} extends IService<$!{entityName}> {
+  $!{entityName} get($!{entityName}GetQuery query) throws ServiceException;
+
+  ListData<$!{entityName}> list($!{entityName}ListQuery query);
+
+  $!{entityName} save($!{entityName}CreateReq req) throws ServiceException;
+
+  List<Long> saveBatch($!{entityName}CreateBatchReq req) throws ServiceException;
+
+  void remove($!{entityName}DeleteReq req) throws ServiceException;
+
+  void removeBatch($!{entityName}DeleteBatchReq req) throws ServiceException;
+
+  void update($!{entityName}UpdateReq req) throws ServiceException;
+
+  void updateBatch($!{entityName}UpdateBatchReq req) throws ServiceException;
+}
+------------------------------------------------------------------------------------------
 ```
 
 * controller 简单版和完整版
@@ -1147,7 +1189,12 @@ import $!{tableInfo.savePackageName}.common.api.exception.ServiceException;
 import $!{tableInfo.savePackageName}.pojo.po.$!{entityName};
 import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}GetQuery;
 import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}ListQuery;
-import $!{tableInfo.savePackageName}.pojo.req.*;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}CreateReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}CreateBatchReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteBatchReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateReq;
+import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateBatchReq;
 import $!{tableInfo.savePackageName}.pojo.vo.ListData;
 import $!{tableInfo.savePackageName}.service.$!{entityName}Service;
 import jakarta.validation.Valid;
