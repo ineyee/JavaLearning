@@ -1009,31 +1009,190 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
 * pojo
 
-```velocity
-##导入宏定义
-$!{define.vm}
-##保存文件（宏定义）
-#save("/pojo/po", ".java")
-##包路径（宏定义）
-#setPackageSuffix("pojo.po")
-##自动导入包（全局变量）
-$!{autoImport.vm}
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import lombok.Data;
+  * po
 
-@Data
-public class $!{tableInfo.name} {
-#foreach($column in $tableInfo.fullColumn)
-    #if($column.name == "createTime")
-    @TableField(fill = FieldFill.INSERT)
-    #elseif($column.name == "updateTime")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    #end
-    private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
-#end
-}
-```
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  ##保存文件（宏定义）
+  #save("/pojo/po", ".java")
+  ##包路径（宏定义）
+  #setPackageSuffix("pojo.po")
+  ##自动导入包（全局变量）
+  $!{autoImport.vm}
+  import com.baomidou.mybatisplus.annotation.FieldFill;
+  import com.baomidou.mybatisplus.annotation.TableField;
+  import lombok.Data;
+  
+  @Data
+  public class $!{tableInfo.name} {
+  #foreach($column in $tableInfo.fullColumn)
+      #if($column.name == "createTime")
+      @TableField(fill = FieldFill.INSERT)
+      #elseif($column.name == "updateTime")
+      @TableField(fill = FieldFill.INSERT_UPDATE)
+      #end
+      private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
+  #end
+  }
+  ```
+
+  * XxxGetQuery
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  #setTableSuffix("GetQuery")
+  #save("/pojo/query", "GetQuery.java")
+  #setPackageSuffix("pojo.query")
+  
+  import jakarta.validation.constraints.NotNull;
+  import lombok.Data;
+  
+  @Data
+  public class $!{tableName} {
+    @NotNull(message = "id 字段不能为空")
+    private Long id;
+  }
+  ```
+
+  * XxxListQuery
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  #setTableSuffix("ListQuery")
+  #save("/pojo/query", "ListQuery.java")
+  #setPackageSuffix("pojo.query")
+  
+  import lombok.Data;
+  import lombok.EqualsAndHashCode;
+  
+  @EqualsAndHashCode(callSuper = true)
+  @Data
+  public class $!{tableName} extends ListQuery {
+    // TODO: 按需追加查询参数
+  }
+  ```
+
+  * XxxCreateReq
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  #setTableSuffix("CreateReq")
+  #save("/pojo/req", "CreateReq.java")
+  #setPackageSuffix("pojo.req")
+  
+  import lombok.Data;
+  
+  @Data
+  public class $!{tableName} {
+    // TODO: 根据表结构补充字段（除主键外）
+  }
+  ```
+
+  * XxxCreateBatchReq
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  #setTableSuffix("CreateBatchReq")
+  #save("/pojo/req", "CreateBatchReq.java")
+  #setPackageSuffix("pojo.req")
+  
+  import jakarta.validation.Valid;
+  import jakarta.validation.constraints.NotEmpty;
+  import lombok.Data;
+  import java.util.List;
+  
+  @Data
+  public class $!{tableName} {
+    @NotEmpty(message = "$!tool.firstLowerCase($!tableInfo.name)List 字段不能为空")
+    private List<@Valid $!{tableInfo.name}CreateReq> $!{tool.firstLowerCase($!tableInfo.name)}List;
+  }
+  ```
+
+  * XxxDeleteReq
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  #setTableSuffix("DeleteReq")
+  #save("/pojo/req", "DeleteReq.java")
+  #setPackageSuffix("pojo.req")
+  
+  import jakarta.validation.constraints.NotNull;
+  import lombok.Data;
+  
+  @Data
+  public class $!{tableName} {
+    @NotNull(message = "id 字段不能为空")
+    private Long id;
+  }
+  ```
+
+  * XxxDeleteBatchReq
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  #setTableSuffix("DeleteBatchReq")
+  #save("/pojo/req", "DeleteBatchReq.java")
+  #setPackageSuffix("pojo.req")
+  
+  import jakarta.validation.constraints.NotEmpty;
+  import jakarta.validation.constraints.NotNull;
+  import lombok.Data;
+  import java.util.List;
+  
+  @Data
+  public class $!{tableName} {
+    @NotEmpty(message = "idList 字段不能为空")
+    private List<@NotNull Long> idList;
+  }
+  ```
+
+  * XxxUpdateReq
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  #setTableSuffix("UpdateReq")
+  #save("/pojo/req", "UpdateReq.java")
+  #setPackageSuffix("pojo.req")
+  
+  import jakarta.validation.constraints.NotNull;
+  import lombok.Data;
+  
+  @Data
+  public class $!{tableName} {
+    @NotNull(message = "id 字段不能为空")
+    private Long id;
+    // TODO: 追加可更新字段
+  }
+  ```
+
+  * XxxUpdateBatchReq
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  #setTableSuffix("UpdateBatchReq")
+  #save("/pojo/req", "UpdateBatchReq.java")
+  #setPackageSuffix("pojo.req")
+  
+  import jakarta.validation.Valid;
+  import jakarta.validation.constraints.NotEmpty;
+  import lombok.Data;
+  import java.util.List;
+  
+  @Data
+  public class $!{tableName} {
+    @NotEmpty(message = "$!tool.firstLowerCase($!tableInfo.name)List 字段不能为空")
+    private List<@Valid $!{tableInfo.name}UpdateReq> $!{tool.firstLowerCase($!tableInfo.name)}List;
+  }
+  ```
 
 * mapper
 
