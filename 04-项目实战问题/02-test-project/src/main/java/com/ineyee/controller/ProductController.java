@@ -1,8 +1,19 @@
 package com.ineyee.controller;
 
-import com.ineyee.service.ProductService;
+import com.ineyee.common.api.HttpResult;
+import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.pojo.po.Product;
+import com.ineyee.pojo.query.product.ProductGetQuery;
+import com.ineyee.pojo.query.product.ProductListQuery;
+import com.ineyee.pojo.req.product.*;
+import com.ineyee.pojo.vo.ListData;
+import com.ineyee.service.product.ProductService;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 // 表现层之控制器层
 // 控制器层（controller）的职责就是直接与客户端打交道，即：
@@ -18,15 +29,62 @@ import org.springframework.web.bind.annotation.*;
 //   * 调用业务层的 API 时一定要用 try-catch，因为数据层和业务层的异常它们都没处理、都是继续上抛到表现层来统一处理的，catch 到异常时就给客户端响应错误，没有错误时就给客户端响应数据
 // 但是因为现在有了全局异常处理来给客户端响应错误，所以：
 //   * controller 层调用 service 层的 API 时直接调用就可以了，不用再 try-catch（由数据层抛上来的系统异常 + 由业务层抛上来的业务异常），因为 controller 层把异常继续往上抛，就会抛给 DispatcherServlet，DispatcherServlet 捕获到异常就会调用我们定义的异常处理器来统一处理异常、给客户端响应错误
-//   * 那 controller 层本身可能产生的异常呢？比如请求路径不存在、参数校验出错等，其实这都是系统异常
+//   * 那 controller 层本身可能产生的异常呢？比如请求路径不存在、请求参数校验出错等，其实这都是系统异常
 //       * 请求路径不存在的话，也是系统异常，会被统一拦截掉，统一返回 -100000 那个错误（如果不拦截的话，服务器会自动返回 404、因为这是客户端搞错路径了）
-//       * 参数校验出错的话，也是系统异常，会被统一拦截掉，统一返回 -100000 那个错误（如果不拦截的话，服务器会自动返回  400、因为这是客户端没按服务端的要求传递参数）
+//       * 请求参数校验出错的话，也是系统异常，会被统一拦截掉，统一返回 -100000 那个错误（如果不拦截的话，服务器会自动返回  400、因为这是客户端没按服务端的要求传递参数）
 //   * 因此更进一步 controller 里只写成功时响应数据的代码即可、不需要写失败时响应错误的代码，因为整个过程中出现的任何异常都会被异常处理器拦截掉来统一响应错误给客户端
+@Slf4j
 @RestController
 @RequestMapping("/product")
 public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @GetMapping("/get")
+    public HttpResult<Product> get(@Valid ProductGetQuery query) throws ServiceException {
+        Product product = productService.get(query);
+        return HttpResult.ok(product);
+    }
 
+    @GetMapping("/list")
+    public HttpResult<ListData<Product>> list(@Valid ProductListQuery query) {
+        ListData<Product> products = productService.list(query);
+        return HttpResult.ok(products);
+    }
+
+    @PostMapping("/save")
+    public HttpResult<Product> save(@Valid @RequestBody ProductCreateReq req) throws ServiceException {
+        Product product = productService.save(req);
+        return HttpResult.ok(product);
+    }
+
+    @PostMapping("/saveBatch")
+    public HttpResult<List<Long>> saveBatch(@Valid @RequestBody ProductCreateBatchReq req) throws ServiceException {
+        List<Long> productIdList = productService.saveBatch(req);
+        return HttpResult.ok(productIdList);
+    }
+
+    @PostMapping("/remove")
+    public HttpResult<Void> remove(@Valid @RequestBody ProductDeleteReq req) throws ServiceException {
+        productService.remove(req);
+        return HttpResult.ok();
+    }
+
+    @PostMapping("/removeBatch")
+    public HttpResult<Void> removeBatch(@Valid @RequestBody ProductDeleteBatchReq req) throws ServiceException {
+        productService.removeBatch(req);
+        return HttpResult.ok();
+    }
+
+    @PostMapping("/update")
+    public HttpResult<Void> update(@Valid @RequestBody ProductUpdateReq req) throws ServiceException {
+        productService.update(req);
+        return HttpResult.ok();
+    }
+
+    @PostMapping("/updateBatch")
+    public HttpResult<Void> updateBatch(@Valid @RequestBody ProductUpdateBatchReq req) throws ServiceException {
+        productService.updateBatch(req);
+        return HttpResult.ok();
+    }
 }

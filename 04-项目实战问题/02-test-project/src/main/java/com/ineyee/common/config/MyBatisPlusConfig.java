@@ -7,7 +7,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// MyBatis-Plus 相关配置
+// MyBatisPlus 添加分页插件拦截器
 @Configuration
 // mapper 层是通过 @MapperScan 注解来扫描的，Spring 会自动创建所有的 mapper 对象并放入 IoC 容器中
 @MapperScan("com.ineyee.mapper")

@@ -1,18 +1,29 @@
-package com.ineyee.service;
+package com.ineyee.service.singer;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.po.Singer;
-import com.ineyee.pojo.query.SingerListQuery;
-import com.ineyee.pojo.req.SingerCreateBatchReq;
-import com.ineyee.pojo.req.SingerCreateReq;
-import com.ineyee.pojo.req.SingerUpdateBatchReq;
-import com.ineyee.pojo.req.SingerUpdateReq;
+import com.ineyee.pojo.query.singer.SingerListQuery;
+import com.ineyee.pojo.req.singer.SingerCreateBatchReq;
+import com.ineyee.pojo.req.singer.SingerCreateReq;
+import com.ineyee.pojo.req.singer.SingerUpdateBatchReq;
+import com.ineyee.pojo.req.singer.SingerUpdateReq;
 import com.ineyee.pojo.vo.ListData;
 
 import java.util.List;
 
 public interface SingerService extends IService<Singer> {
+    /**
+     * 分页获取用户列表
+     *
+     * @param query 请求参数模型
+     * @return 列表数据专用响应模型
+     * 之前的查询结果仅仅是 List<T>，所以我们就通过返回值直接返回了
+     * 但是现在的查询结果需要有 List<T>、pageNum、pageSize、total、totalPages，所以我们就定义了一个 ListData<T> 来专门返回
+     * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     */
+    ListData<Singer> list(SingerListQuery query) throws ServiceException;
+
     /**
      * 新增一个用户
      *
@@ -52,15 +63,4 @@ public interface SingerService extends IService<Singer> {
      * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
     Boolean updateBatch(SingerUpdateBatchReq req) throws ServiceException;
-
-    /**
-     * 分页获取用户列表
-     *
-     * @param query 请求参数模型
-     * @return 列表数据专用响应模型
-     * 之前的查询结果仅仅是 List<T>，所以我们就通过返回值直接返回了
-     * 但是现在的查询结果需要有 List<T>、pageNum、pageSize、total、totalPages，所以我们就定义了一个 ListData<T> 来专门返回
-     * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
-     */
-    ListData<Singer> list(SingerListQuery query) throws ServiceException;
 }

@@ -5,9 +5,7 @@ import lombok.Data;
 @Data
 public class ListQuery {
     // 分页参数（可选）
-    // 如果数据量巨大时
-    // 一页一条数据，那么 pageNum 就会很大，所以用 Long
-    // 一页多条数据，那么 pageSize 就会很大，所以用 Long
+    // 如果数据量巨大时：一页一条数据，那么 pageNum 就会很大，所以用 Long；一页多条数据，那么 pageSize 就会很大，所以用 Long
     private Long pageNum;
     private Long pageSize;
 

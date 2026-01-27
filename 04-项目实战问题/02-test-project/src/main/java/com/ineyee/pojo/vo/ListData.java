@@ -41,24 +41,24 @@ public class ListData<T> {
     /**
      * 当前第几页
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)  // null 时不序列化
+    @JsonInclude(JsonInclude.Include.NON_NULL) // null 时不序列化
     private Long pageNum;
 
     /**
      * 一页多少条
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_NULL) // null 时不序列化
     private Long pageSize;
 
     /**
      * 数据总条数
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_NULL) // null 时不序列化
     private Long total;
 
     /**
      * 数据总页数
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_NULL) // null 时不序列化
     private Long totalPages;
 }

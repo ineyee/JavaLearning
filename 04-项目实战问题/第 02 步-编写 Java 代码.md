@@ -1,6 +1,6 @@
 设计并创建好数据库和表之后，我们就可以编写 Java 代码了。
 
-## 一、SpringBoot + MyBatis 项目目录结构划分
+## ✅ 一、SpringBoot + MyBatis 项目目录结构划分
 
 ```
 ├─${project-name}/(项目名)
@@ -8,41 +8,34 @@
 │  │  ├─main/
 │  │  │  ├─java/(我们编写的 Java 代码都放在这个文件夹里)
 │  │  │  │  ├─com.ineyee/(公司唯一标识)
-│  │  │  │  │  ├─api/(给客户端响应数据和错误)
-│  │  │  │  │  │  ├─error/(错误码和错误信息的枚举常量)
-│  │  │  │  │  │  │  ├─Error.java(父接口)
-│  │  │  │  │  │  │  ├─CommonError implements Error(通用错误码及错误信息)
-│  │  │  │  │  │  │  ├─UserError implements Error(用户模块错误码及错误信息)
-│  │  │  │  │  │  ├─exception/(业务异常和全局异常处理)
-│  │  │  │  │  │  │  ├─ServiceException.java(业务异常)
-│  │  │  │  │  │  │  ├─GlobalExceptionHandler.java(全局异常处理)
-│  │  │  │  │  │  ├─HttpResult.java(给客户端响应数据和错误的包装类)
-│  │  │  │  │  ├─config/(仍需手动配置的东西)
-│  │  │  │  │  │  ├─FilterConfig.java(过滤器配置类)
-│  │  │  │  │  │  ├─SpringMVCConfig.java(拦截器配置类)
+│  │  │  │  │  ├─common/(一些公用的东西)
+│  │  │  │  │  │  ├─api/(给客户端响应数据和错误)
+│  │  │  │  │  │  │  ├─error/(错误码和错误信息的枚举常量)
+│  │  │  │  │  │  │  │  ├─ServiceError.java(父接口)
+│  │  │  │  │  │  │  │  ├─CommonError implements ServiceError(通用错误码及错误信息)
+│  │  │  │  │  │  │  ├─exception/(业务异常和全局异常处理)
+│  │  │  │  │  │  │  │  ├─ServiceException.java(业务异常)
+│  │  │  │  │  │  │  │  ├─GlobalExceptionHandler.java(全局异常处理)
+│  │  │  │  │  │  │  ├─HttpResult.java(给客户端响应数据和错误的包装类)
+│  │  │  │  │  │  ├─config/(仍需手动配置的东西、拦截器、过滤器之类)
+│  │  │  │  │  │  │  ├─CorsConfig.java(跨域处理相关配置)
+│  │  │  │  │  │  │  ├─MyBatisPlus.java(添加分页插件拦截器)
+│  │  │  │  │  │  │  ├─MyBatisPlusMetaObjectHandler.java(用于自动填充字段)
+│  │  │  │  │  │  ├─prop/(自定义的属性绑定)
+│  │  │  │  │  │  │  ├─CorsProperties.java(跨域处理相关自定义的属性绑定)
 │  │  │  │  │  ├─controller/(表现层之控制器层)
-│  │  │  │  │  │  ├─UserController
 │  │  │  │  │  ├─mapper/(数据层的接口)
-│  │  │  │  │  │  ├─UserDao
 │  │  │  │  │  ├─pojo/(表现层之模型层)
-│  │  │  │  │  │  ├── po/(持久化对象)        # 数据库模型（Mapper 专用）
-│  │  │  │  │  │  │  ├─User
-│  │  │  │  │  │  ├── bo        # 业务模型（Service 内部）
-│  │  │  │  │  │  ├── dto       # 服务/接口传输模型（可进可出）
-│  │  │  │  │  │  ├── query     # 查询条件（分页 / 筛选）
-│  │  │  │  │  │  ├── req       # 请求体（新增 / 修改）
-│  │  │  │  │  │  └── vo        # 接口返回模型
-│  │  │  │  │  ├─filter/(各种过滤器)
-│  │  │  │  │  │  ├─CachedBodyFilter(HTTP 请求体缓存过滤器)
-│  │  │  │  │  ├─interceptor/(各种拦截器)
-│  │  │  │  │  │  ├─HttpLogInterceptor(HTTP 请求日志拦截器)
+│  │  │  │  │  │  ├──po
+│  │  │  │  │  │  ├──bo
+│  │  │  │  │  │  ├──dto
+│  │  │  │  │  │  ├──vo
+│  │  │  │  │  │  ├──query
+│  │  │  │  │  │  ├──req
 │  │  │  │  │  ├─service/(业务层)
-│  │  │  │  │  │  ├─UserService
-│  │  │  │  │  │  ├─UserServiceImpl implements UserService
 │  │  │  │  │  ├─Application.java(项目的入口类)
 │  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
 │  │  │  │  ├─mappers/(数据层的实现)
-│  │  │  │  │  ├─user.xml
 │  │  │  │  ├─static/(SpringBoot 项目的静态资源固定放在 static 目录下)
 │  │  │  │  │  ├─img/(图片资源)
 │  │  │  │  │  │  ├─logo.png(http://localhost:8080/img/logo.png 即可访问到)
@@ -676,7 +669,7 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 po 肯定是一一对应，dto 可能也是一一对应（只不过是多张表的组合数据）
 
-###### 1.2 请求参数模型
+###### ✅ 1.2 请求参数模型
 
 之前我们学习了很多种接收请求参数的方式，现在汇总敲定一下规范：
 
@@ -685,10 +678,14 @@ po 肯定是一一对应，dto 可能也是一一对应（只不过是多张表�
   * 表单提交时，不需要注解修饰、把所有参数都接收到一个请求参数模型里
   * JSON 提交时，使用 @RequestBody 注解修饰、把所有参数都接收到一个请求参数模型里
 
-把所有参数都接收到一个请求参数模型里的好处是可以设置参数是否必传、参数统一管理 & 扩展参数方便，所以该创建类就创建类、不要觉得累赘。请求参数模型一般有下面几种：
+把所有参数都接收到一个请求参数模型里的好处是可以设置参数是否必传（@Valid + @NotNull | @NotEmpty | @NotBlank）、参数统一管理 & 扩展参数方便，所以该创建类就创建类、不要觉得累赘。请求参数模型一般有下面几种：
 
 ```
 ├─pojo/
+│  ├─query/
+│  │  ├─XxxGetQuery
+│  │  ├─XxxListQuery extends ListQuery
+│  │  ├─ListQuery
 │  ├─req/
 │  │  ├─XxxCreateReq
 │  │  ├─XxxCreateBatchReq
@@ -696,145 +693,31 @@ po 肯定是一一对应，dto 可能也是一一对应（只不过是多张表�
 │  │  ├─XxxDeleteBatchReq
 │  │  ├─XxxUpdateReq
 │  │  ├─XxxUpdateBatchReq
-│  ├─query/
-│  │  ├─param/(公共查询条件，可被多个业务复用)
-│  │  │  ├─PageParam(分页查询条件)
-│  │  │  ├─SortParam(排序查询条件)
-│  │  │  ├─KeywordParam(模糊查询条件)
-│  │  │  ├─
-│  │  ├─XxxQuery(特有业务条件 + 选择性持有上面的公共查询条件)
 
 为什么 XxxQuery 没有 Req 后缀？因为 Create、Update、Delete 跟 Controller 强绑定，语义绝对是“这是一次 HTTP 请求”；而 Query 则可能被 Controller 以外的其它地方使用，所以它的语义不绝对是“这是一次 HTTP 请求”，而仅仅是一个查询条件模型。
 ```
 
 ```java
-/*
- 单个保存：请求参数直接用对象
-
- url = http://localhost:9999/tp-dev/singer/save
- body = {
-    "name": "库里",
-    "sex": "男"
- }
- */
+// 单个查询：url = http://localhost:9999/tp-dev/product/get?id=1
 @Data
-public class SingerCreateReq {
-    // @NotNull name 字段必填
-    @NotNull
-    private String name;
-    private String sex;
-}
-
-/*
- 批量保存：请求参数最好包一层对象，而不是直接用数组
-
- url = http://localhost:9999/tp-dev/singer/save
- body = {
-    "singerList": [
-        { "name": "三三", "sex": "女" },
-        { "name": "四四", "sex": "男" },
-        { "name": "五五" }
-    ]
- }
- */
-@Data
-public class SingerCreateBatchReq {
-    // @NotEmpty 保证至少有一条，不是 null、不是 []
-    // @Valid 触发内部 name 必填校验
-    @NotEmpty
-    private List<@Valid SingerCreateReq> singerList;
-}
-```
-
-```java
-/*
- 单个删除：请求参数直接用对象
-
- url = http://localhost:9999/tp-dev/singer/remove
- body = {
-    "id": 1
- }
- */
-@Data
-public class SingerDeleteReq {
-    // @NotNull id 字段必填
-    @NotNull
+public class ProductGetQuery {
+    // @NotNull = 不能为 null
+    @NotNull(message = "id 字段不能为空")
     private Long id;
 }
 
-/*
- 批量删除：请求参数最好包一层对象，而不是直接用数组
-
- url = http://localhost:9999/tp-dev/singer/removeBatch
- body = {
-    "idList": [1, 2, 3]
- }
- */
+// 列表查询：url = http://localhost:9999/tp-dev/product/list?pageNum=1&pageSize=10
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class SingerDeleteBatchReq {
-    // @NotEmpty 保证至少有一条，不是 null、不是 []
-    // @NotNull 数组里的 id 不能是 null
-    @NotEmpty
-    private List<@NotNull Long> idList;
+public class ProductListQuery extends ListQuery {
+    // 可按需增加其它参数，如根据产品价格查询等
+    BigDecimal minPrice;
+    BigDecimal maxPrice;
 }
-```
-
-```java
-/*
- 单个更新：请求参数直接用对象
-
- url = http://localhost:9999/tp-dev/singer/update
- body = {
-    "id": 1,
-    "name": "Curry"
- }
- */
-@Data
-public class SingerUpdateReq {
-    // @NotNull id 字段必填
-    @NotNull
-    private Long id;
-
-    private String name;
-    private String sex;
-}
-
-/*
- 批量更新：请求参数最好包一层对象，而不是直接用数组
-
- url = http://localhost:9999/tp-dev/singer/updateBatch
- body = {
-    "singerList": [
-        { "id": 1, "name": "三三" },
-        { "id": 2, "sex": "男" },
-        { "id": 3, "name": "五五", "sex": "女" }
-    ]
- }
- */
-@Data
-public class SingerUpdateBatchReq {
-    // @NotEmpty 保证至少有一条，不是 null、不是 []
-    // @Valid 触发内部 id 必填校验
-    @NotEmpty
-    private List<@Valid SingerUpdateReq> singerList;
-}
-```
-
-```java
-// 单个查询：url = http://localhost:9999/tp-dev/singer/get?id=1
-@Data
-public class SingerGetQuery {
-    // @NotNull id 字段必填
-    @NotNull
-    private Long id;
-}
-
 @Data
 public class ListQuery {
     // 分页参数（可选）
-    // 如果数据量巨大时
-    // 一页一条数据，那么 pageNum 就会很大，所以用 Long
-    // 一页多条数据，那么 pageSize 就会很大，所以用 Long
+    // 如果数据量巨大时：一页一条数据，那么 pageNum 就会很大，所以用 Long；一页多条数据，那么 pageSize 就会很大，所以用 Long
     private Long pageNum;
     private Long pageSize;
 
@@ -861,12 +744,116 @@ public class ListQuery {
     // 模糊搜索参数（可选）
     private String keyword;
 }
-// 列表查询：url = http://localhost:9999/tp-dev/singer/list?pageNum=1&pageSize=10
-@EqualsAndHashCode(callSuper = true)
+```
+
+```java
+/*
+ 单个保存：请求参数直接用对象
+
+ url = http://localhost:9999/tp-dev/product/save
+ body = {
+    "name": "iPhoneX",
+    "description": "首款全面屏",
+    "price": 8888
+ }
+ */
 @Data
-public class SingerListQuery extends ListQuery {
-    // 可按需增加其它参数，如根据性别查询、根据起始日期和结束日期查询等
-    // ......
+public class ProductCreateReq {
+    // @NotBlank = 不能为 null + 字符串不能为空串 + 字符串不能全是空格字符
+    @NotBlank(message = "name 字段不能为空")
+    private String name;
+    @Length(min = 0, max = 10, message = "description 字段长度必须在 0 ~ 10 之间")
+    private String description;
+    @NotNull(message = "price 字段不能为空")
+    private BigDecimal price;
+}
+
+/*
+ 批量保存：请求参数最好包一层对象，而不是直接用数组
+
+ url = http://localhost:9999/tp-dev/product/save
+ body = {
+    "productList": [
+        { "name": "iPhoneX", "description": "首款全面屏", "price": 8888 },
+        { "name": "华为 Mate30 Pro", "description": "国货之光", "price":  6666.66 },
+        { "name": "小米 17", "description": "注意小字", "price":  4444.44 },
+    ]
+ }
+ */
+@Data
+public class ProductCreateBatchReq {
+    // @NotEmpty = 不能为 null + 字符串不能为空串、集合里不能没有元素
+    // @Valid 触发内层参数校验
+    @NotEmpty(message = "productList 字段不能为空")
+    private List<@Valid ProductCreateReq> productList;
+}
+```
+
+```java
+/*
+ 单个删除：请求参数直接用对象
+
+ url = http://localhost:9999/tp-dev/product/remove
+ body = {
+    "id": 1
+ }
+ */
+@Data
+public class ProductDeleteReq {
+    @NotNull(message = "id 字段不能为空")
+    private Long id;
+}
+
+/*
+ 批量删除：请求参数最好包一层对象，而不是直接用数组
+
+ url = http://localhost:9999/tp-dev/product/removeBatch
+ body = {
+    "idList": [1, 2, 3]
+ }
+ */
+@Data
+public class ProductDeleteBatchReq {
+    @NotEmpty(message = "idList 字段不能为空")
+    private List<@NotNull Long> idList;
+}
+```
+
+```java
+/*
+ 单个更新：请求参数直接用对象
+
+ url = http://localhost:9999/tp-dev/product/update
+ body = {
+    "id": 1,
+    "price": "7777"
+ }
+ */
+@Data
+public class ProductUpdateReq {
+    @NotNull(message = "id 字段不能为空")
+    private Long id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+}
+
+/*
+ 批量更新：请求参数最好包一层对象，而不是直接用数组
+
+ url = http://localhost:9999/tp-dev/product/updateBatch
+ body = {
+    "productList": [
+        { "id": 1, "price": "7777" },
+        { "id": 2, "name": "HuaWei Mate30 Pro" },
+        { "id": 3, "description": "营销大师" }
+    ]
+ }
+ */
+@Data
+public class ProductUpdateBatchReq {
+    @NotEmpty(message = "productList 字段不能为空")
+    private List<@Valid ProductUpdateReq> productList;
 }
 ```
 
@@ -915,6 +902,44 @@ myBatis-plus:
       # MyBatisPlus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
       # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
       id-type: ASSIGN_ID
+```
+
+* 创建一个 MyBatisPlusConfig 类，用来添加分页插件拦截器
+
+```java
+// MyBatisPlus 添加分页插件拦截器
+@Configuration
+// mapper 层是通过 @MapperScan 注解来扫描的，Spring 会自动创建所有的 mapper 对象并放入 IoC 容器中
+@MapperScan("com.ineyee.mapper")
+public class MyBatisPlusConfig {
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // 添加分页插件拦截器，指定数据库类型为 MySQL（如果配置多个插件, 切记分页最后添加）
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;
+    }
+}
+```
+
+* 创建一个 MyBatisPlusMetaObjectHandler 类，用来配置自动填充字段，需配合属性的 @TableField 注解一起使用
+
+```java
+// MyBatisPlus 提供的接口 MetaObjectHandler，用于自动填充字段
+@Component
+public class MyBatisPlusMetaObjectHandler implements MetaObjectHandler {
+    @Override
+    public void insertFill(MetaObject metaObject) {
+        LocalDateTime now = LocalDateTime.now();
+        this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
+        this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
+    }
+
+    @Override
+    public void updateFill(MetaObject metaObject) {
+        this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+    }
+}
 ```
 
 ###### ✅ 2.1 对数据层的影响
@@ -993,12 +1018,18 @@ $!{define.vm}
 #setPackageSuffix("pojo.po")
 ##自动导入包（全局变量）
 $!{autoImport.vm}
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 @Data
 public class $!{tableInfo.name} {
 #foreach($column in $tableInfo.fullColumn)
-    #if(${column.comment})//${column.comment}#end
+    #if($column.name == "createTime")
+    @TableField(fill = FieldFill.INSERT)
+    #elseif($column.name == "updateTime")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    #end
     private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
 #end
 }

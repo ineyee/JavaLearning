@@ -1,4 +1,4 @@
-package com.ineyee.service;
+package com.ineyee.service.singer;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -6,11 +6,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.SingerMapper;
 import com.ineyee.pojo.po.Singer;
-import com.ineyee.pojo.query.SingerListQuery;
-import com.ineyee.pojo.req.SingerCreateBatchReq;
-import com.ineyee.pojo.req.SingerCreateReq;
-import com.ineyee.pojo.req.SingerUpdateBatchReq;
-import com.ineyee.pojo.req.SingerUpdateReq;
+import com.ineyee.pojo.query.singer.SingerListQuery;
+import com.ineyee.pojo.req.singer.SingerCreateBatchReq;
+import com.ineyee.pojo.req.singer.SingerCreateReq;
+import com.ineyee.pojo.req.singer.SingerUpdateBatchReq;
+import com.ineyee.pojo.req.singer.SingerUpdateReq;
 import com.ineyee.pojo.vo.ListData;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -103,7 +103,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
             );
         }
 
-        if (query.getPageNum() != null && query.getPageSize() != null) { // 要搞分页，别忘了在 MyBatisPlusConfig 里添加一下 MyBatis-Plus 的分页插件
+        if (query.getPageNum() != null && query.getPageSize() != null) { // 要搞分页，别忘了在 MyBatisPlusConfig 里添加一下 MyBatisPlus 的分页插件
             Page<Singer> page = new Page<>(query.getPageNum(), query.getPageSize());
             // 这里调用 MyBatis-Plus 在 service 层提供的 page 方法，不再直接调用 mapper 层的 selectPage 方法
             Page<Singer> queryedPage = page(page, wrapper);
