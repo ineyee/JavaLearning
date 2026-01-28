@@ -7,12 +7,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 @Data
-public class Singer {
+public class Song {
     private Long id;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     private String name;
-    private Integer sex;
+    private String cover;
+    private Long singerId;
 }

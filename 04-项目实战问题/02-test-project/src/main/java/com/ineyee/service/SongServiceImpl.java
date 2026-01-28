@@ -5,16 +5,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.exception.ServiceException;
-import com.ineyee.mapper.SingerMapper;
-import com.ineyee.pojo.po.Singer;
-import com.ineyee.pojo.query.SingerGetQuery;
-import com.ineyee.pojo.query.SingerListQuery;
-import com.ineyee.pojo.req.SingerCreateBatchReq;
-import com.ineyee.pojo.req.SingerCreateReq;
-import com.ineyee.pojo.req.SingerDeleteBatchReq;
-import com.ineyee.pojo.req.SingerDeleteReq;
-import com.ineyee.pojo.req.SingerUpdateBatchReq;
-import com.ineyee.pojo.req.SingerUpdateReq;
+import com.ineyee.mapper.SongMapper;
+import com.ineyee.pojo.po.Song;
+import com.ineyee.pojo.query.SongGetQuery;
+import com.ineyee.pojo.query.SongListQuery;
+import com.ineyee.pojo.req.SongCreateBatchReq;
+import com.ineyee.pojo.req.SongCreateReq;
+import com.ineyee.pojo.req.SongDeleteBatchReq;
+import com.ineyee.pojo.req.SongDeleteReq;
+import com.ineyee.pojo.req.SongUpdateBatchReq;
+import com.ineyee.pojo.req.SongUpdateReq;
 import com.ineyee.pojo.vo.ListData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -26,11 +26,11 @@ import java.util.List;
 
 @Service
 @Transactional
-public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> implements SingerService {
+public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements SongService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Singer get(SingerGetQuery query) throws ServiceException {
-        Singer data = getById(query.getId());
+    public Song get(SongGetQuery query) throws ServiceException {
+        Song data = getById(query.getId());
         if (data == null) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
@@ -39,25 +39,25 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ListData<Singer> list(SingerListQuery query) {
-        LambdaQueryWrapper<Singer> wrapper = new LambdaQueryWrapper<>();
+    public ListData<Song> list(SongListQuery query) {
+        LambdaQueryWrapper<Song> wrapper = new LambdaQueryWrapper<>();
         // TODO: 按需追加查询条件
 
-        wrapper.orderByDesc(Singer::getId);
+        wrapper.orderByDesc(Song::getId);
 
         if (query.getPageNum() != null && query.getPageSize() != null) {
-            Page<Singer> page = new Page<>(query.getPageNum(), query.getPageSize());
-            Page<Singer> queriedPage = page(page, wrapper);
+            Page<Song> page = new Page<>(query.getPageNum(), query.getPageSize());
+            Page<Song> queriedPage = page(page, wrapper);
             return ListData.fromPage(queriedPage);
         } else {
-            List<Singer> dataList = list(wrapper);
+            List<Song> dataList = list(wrapper);
             return ListData.fromList(dataList);
         }
     }
 
     @Override
-    public Singer save(SingerCreateReq req) throws ServiceException {
-        Singer entity = new Singer();
+    public Song save(SongCreateReq req) throws ServiceException {
+        Song entity = new Song();
         BeanUtils.copyProperties(req, entity);
         if (!save(entity)) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
@@ -66,10 +66,10 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
     }
 
     @Override
-    public List<Long> saveBatch(SingerCreateBatchReq req) throws ServiceException {
-        List<Singer> entityList = new ArrayList<>();
-        req.getSingerList().forEach(item -> {
-            Singer entity = new Singer();
+    public List<Long> saveBatch(SongCreateBatchReq req) throws ServiceException {
+        List<Song> entityList = new ArrayList<>();
+        req.getSongList().forEach(item -> {
+            Song entity = new Song();
             BeanUtils.copyProperties(item, entity);
             entityList.add(entity);
         });
@@ -82,22 +82,22 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
     }
 
     @Override
-    public void remove(SingerDeleteReq req) throws ServiceException {
+    public void remove(SongDeleteReq req) throws ServiceException {
         if (!removeById(req.getId())) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
     }
 
     @Override
-    public void removeBatch(SingerDeleteBatchReq req) throws ServiceException {
+    public void removeBatch(SongDeleteBatchReq req) throws ServiceException {
         if (!removeBatchByIds(req.getIdList())) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
     }
 
     @Override
-    public void update(SingerUpdateReq req) throws ServiceException {
-        Singer entity = new Singer();
+    public void update(SongUpdateReq req) throws ServiceException {
+        Song entity = new Song();
         BeanUtils.copyProperties(req, entity);
         if (!updateById(entity)) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
@@ -105,10 +105,10 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
     }
 
     @Override
-    public void updateBatch(SingerUpdateBatchReq req) throws ServiceException {
-        List<Singer> entityList = new ArrayList<>();
-        req.getSingerList().forEach(item -> {
-            Singer entity = new Singer();
+    public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
+        List<Song> entityList = new ArrayList<>();
+        req.getSongList().forEach(item -> {
+            Song entity = new Song();
             BeanUtils.copyProperties(item, entity);
             entityList.add(entity);
         });

@@ -1087,8 +1087,13 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
   import lombok.Data;
   
   @Data
-  public class $!{tableName} {
-    // TODO: 根据表结构补充字段（除主键外）
+  public class $!{tableName}{
+      // TODO: 根据接口需求在这里给属性添加相应的校验规则
+  #foreach($column in $tableInfo.fullColumn)
+  #if($column.name != 'id' && $column.name != 'createTime' && $column.name != 'updateTime')
+    private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
+  #end
+  #end
   }
   ```
 
@@ -1166,10 +1171,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
   import lombok.Data;
   
   @Data
-  public class $!{tableName} {
+  public class $!{tableName}{
+  #foreach($column in $tableInfo.fullColumn)
+  #if($column.name == 'id')
     @NotNull(message = "id 字段不能为空")
-    private Long id;
-    // TODO: 追加可更新字段
+    private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
+  #elseif($column.name != 'createTime' && $column.name != 'updateTime')
+    private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
+  #end
+  #end
   }
   ```
 

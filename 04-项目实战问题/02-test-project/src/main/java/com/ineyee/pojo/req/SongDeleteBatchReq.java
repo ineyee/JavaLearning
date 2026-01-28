@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SingerDeleteBatchReq {
+public class SongDeleteBatchReq {
     @NotEmpty(message = "idList 字段不能为空")
     private List<@NotNull Long> idList;
 }

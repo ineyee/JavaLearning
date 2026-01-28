@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SingerCreateBatchReq {
-    @NotEmpty(message = "singerList 字段不能为空")
-    private List<@Valid SingerCreateReq> singerList;
+public class SongCreateBatchReq {
+    @NotEmpty(message = "songList 字段不能为空")
+    private List<@Valid SongCreateReq> songList;
 }

@@ -5,6 +5,6 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SingerListQuery extends ListQuery {
+public class SongListQuery extends ListQuery {
     // TODO: 按需追加查询参数
 }

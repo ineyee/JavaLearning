@@ -14,6 +14,8 @@ import java.math.BigDecimal;
     "price": "7777"
  }
  */
+// 属性其实就是 po 里 createTime、updateTime 以外的字段
+// id 字段必填，其它字段都是可选更新、那就不需要添加校验规则了
 @Data
 public class ProductUpdateReq {
     @NotNull(message = "id 字段不能为空")

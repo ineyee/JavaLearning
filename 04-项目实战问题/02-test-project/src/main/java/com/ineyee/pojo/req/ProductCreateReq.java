@@ -17,6 +17,8 @@ import java.math.BigDecimal;
     "price": 8888
  }
  */
+// 属性其实就是 po 里 id、createTime、updateTime 以外的字段
+// 只是我们需要根据接口需求在这里给属性添加相应的校验规则
 @Data
 public class ProductCreateReq {
     // @NotBlank = 不能为 null + 字符串不能为空串 + 字符串不能全是空格字符
