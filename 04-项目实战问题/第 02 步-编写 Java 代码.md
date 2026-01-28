@@ -1364,7 +1364,8 @@ public class $!{tableName} extends ServiceImpl<$!{entityName}Mapper, $!{entityNa
       LambdaQueryWrapper<$!{entityName}> wrapper = new LambdaQueryWrapper<>();
       // TODO: 按需追加查询条件
 
-      wrapper.orderByDesc($!{entityName}::getId);
+      wrapper.orderByDesc($!{entityName}::getCreateTime)
+              .orderByDesc($!{entityName}::getId);
 
       if (query.getPageNum() != null && query.getPageSize() != null) {
           Page<$!{entityName}> page = new Page<>(query.getPageNum(), query.getPageSize());

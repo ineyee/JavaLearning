@@ -43,7 +43,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         LambdaQueryWrapper<Song> wrapper = new LambdaQueryWrapper<>();
         // TODO: 按需追加查询条件
 
-        wrapper.orderByDesc(Song::getId);
+        wrapper.orderByDesc(Song::getCreateTime)
+                .orderByDesc(Song::getId);
 
         if (query.getPageNum() != null && query.getPageSize() != null) {
             Page<Song> page = new Page<>(query.getPageNum(), query.getPageSize());

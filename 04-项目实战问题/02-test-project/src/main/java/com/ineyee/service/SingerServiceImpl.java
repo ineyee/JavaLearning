@@ -43,7 +43,8 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
         LambdaQueryWrapper<Singer> wrapper = new LambdaQueryWrapper<>();
         // TODO: 按需追加查询条件
 
-        wrapper.orderByDesc(Singer::getId);
+        wrapper.orderByDesc(Singer::getCreateTime)
+                .orderByDesc(Singer::getId);
 
         if (query.getPageNum() != null && query.getPageSize() != null) {
             Page<Singer> page = new Page<>(query.getPageNum(), query.getPageSize());
