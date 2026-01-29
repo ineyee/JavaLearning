@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.mapper.SingerMapper;
 import com.ineyee.mapper.SongMapper;
+import com.ineyee.pojo.dto.SongDetailDto;
 import com.ineyee.pojo.dto.SongListDto;
+import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.po.Song;
 import com.ineyee.pojo.query.SongGetQuery;
 import com.ineyee.pojo.query.SongListQuery;
@@ -27,14 +30,26 @@ import java.util.List;
 @Service
 @Transactional
 public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements SongService {
+    private final SingerMapper singerMapper;
+
+    public SongServiceImpl(SingerMapper singerMapper) {
+        this.singerMapper = singerMapper;
+    }
+
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Song get(SongGetQuery query) throws ServiceException {
-        Song data = getById(query.getId());
-        if (data == null) {
+    public SongDetailDto get(SongGetQuery query) throws ServiceException {
+        Song songPo = getById(query.getId());
+        if (songPo == null) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
-        return data;
+
+        Singer singerPo = singerMapper.selectById(songPo.getSingerId());
+        if (singerPo == null) {
+            throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+        }
+
+        return SongDetailDto.from(songPo, singerPo);
     }
 
     @Override
