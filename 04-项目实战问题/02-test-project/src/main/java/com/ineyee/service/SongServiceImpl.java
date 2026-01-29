@@ -65,6 +65,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             queriedPage.setSize(Long.MAX_VALUE);
         }
 
+        // 上面已经泛型了 SongMapper，baseMapper 就是自动注入的 songMapper，不需要我们再手动注入了
         List<SongListDto> list = baseMapper.selectList(queriedPage, query);
         queriedPage.setRecords(list);
 

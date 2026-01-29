@@ -9,5 +9,4 @@ public class SongListDto {
     private String songCover;
 
     private String singerName;
-    private Integer singerSex;
 }

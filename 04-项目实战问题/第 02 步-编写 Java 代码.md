@@ -591,7 +591,7 @@ public class TestService {
 
 common 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## ✅ 八、单表 CRUD（可以充分利用 MyBatisPlus、以 product 表为例）
+## ✅ 八、单表 CRUD（可以完全利用 MyBatisPlus、以 product 表为例）
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -649,6 +649,298 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动配置参数是否必传的验证器、响应体自动转 JSON 字符串、请求参数和响应体的编码方式消息转换器（String 和 JSON 响应体的编码方式、默认就是 UTF-8，LocalDateTime 序列化为 ISO-8601 字符串格式等），我们同样不再需要像以前一样“在 Spring 的子配置文件里配置一大堆东西”。controller 里该用啥用啥，其它的我们啥也不用再干。
 
+## 九、多表 CRUD（需要自己编写 SQL 语句、以 singer&song 表为例）
+
+> * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
+> * 一个数据库里可以有多张表，比如 user、product 这两张表
+> * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
+
+#### ✅ 第 1 步：生成模板代码
+
+首先按单表 CRUD 的步骤，生成各层的模板代码，多表 CRUD 无非是在这些代码的基础上改改。
+
+#### ✅ 第 2 步：多表查询的实现
+
+###### ✅ 2.1 多表查询之列表查询 - 以歌曲列表界面为例
+
+* （1）首先考虑接口应该返回什么样的数据结构给客户端
+
+因为歌曲列表界面只需要展示每首歌曲的名称、封面（当然 id 是必须的），还有歌曲所属歌手的名字，所以我们返回给客户端的数据结构应该如下**（列表的字段应该尽可能少——为了快，也就是从两个 po 里筛选出需要的）**：
+
+```json
+// 扁平结构
+{
+  "songId": 220,
+  "songName": "七里香",
+  "songCover": "http://video.rita10.us/MusicalInstrument",
+  "singerName": "周杰伦"
+}
+
+// 嵌套结构
+{
+  "id": 220,
+  "name": "七里香",
+  "cover": "https://video.hung402.net/ToolsHomeDecoration",
+  "singer": {
+    "name": "周杰伦"
+  }
+}
+```
+
+> **多表查询之列表查询时，推荐使用扁平结构。因为列表页讲究“快”，而这种扁平的数据结构，我们只需要编写最简单的多表查询 SQL 语句即可实现，数据库的查询效率是最高的；列表页还讲究“平”，即客户端拿到数据后最好不要再组织复杂的数据结构，而是直接使用。**
+
+* （2）有了接口的数据结构，pojo 层的 Dto 模型也就随之决定了，框架会自动把 Dto 模型转换成对应的数据结构
+
+```java
+@Data
+public class SongListDto {
+    private Long songId;
+    private String songName;
+    private String songCover;
+
+    private String singerName;
+}
+```
+
+* （3）接下来考虑怎么把 Po 转换成 Dto
+
+我们的代码里已经有 Song 表对应的 Po 和 Singer 表对应的 Po 了，我们当然可以在 service 层通过 Java 代码来完成两个 Po 到 Dto 的转换，但是这会导致 N+1 查询问题，高并发直接炸：
+
+```java
+List<SongListDto> dtoList = new ArrayList<>();
+
+// 先查询出所有的歌曲，1 次查询
+List<Song> songList = list();
+// 然后遍历所有的 N 首歌曲，查询其所属歌手信息，N 次查询
+for (Song song : songList) {
+    Singer singerPo = singerMapper.selectById(song.getSingerId());
+
+    SongListDto songListDto = new SongListDto();
+    songListDto.setSongId(song.getId());
+    songListDto.setSongName(song.getName());
+    songListDto.setSongCover(song.getCover());
+    songListDto.setSingerName(singerPo.getName());
+
+    dtoList.add(songListDto);
+}
+```
+
+> **所以多表查询之列表查询时，推荐在 mapper 层完成 Dto 的聚合，而不是在 service 层。说白了就是用 SQL 语句直接查询出 Dto，而不在是 Po。**
+
+* （4）mapper 层自己定义接口方法、自己编写 SQL 语句实现接口方法
+
+```java
+public interface SongMapper extends BaseMapper<Song> {
+    // 我们可以用 MyBatisPlus 提供的分页插件，自动把查询结果搞进一个 Page 对象里，接口方法加个参数即可
+    List<SongListDto> selectList(Page<SongListDto> page, SongListQuery query);
+}
+```
+
+```xml
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    namespace，当前文件的命名空间，可以理解为当前文件里所有 SQL 语句唯一标识的默认前缀，避免当前文件里 SQL 语句的唯一标识和别的文件里 SQL 语句的唯一标识重复
+    必须命名为对应 mapper 接口类的全类名，因为这个 xml 文件会被做为对应 mapper 接口的实现即数据层。如果名字不匹配的话，MyBatis 无法自动将当前文件做为对应接口的实现
+-->
+<mapper namespace="com.ineyee.mapper.SongMapper">
+    <!--
+        select 标签里用来写“查”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 mapper 层方法的命名规范来命名
+            parameterType：给 SQL 语句提供参数的入参真实类型，外界传进来时统一是基类 Object
+            resultType：从数据库表里查询出来一条一条的数据，会自动转换成 SongListDto 类型的对象
+
+        1、从数据库里读取数据时，建议 SQL 语句里显式写全要查询的所有字段，不要用 *
+        2、这里是在给 song 表和 singer 表的字段取别名，避免查询结果里的字段名冲突
+            song 的字段对应 FROM song，代表是从 song 里的查询
+            singer 的字段对应 LEFT JOIN singer，代表是从 singer 里的查询
+        3、FROM song 代表主要查询歌曲，LEFT JOIN singer 代表辅助查询歌手，也就是说肯定会查询出满足条件的所有歌曲
+        4、song 表是从表，singer 表是主表，从表.外键 = 主表.主键
+        5、先按 create_time 降序排序，如果 create_time 相同，再按 id 降序排序
+        6、注意 SQL 语句的结尾不能写分号，因为我们要用 MyBatisPlus 提供的分页插件自动拼接分页语句
+        7、TODO: 按需追加查询条件
+    -->
+    <select id="selectList" parameterType="SongListQuery" resultType="SongListDto">
+        SELECT song.id       AS song_id,
+               song.`name`   AS song_name,
+               song.cover    AS song_cover,
+               singer.`name` AS singer_name,
+               singer.sex    AS singer_sex
+        FROM song
+                 LEFT JOIN singer ON song.singer_id = singer.id
+        ORDER BY song.create_time DESC, song.id DESC
+    </select>
+</mapper>
+```
+
+* （5）service 层修改下模板代码的默认实现
+
+```java
+ListData<SongListDto> list(SongListQuery query);
+```
+
+```java
+@Override
+@Transactional(propagation = Propagation.SUPPORTS)
+public ListData<SongListDto> list(SongListQuery query) {
+  Page<SongListDto> queriedPage = new Page<>();
+
+  if (query.getPageNum() != null && query.getPageSize() != null) {
+    queriedPage.setCurrent(query.getPageNum());
+    queriedPage.setSize(query.getPageSize());
+  } else {
+    queriedPage.setCurrent(1);
+    queriedPage.setSize(Long.MAX_VALUE);
+  }
+
+  // 上面已经泛型了 SongMapper，baseMapper 就是自动注入的 songMapper，不需要我们再手动注入了
+  List<SongListDto> list = baseMapper.selectList(queriedPage, query);
+  queriedPage.setRecords(list);
+
+  if (query.getPageNum() != null && query.getPageSize() != null) {
+    return ListData.fromPage(queriedPage);
+  } else {
+    return ListData.fromList(list);
+  }
+}
+```
+
+* （6）controller 层修改下模板代码的默认实现
+
+```java
+@GetMapping("/list")
+public HttpResult<ListData<SongListDto>> list(@Valid SongListQuery query) {
+  ListData<SongListDto> dataList = songService.list(query);
+  return HttpResult.ok(dataList);
+}
+```
+
+###### ✅ 2.2 多表查询之单个查询 - 以歌曲详情界面为例
+
+* （1）首先考虑接口应该返回什么样的数据结构给客户端
+
+因为歌曲详情界面需要展示的歌曲信息比较多，所以我们应该尽可能多的返回歌曲的字段，但是歌手的字段还是应该按需返回，我们返回给客户端的数据结构应该如下**（详情的字段应该尽可能多——为了全，也就是从主要 po 里过滤掉敏感的、从次要 po 里筛选出需要的）**：
+
+```json
+// 嵌套结构
+{
+  "id": 220,
+  "createTime": "2025-01-11T08:58:39",
+  "updateTime": "2013-07-30T01:54:19",
+  "name": "七里香",
+  "cover": "https://video.hung402.net/ToolsHomeDecoration",
+  "singer": {
+    "id": 4,
+    "name": "周杰伦",
+    "sex": 0
+  }
+}
+
+// 扁平结构
+{
+  "songId": 220,
+  "songCreateTime": "2025-01-11T08:58:39",
+  "songUpdateTime": "2013-07-30T01:54:19",
+  "songName": "七里香",
+  "songCover": "http://video.rita10.us/MusicalInstrument",
+  "singerId": 4,
+  "singerName": "周杰伦",
+  "singerSex": 0
+}
+```
+
+> **多表查询之单个查询时，推荐使用嵌套结构。因为详情页一般都有比较复杂的业务逻辑，而嵌套结构做起业务逻辑来更清晰，客户端拿到数据后最好也组织成对应的嵌套结构。**
+
+* （2）有了接口的数据结构，pojo 层的 Dto 模型也就随之决定了，框架会自动把 Dto 模型转换成对应的数据结构
+
+```java
+@Data
+public class SongDetailDto {
+    private Long id;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+    private String name;
+    private String cover;
+
+    private SingerDto singer;
+
+    public static SongDetailDto from(Song songPo, Singer singerPo) {
+        SongDetailDto dto = new SongDetailDto();
+        dto.setId(songPo.getId());
+        dto.setCreateTime(songPo.getCreateTime());
+        dto.setUpdateTime(songPo.getUpdateTime());
+        dto.setName(songPo.getName());
+        dto.setCover(songPo.getCover());
+        dto.setSinger(SingerDto.from(singerPo));
+        return dto;
+    }
+}
+```
+
+```java
+@Data
+public class SingerDto {
+    private Long id;
+    private String name;
+    private Integer sex;
+
+    public static SingerDto from(Singer singerPo) {
+        SingerDto dto = new SingerDto();
+        dto.setId(singerPo.getId());
+        dto.setName(singerPo.getName());
+        dto.setSex(singerPo.getSex());
+        return dto;
+    }
+}
+```
+
+* （3）接下来考虑怎么把 Po 转换成 Dto
+
+我们的代码里已经有 Song 表对应的 Po 和 Singer 表对应的 Po 了，我们当然可以在 service 层通过 Java 代码来完成两个 Po 到 Dto 的转换。
+
+> **多表查询之单个查询时，推荐在 service 层完成 Dto 的聚合，而不是在 mapper 层，因为这种情况下在 mapper 层自己写 SQL 语句将会非常复杂，但是在 service 层则只需要两次简单的查询 + 几句 Java 代码即可。也就是说这种情况下我们继续保持用模板代码默认的查询出 po 即可，并且也不用自己写 SQL 语句。**
+
+* （4）mapper 层不用动
+* （5）service 层修改下模板代码的默认实现，完成 Dto 的聚合
+
+```java
+SongDetailDto get(SongGetQuery query) throws ServiceException;
+```
+
+```java
+private final SingerMapper singerMapper;
+public SongServiceImpl(SingerMapper singerMapper) {
+  this.singerMapper = singerMapper;
+}
+
+@Override
+@Transactional(propagation = Propagation.SUPPORTS)
+public SongDetailDto get(SongGetQuery query) throws ServiceException {
+  Song songPo = getById(query.getId());
+  if (songPo == null) {
+    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+  }
+
+  Singer singerPo = singerMapper.selectById(songPo.getSingerId());
+  if (singerPo == null) {
+    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+  }
+
+  return SongDetailDto.from(songPo, singerPo);
+}
+```
+
+* （6）controller 层修改下模板代码的默认实现
+
+```java
+@GetMapping("/get")
+public HttpResult<SongDetailDto> get(@Valid SongGetQuery query) throws ServiceException {
+SongDetailDto data = songService.get(query);
+return HttpResult.ok(data);
+}
+```
+
 ## 九九、补充
 
 #### 1、domain -> pojo
@@ -667,8 +959,6 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 | BO：Business Object<br />业务对象           | bo 关注的是业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表、也就是一个 po 就能完成，也可能需要联合多张表、也就是多个 po 才能完成（比如个人简介是一个 po、技术栈是一个 po、项目经验是一个 po，而个人简历则是一个 bo，由三个 po 联合完成）<br /><br />这个类内部一般就是编写构造方法、成员变量**（但是成员变量的类型可以跟数据库里不一样了，应该更加注重业务语义，比如数据库里用 0、1、2 这种整型来代表枚举，这个类里就可以用枚举类型了）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法** | 把 po 转换成 bo、把 bo 从数据层传到业务层           | bo 可以没有<br /><br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
 | DTO：Data Transfer Object<br />数据传输对象 | dto 关注的是数据传输效率<br /><br />po 和 bo 的属性其实都还是跟数据库表里的字段一一对应，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 里的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br /><br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
 | VO：View Object<br />视图对象               | vo 关注的是前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象（比如 dto 里的数据是没有国际化的，而 vo 里的数据就是经过国际化后的数据）<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br /><br />但有的话，前端的界面展示会更加动态化  |
-
-po 肯定是一一对应，dto 可能也是一一对应（只不过是多张表的组合数据）
 
 ###### ✅ 1.2 请求参数模型
 
