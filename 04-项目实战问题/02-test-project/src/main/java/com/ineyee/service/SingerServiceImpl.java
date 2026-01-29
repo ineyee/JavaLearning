@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.SingerMapper;
+import com.ineyee.pojo.dto.SingerDetailDto;
 import com.ineyee.pojo.dto.SingerListDto;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerGetQuery;
@@ -29,12 +30,13 @@ import java.util.List;
 public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> implements SingerService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Singer get(SingerGetQuery query) throws ServiceException {
-        Singer data = getById(query.getId());
-        if (data == null) {
+    public SingerDetailDto get(SingerGetQuery query) throws ServiceException {
+        Singer singerPo = getById(query.getId());
+        if (singerPo == null) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
-        return data;
+
+        return SingerDetailDto.from(singerPo);
     }
 
     @Override

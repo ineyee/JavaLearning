@@ -2,6 +2,7 @@ package com.ineyee.controller;
 
 import com.ineyee.common.api.HttpResult;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.pojo.dto.SingerDetailDto;
 import com.ineyee.pojo.dto.SingerListDto;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerGetQuery;
@@ -29,8 +30,8 @@ public class SingerController {
     private SingerService singerService;
 
     @GetMapping("/get")
-    public HttpResult<Singer> get(@Valid SingerGetQuery query) throws ServiceException {
-        Singer data = singerService.get(query);
+    public HttpResult<SingerDetailDto> get(@Valid SingerGetQuery query) throws ServiceException {
+        SingerDetailDto data = singerService.get(query);
         return HttpResult.ok(data);
     }
 

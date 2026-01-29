@@ -2,6 +2,7 @@ package com.ineyee.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.pojo.dto.SingerDetailDto;
 import com.ineyee.pojo.dto.SingerListDto;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerGetQuery;
@@ -17,7 +18,7 @@ import com.ineyee.common.api.ListData;
 import java.util.List;
 
 public interface SingerService extends IService<Singer> {
-    Singer get(SingerGetQuery query) throws ServiceException;
+    SingerDetailDto get(SingerGetQuery query) throws ServiceException;
 
     ListData<SingerListDto> list(SingerListQuery query);
 
