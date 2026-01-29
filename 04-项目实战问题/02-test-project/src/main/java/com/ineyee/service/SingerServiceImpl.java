@@ -1,11 +1,11 @@
 package com.ineyee.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.SingerMapper;
+import com.ineyee.pojo.dto.SingerListDto;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerGetQuery;
 import com.ineyee.pojo.query.SingerListQuery;
@@ -39,20 +39,24 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ListData<Singer> list(SingerListQuery query) {
-        LambdaQueryWrapper<Singer> wrapper = new LambdaQueryWrapper<>();
-        // TODO: 按需追加查询条件
-
-        wrapper.orderByDesc(Singer::getCreateTime)
-                .orderByDesc(Singer::getId);
+    public ListData<SingerListDto> list(SingerListQuery query) {
+        Page<SingerListDto> queriedPage = new Page<>();
 
         if (query.getPageNum() != null && query.getPageSize() != null) {
-            Page<Singer> page = new Page<>(query.getPageNum(), query.getPageSize());
-            Page<Singer> queriedPage = page(page, wrapper);
+            queriedPage.setCurrent(query.getPageNum());
+            queriedPage.setSize(query.getPageSize());
+        } else {
+            queriedPage.setCurrent(1);
+            queriedPage.setSize(Long.MAX_VALUE);
+        }
+
+        List<SingerListDto> list = baseMapper.selectList(queriedPage, query);
+        queriedPage.setRecords(list);
+
+        if (query.getPageNum() != null && query.getPageSize() != null) {
             return ListData.fromPage(queriedPage);
         } else {
-            List<Singer> dataList = list(wrapper);
-            return ListData.fromList(dataList);
+            return ListData.fromList(list);
         }
     }
 

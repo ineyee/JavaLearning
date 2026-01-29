@@ -1,0 +1,36 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    namespace，当前文件的命名空间，可以理解为当前文件里所有 SQL 语句唯一标识的默认前缀，避免当前文件里 SQL 语句的唯一标识和别的文件里 SQL 语句的唯一标识重复
+    必须命名为对应 mapper 接口类的全类名，因为这个 xml 文件会被做为对应 mapper 接口的实现即数据层。如果名字不匹配的话，MyBatis 无法自动将当前文件做为对应接口的实现
+-->
+<mapper namespace="com.ineyee.mapper.SingerMapper">
+    <!--
+        select 标签里用来写“查”的 SQL 语句
+            id：这条 SQL 语句的唯一标识，可以按照 mapper 层方法的命名规范来命名
+            parameterType：给 SQL 语句提供参数的入参真实类型，外界传进来时统一是基类 Object
+            resultType：从数据库表里查询出来一条一条的数据，会自动转换成 SingerListDto 类型的对象
+
+        1、从数据库里读取数据时，建议 SQL 语句里显式写全要查询的所有字段，不要用 *
+        2、这里是在给 song 表和 singer 表的字段取别名，避免查询结果里的字段名冲突
+            song 的字段对应 FROM song，代表是从 song 里的查询
+            singer 的字段对应 LEFT JOIN singer，代表是从 singer 里的查询
+        3、FROM singer 代表主要查询歌手，LEFT JOIN song 代表辅助查询歌曲，也就是说肯定会查询出满足条件的所有歌手
+        4、song 表是从表，singer 表是主表，从表.外键 = 主表.主键
+        5、对 SELECT FROM LEFT JOIN 的结果集通过 singer.id 分组，分组后再统计 song.id 不为空的数量——即歌曲数
+        6、我们虽然不用 singer.create_time 分组，但是 SQL 要求 ORDER BY 里的字段必须存在于 GROUP BY 里
+        7、、先按 create_time 降序排序，如果 create_time 相同，再按 id 降序排序
+        8、注意 SQL 语句的结尾不能写分号，因为我们要用 MyBatisPlus 提供的分页插件自动拼接分页语句
+        9、TODO: 按需追加查询条件
+    -->
+    <select id="selectList" parameterType="SingerListQuery" resultType="SingerListDto">
+        SELECT singer.id      AS singer_id,
+               singer.`name`  AS singer_name,
+               COUNT(song.id) AS song_count
+        FROM singer
+                 LEFT JOIN song ON song.singer_id = singer.id
+        GROUP BY singer.id, singer.create_time
+        ORDER BY singer.create_time DESC, singer.id DESC
+    </select>
+</mapper>
