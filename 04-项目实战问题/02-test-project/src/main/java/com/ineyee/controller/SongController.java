@@ -2,6 +2,7 @@ package com.ineyee.controller;
 
 import com.ineyee.common.api.HttpResult;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.pojo.dto.SongListDto;
 import com.ineyee.pojo.po.Song;
 import com.ineyee.pojo.query.SongGetQuery;
 import com.ineyee.pojo.query.SongListQuery;
@@ -11,7 +12,7 @@ import com.ineyee.pojo.req.SongDeleteReq;
 import com.ineyee.pojo.req.SongDeleteBatchReq;
 import com.ineyee.pojo.req.SongUpdateReq;
 import com.ineyee.pojo.req.SongUpdateBatchReq;
-import com.ineyee.pojo.vo.ListData;
+import com.ineyee.common.api.ListData;
 import com.ineyee.service.SongService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +35,8 @@ public class SongController {
     }
 
     @GetMapping("/list")
-    public HttpResult<ListData<Song>> list(@Valid SongListQuery query) {
-        ListData<Song> dataList = songService.list(query);
+    public HttpResult<ListData<SongListDto>> list(@Valid SongListQuery query) {
+        ListData<SongListDto> dataList = songService.list(query);
         return HttpResult.ok(dataList);
     }
 

@@ -6,7 +6,7 @@ import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
-import com.ineyee.pojo.vo.ListData;
+import com.ineyee.common.api.ListData;
 import com.ineyee.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

@@ -11,7 +11,7 @@ import com.ineyee.pojo.req.SingerDeleteReq;
 import com.ineyee.pojo.req.SingerDeleteBatchReq;
 import com.ineyee.pojo.req.SingerUpdateReq;
 import com.ineyee.pojo.req.SingerUpdateBatchReq;
-import com.ineyee.pojo.vo.ListData;
+import com.ineyee.common.api.ListData;
 
 import java.util.List;
 

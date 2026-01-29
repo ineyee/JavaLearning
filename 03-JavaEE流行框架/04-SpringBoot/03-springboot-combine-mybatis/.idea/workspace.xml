@@ -5,22 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de499fe2-4ff5-4928-9789-7c32cab2d631" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/cfg/MyBatisPlusCfg.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/query/ListQuery.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/query/SingerGetQuery.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/query/SingerListQuery.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerCreateBatchReq.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerCreateReq.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerDeleteBatchReq.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerDeleteReq.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerUpdateBatchReq.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/req/SingerUpdateReq.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/controller/SingerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/controller/SingerController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/mapper/SingerMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/mapper/SingerMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SingerServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/.idea/data_source_mapping.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/.idea/sqldialects.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/dto/SongListDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/mapper/song.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/controller/SongController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/controller/SongController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/mapper/SongMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/mapper/SongMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/query/ListQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/pojo/query/ListQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SongService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SongService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SongServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/java/com/ineyee/service/SongServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/02-test-project/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../04-项目实战问题/第 02 步-编写 Java 代码.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../04-项目实战问题/第 02 步-编写 Java 代码.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

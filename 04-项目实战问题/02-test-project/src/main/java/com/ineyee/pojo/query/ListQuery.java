@@ -29,6 +29,14 @@ public class ListQuery {
         return Math.max(pageSize, 10L);
     }
 
+    // 计算 offset（自定义 SQL 实现时可能需要）
+    public Long getOffset() {
+        if (pageNum == null || pageSize == null) {
+            return null;
+        }
+        return (pageNum - 1) * pageSize;
+    }
+
     // 模糊搜索参数（可选）
     private String keyword;
 }

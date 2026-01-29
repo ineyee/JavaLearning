@@ -1,4 +1,4 @@
-package com.ineyee.pojo.vo;
+package com.ineyee.common.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -1,11 +1,11 @@
 package com.ineyee.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.SongMapper;
+import com.ineyee.pojo.dto.SongListDto;
 import com.ineyee.pojo.po.Song;
 import com.ineyee.pojo.query.SongGetQuery;
 import com.ineyee.pojo.query.SongListQuery;
@@ -15,7 +15,7 @@ import com.ineyee.pojo.req.SongDeleteBatchReq;
 import com.ineyee.pojo.req.SongDeleteReq;
 import com.ineyee.pojo.req.SongUpdateBatchReq;
 import com.ineyee.pojo.req.SongUpdateReq;
-import com.ineyee.pojo.vo.ListData;
+import com.ineyee.common.api.ListData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,20 +39,24 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ListData<Song> list(SongListQuery query) {
-        LambdaQueryWrapper<Song> wrapper = new LambdaQueryWrapper<>();
-        // TODO: 按需追加查询条件
-
-        wrapper.orderByDesc(Song::getCreateTime)
-                .orderByDesc(Song::getId);
+    public ListData<SongListDto> list(SongListQuery query) {
+        Page<SongListDto> queriedPage = new Page<>();
 
         if (query.getPageNum() != null && query.getPageSize() != null) {
-            Page<Song> page = new Page<>(query.getPageNum(), query.getPageSize());
-            Page<Song> queriedPage = page(page, wrapper);
+            queriedPage.setCurrent(query.getPageNum());
+            queriedPage.setSize(query.getPageSize());
+        } else {
+            queriedPage.setCurrent(1);
+            queriedPage.setSize(Long.MAX_VALUE);
+        }
+
+        List<SongListDto> list = baseMapper.selectList(queriedPage, query);
+        queriedPage.setRecords(list);
+
+        if (query.getPageNum() != null && query.getPageSize() != null) {
             return ListData.fromPage(queriedPage);
         } else {
-            List<Song> dataList = list(wrapper);
-            return ListData.fromList(dataList);
+            return ListData.fromList(list);
         }
     }
 

@@ -11,7 +11,7 @@ import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
-import com.ineyee.pojo.vo.ListData;
+import com.ineyee.common.api.ListData;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

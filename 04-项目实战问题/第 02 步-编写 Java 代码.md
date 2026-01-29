@@ -17,6 +17,7 @@
 │  │  │  │  │  │  │  │  ├─ServiceException.java(业务异常)
 │  │  │  │  │  │  │  │  ├─GlobalExceptionHandler.java(全局异常处理)
 │  │  │  │  │  │  │  ├─HttpResult.java(给客户端响应数据和错误的包装类)
+│  │  │  │  │  │  │  ├─ListData.java(专门用来组装列表查询结果，返回给客户端)
 │  │  │  │  │  │  ├─config/(仍需手动配置的东西、拦截器、过滤器之类)
 │  │  │  │  │  │  │  ├─CorsConfig.java(跨域处理相关配置)
 │  │  │  │  │  │  │  ├─MyBatisPlus.java(添加分页插件拦截器)
@@ -26,12 +27,12 @@
 │  │  │  │  │  ├─controller/(表现层之控制器层)
 │  │  │  │  │  ├─mapper/(数据层的接口)
 │  │  │  │  │  ├─pojo/(表现层之模型层)
-│  │  │  │  │  │  ├──po
-│  │  │  │  │  │  ├──bo
-│  │  │  │  │  │  ├──dto
-│  │  │  │  │  │  ├──vo
-│  │  │  │  │  │  ├──query
-│  │  │  │  │  │  ├──req
+│  │  │  │  │  │  ├──po/
+│  │  │  │  │  │  ├──dto/
+│  │  │  │  │  │  ├──bo/
+│  │  │  │  │  │  ├──vo/
+│  │  │  │  │  │  ├──query/
+│  │  │  │  │  │  ├──req/
 │  │  │  │  │  ├─service/(业务层)
 │  │  │  │  │  ├─Application.java(项目的入口类)
 │  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
@@ -75,7 +76,7 @@ myBatis-plus:
   # mapper 层实现的位置
   # 单表的 mapper 层实现，一般用 MyBatisPlus 自动生成的就够用了
   # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatisPlus 一起使用不会冲突）
-  mapper-locations: classpath:mappers/*.xml
+  mapper-locations: classpath:mapper/*.xml
   global-config:
     db-config:
       # 主键生成策略：
@@ -741,6 +742,14 @@ public class ListQuery {
         return Math.max(pageSize, 10L);
     }
 
+    // 计算 offset（自定义 SQL 实现时可能需要）
+    public Long getOffset() {
+        if (pageNum == null || pageSize == null) {
+            return null;
+        }
+        return (pageNum - 1) * pageSize;
+    }
+
     // 模糊搜索参数（可选）
     private String keyword;
 }
@@ -895,7 +904,7 @@ myBatis-plus:
   # mapper 层实现的位置
   # 单表的 mapper 层实现，一般用 MyBatisPlus 自动生成的就够用了
   # 多表的 mapper 层实现，才需要像以前一样自定义 mapper 文件、自己去编写 SQL 语句（跟 MyBatisPlus 一起使用不会冲突）
-  mapper-locations: classpath:mappers/*.xml
+  mapper-locations: classpath:mapper/*.xml
   global-config:
     db-config:
       # 主键生成策略：
