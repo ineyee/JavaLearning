@@ -29,6 +29,11 @@
 │  │  │  │  │  ├─pojo/(表现层之模型层)
 │  │  │  │  │  │  ├──po/
 │  │  │  │  │  │  ├──dto/
+│  │  │  │  │  │  │  ├──SongListDto(歌曲列表 dto)
+│  │  │  │  │  │  │  ├──SongDetailDto(歌曲详情 dto)
+│  │  │  │  │  │  │  ├──SingerDto(歌曲详情 dto 里持有的极简歌手信息 dto)
+│  │  │  │  │  │  │  ├──SingerListDto(歌手列表 dto)
+│  │  │  │  │  │  │  ├──SingerDetailDto(歌手详情 dto)
 │  │  │  │  │  │  ├──bo/
 │  │  │  │  │  │  ├──vo/
 │  │  │  │  │  │  ├──query/
