@@ -86,6 +86,10 @@ myBatis-plus:
       # MyBatisPlus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
       # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
       id-type: ASSIGN_ID
+      # 逻辑删除配置
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 ```
 
 ```yaml
@@ -652,7 +656,7 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动配置参数是否必传的验证器、响应体自动转 JSON 字符串、请求参数和响应体的编码方式消息转换器（String 和 JSON 响应体的编码方式、默认就是 UTF-8，LocalDateTime 序列化为 ISO-8601 字符串格式等），我们同样不再需要像以前一样“在 Spring 的子配置文件里配置一大堆东西”。controller 里该用啥用啥，其它的我们啥也不用再干。
 
-## 九、多表 CRUD（需要自己编写 SQL 语句来查询、需要自己编写 Java 代码来保证数据一致性、以 singer&song 表为例）
+## ✅ 九、多表 CRUD（需要自己编写 SQL 语句来查询、需要自己编写 Java 代码来保证增删改数据一致性、以 singer&song 表为例）
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -946,6 +950,217 @@ return HttpResult.ok(data);
 }
 ```
 
+#### ✅ 第 3 步：多表增删改数据一致性的处理
+
+> **多表联查主要是针对从表查询来说的，因为只有从表里有外键，主表查询其实就是单表查询（除非某些特殊场景需要读取从表的数据）**
+
+###### ✅ 3.1 从表 save 时的数据一致性问题及处理
+
+* 问题场景
+
+```java
+// 给从表——歌曲表——里保存歌曲时，设置了一个主表——歌手表——里根本不存在的歌手 id
+SongCreateReq req = new SongCreateReq();
+req.setName("贝加尔湖畔");
+req.setCover("http://贝加尔湖畔.png");
+req.setSingerId(999999L); // 这个歌手 id 根本不存在
+songService.save(req); // 保存成功了，但是这条歌曲数据是无效的
+```
+
+* 后果
+
+```
+从表——歌曲表——里出现“孤儿数据”（外键 singer_id 指向的 id 压根儿不存在）
+```
+
+* **处理：保存前手动校验外键**
+
+```java
+@Override
+public Song save(SongCreateReq req) throws ServiceException {
+  // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+  Singer singer = singerMapper.selectById(req.getSingerId());
+  if (singer == null) {
+    throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST);
+  }
+  // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+
+  Song entity = new Song();
+  BeanUtils.copyProperties(req, entity);
+  if (!save(entity)) {
+    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+  }
+  return entity;
+}
+```
+
+```java
+@Override
+public List<Long> saveBatch(SongCreateBatchReq req) throws ServiceException {
+  // =========== 保存前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+  List<Long> singerIdList = req.getSongList().stream().map(SongCreateReq::getSingerId).toList();
+  List<Singer> singerList = singerMapper.selectByIds(singerIdList);
+  List<Long> existSingerIdList = singerList.stream().map(Singer::getId).toList();
+  List<Long> notExistSingerIdList = new ArrayList<>(singerIdList);
+  notExistSingerIdList.removeAll(existSingerIdList);
+  if (!notExistSingerIdList.isEmpty()) {
+    throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST.getCode(), SingerServiceError.SINGER_NOT_EXIST.getMessage() + notExistSingerIdList);
+  }
+  // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+
+  List<Song> entityList = new ArrayList<>();
+  req.getSongList().forEach(item -> {
+    Song entity = new Song();
+    BeanUtils.copyProperties(item, entity);
+    entityList.add(entity);
+  });
+  if (!saveBatch(entityList)) {
+    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+  }
+  List<Long> idList = new ArrayList<>();
+  entityList.forEach(item -> idList.add(item.getId()));
+  return idList;
+}
+```
+
+###### ✅ 3.2 主表 delete 时的数据一致性问题及处理
+
+* 问题场景
+
+```java
+// 主表——歌手表——里删除某个歌手时，没有处理该歌手在从表——歌曲表——里的歌曲
+SongDeleteReq req = new SongDeleteReq();
+req.setId(970L); // 歌手删除成功了，但是歌曲表里还残留该歌手的 100 条歌曲数据
+```
+
+* 后果
+
+```
+从表——歌曲表——里出现“孤儿数据”（外键 singer_id 指向的 id 已经被删了、不存在了）
+```
+
+* **处理：用 MyBatisPlus 的软删除 + 删除前不用手动校验、该删删**
+
+  * （1）首先数据库的每张表里得有 deleted 字段
+  * （2）这样一来每个 Po 里就能映射出 deleted 属性了：@TableLogic 的用途是告诉 MyBatisPlus 这是一个逻辑删除字段；@TableField(fill = FieldFill.INSERT) 的用途是告诉 MyBatisPlus 新插入数据是自动回填这个字段、默认值为 0-未删除
+
+  ```java
+  @Data
+  public class Singer {
+      private Long id;
+      @TableField(fill = FieldFill.INSERT)
+      private LocalDateTime createTime;
+      @TableField(fill = FieldFill.INSERT_UPDATE)
+      private LocalDateTime updateTime;
+      @TableLogic
+      @TableField(fill = FieldFill.INSERT)
+      private Integer deleted;
+      private String name;
+      private Integer sex;
+  }
+  ```
+
+  * （3）添加一下 MyBatisPlus 的逻辑删除配置
+
+  ```yml
+  myBatis-plus:
+    global-config:
+      db-config:
+        # 逻辑删除配置
+        logic-delete-field: deleted
+        logic-delete-value: 1
+        logic-not-delete-value: 0
+  ```
+
+  * （4）添加一下 MyBatisPlus 的自动填充配置
+
+  ```java
+  @Override
+  public void insertFill(MetaObject metaObject) {
+    LocalDateTime now = LocalDateTime.now();
+    this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
+    this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
+    this.strictInsertFill(metaObject, "deleted", Integer.class, 0);
+  }
+  ```
+
+  * （5）这样一来
+
+  | 接口操作                     | MyBatisPlus 对数据库的实际操作                               |
+  | ---------------------------- | ------------------------------------------------------------ |
+  | 通过接口单个或批量删除数据时 | 数据库其实是把数据的 deleted 字段设置成了 1<br />数据还是存在于数据库里的，并没有真正删除 |
+  | 通过接口单个或批量查询数据时 | 如果用的是 MyBatisPlus 提供的查询方法，它会自动加上 WHERE deleted = 0<br />如果是我们自己编写 SQL 语句来查询，记得手动加上 WHERE deleted = 0 |
+
+  ![image-20260130142415028](第 02 步-编写 Java 代码/img/image-20260130142415028.png)
+
+###### ✅ 3.3 从表 update 时的数据一致性问题及处理
+
+* 问题场景
+
+```java
+// 修改从表——歌曲表——里某首歌曲所属的歌手时，设置了一个主表——歌手表——里根本不存在的歌手 id
+SongUpdateReq req = new SongUpdateReq();
+req.setId(1L);
+req.setSingerId(888888L); // 这个歌手 id 根本不存在
+songService.update(req); // 修改成功了，但是这条歌曲数据是无效的
+```
+
+* 后果
+
+```
+从表——歌曲表——里出现“孤儿数据”（外键 singer_id 指向的 id 压根儿不存在）
+```
+
+* **处理：更新前手动校验外键**
+
+```java
+@Override
+public void update(SongUpdateReq req) throws ServiceException {
+  // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
+  if (req.getSingerId() != null) { // 先看看更新字段里有没有 singerId 字段
+    Singer singer = singerMapper.selectById(req.getSingerId());
+    if (singer == null) {
+      throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST);
+    }
+  }
+  // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
+
+  Song entity = new Song();
+  BeanUtils.copyProperties(req, entity);
+  if (!updateById(entity)) {
+    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+  }
+}
+```
+
+```java
+@Override
+public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
+  // =========== 更新前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+  List<Long> singerIdList = req.getSongList().stream().map(SongUpdateReq::getSingerId).filter(Objects::nonNull).toList();
+  if (!singerIdList.isEmpty()) { // 先看看更新字段里有没有 singerId 字段
+    List<Singer> singerList = singerMapper.selectByIds(singerIdList);
+    List<Long> existSingerIdList = singerList.stream().map(Singer::getId).toList();
+    List<Long> notExistSingerIdList = new ArrayList<>(singerIdList);
+    notExistSingerIdList.removeAll(existSingerIdList);
+    if (!notExistSingerIdList.isEmpty()) {
+      throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST.getCode(), SingerServiceError.SINGER_NOT_EXIST.getMessage() + notExistSingerIdList);
+    }
+  }
+  // =========== 更新前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+
+  List<Song> entityList = new ArrayList<>();
+  req.getSongList().forEach(item -> {
+    Song entity = new Song();
+    BeanUtils.copyProperties(item, entity);
+    entityList.add(entity);
+  });
+  if (!updateBatchById(entityList)) {
+    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+  }
+}
+```
+
 ## 九九、补充
 
 #### 1、domain -> pojo
@@ -1188,6 +1403,20 @@ MyBatisPlus 名字里的“MyBatis”是指它是一个基于 MyBatis 的框架�
 * 在 application.yml 文件里添加 MyBatisPlus 相关配置（MyBatis 相关配置转交给了 MyBatisPlus）
 
 ```yml
+# application.yml
+
+spring:
+  profiles:
+    # 通过子配置文件名来"引入、激活"子配置文件，这里是个数组
+    # 开发环境用 dev，生产环境用 prd
+    active:
+      - dev
+  mvc:
+    servlet:
+      # DispatcherServlet 的加载时机：默认是 -1（延迟加载，第一次请求接口时才初始化）
+      # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
+      load-on-startup: 0
+
 # MyBatisPlus 相关配置（MyBatis 相关配置转交给了 MyBatisPlus）
 myBatis-plus:
   configuration:
@@ -1206,6 +1435,10 @@ myBatis-plus:
       # MyBatisPlus 默认就是 ASSIGN_ID——雪花 ID，微服务、分布式时全局唯一。它会在 Java 代码里自动生成主键，此时我们就不需要设计主键为 AUTO_INCREMENT 了
       # 而单库单表时我们更推荐使用 AUTO——自增主键，性能和稳定性更好。是由数据库负责生成主键，此时我们就需要设计主键为 AUTO_INCREMENT 了
       id-type: ASSIGN_ID
+      # 逻辑删除配置
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 ```
 
 * 创建一个 MyBatisPlusConfig 类，用来添加分页插件拦截器
@@ -1226,7 +1459,7 @@ public class MyBatisPlusConfig {
 }
 ```
 
-* 创建一个 MyBatisPlusMetaObjectHandler 类，用来配置自动填充字段，需配合属性的 @TableField 注解一起使用
+* 创建一个 MyBatisPlusMetaObjectHandler 类，用来配置新增数据后的自动填充字段，需配合属性的 @TableField 注解一起使用
 
 ```java
 // MyBatisPlus 提供的接口 MetaObjectHandler，用于自动填充字段
@@ -1237,6 +1470,7 @@ public class MyBatisPlusMetaObjectHandler implements MetaObjectHandler {
         LocalDateTime now = LocalDateTime.now();
         this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
         this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
+        this.strictInsertFill(metaObject, "deleted", Integer.class, 0);
     }
 
     @Override
@@ -1326,6 +1560,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
   $!{autoImport.vm}
   import com.baomidou.mybatisplus.annotation.FieldFill;
   import com.baomidou.mybatisplus.annotation.TableField;
+  import com.baomidou.mybatisplus.annotation.TableLogic;
   import lombok.Data;
   
   @Data
@@ -1335,6 +1570,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
       @TableField(fill = FieldFill.INSERT)
       #elseif($column.name == "updateTime")
       @TableField(fill = FieldFill.INSERT_UPDATE)
+      #elseif($column.name == "deleted")
+      @TableLogic
+      @TableField(fill = FieldFill.INSERT)
       #end
       private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
   #end

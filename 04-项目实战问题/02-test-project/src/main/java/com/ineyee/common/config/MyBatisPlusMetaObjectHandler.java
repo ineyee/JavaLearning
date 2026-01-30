@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-// MyBatisPlus 提供的接口 MetaObjectHandler，用于自动填充字段
+// MyBatisPlus 提供的接口 MetaObjectHandler，用来配置新增数据后的自动填充字段
 @Component
 public class MyBatisPlusMetaObjectHandler implements MetaObjectHandler {
     @Override
@@ -14,6 +14,7 @@ public class MyBatisPlusMetaObjectHandler implements MetaObjectHandler {
         LocalDateTime now = LocalDateTime.now();
         this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
         this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
+        this.strictInsertFill(metaObject, "deleted", Integer.class, 0);
     }
 
     @Override

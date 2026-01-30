@@ -3,6 +3,7 @@ package com.ineyee.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
+import com.ineyee.common.api.error.SingerServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.SingerMapper;
 import com.ineyee.mapper.SongMapper;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -78,6 +80,13 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
     @Override
     public Song save(SongCreateReq req) throws ServiceException {
+        // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+        Singer singer = singerMapper.selectById(req.getSingerId());
+        if (singer == null) {
+            throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST);
+        }
+        // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+
         Song entity = new Song();
         BeanUtils.copyProperties(req, entity);
         if (!save(entity)) {
@@ -88,6 +97,17 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
     @Override
     public List<Long> saveBatch(SongCreateBatchReq req) throws ServiceException {
+        // =========== 保存前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+        List<Long> singerIdList = req.getSongList().stream().map(SongCreateReq::getSingerId).toList();
+        List<Singer> singerList = singerMapper.selectByIds(singerIdList);
+        List<Long> existSingerIdList = singerList.stream().map(Singer::getId).toList();
+        List<Long> notExistSingerIdList = new ArrayList<>(singerIdList);
+        notExistSingerIdList.removeAll(existSingerIdList);
+        if (!notExistSingerIdList.isEmpty()) {
+            throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST.getCode(), SingerServiceError.SINGER_NOT_EXIST.getMessage() + notExistSingerIdList);
+        }
+        // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+
         List<Song> entityList = new ArrayList<>();
         req.getSongList().forEach(item -> {
             Song entity = new Song();
@@ -118,6 +138,15 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
     @Override
     public void update(SongUpdateReq req) throws ServiceException {
+        // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
+        if (req.getSingerId() != null) { // 先看看更新字段里有没有 singerId 字段
+            Singer singer = singerMapper.selectById(req.getSingerId());
+            if (singer == null) {
+                throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST);
+            }
+        }
+        // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
+
         Song entity = new Song();
         BeanUtils.copyProperties(req, entity);
         if (!updateById(entity)) {
@@ -127,6 +156,19 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
     @Override
     public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
+        // =========== 更新前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+        List<Long> singerIdList = req.getSongList().stream().map(SongUpdateReq::getSingerId).filter(Objects::nonNull).toList();
+        if (!singerIdList.isEmpty()) { // 先看看更新字段里有没有 singerId 字段
+            List<Singer> singerList = singerMapper.selectByIds(singerIdList);
+            List<Long> existSingerIdList = singerList.stream().map(Singer::getId).toList();
+            List<Long> notExistSingerIdList = new ArrayList<>(singerIdList);
+            notExistSingerIdList.removeAll(existSingerIdList);
+            if (!notExistSingerIdList.isEmpty()) {
+                throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST.getCode(), SingerServiceError.SINGER_NOT_EXIST.getMessage() + notExistSingerIdList);
+            }
+        }
+        // =========== 更新前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+
         List<Song> entityList = new ArrayList<>();
         req.getSongList().forEach(item -> {
             Song entity = new Song();

@@ -18,9 +18,12 @@
             singer 的字段对应 LEFT JOIN singer，代表是从 singer 里的查询
         3、FROM song 代表主要查询歌曲，LEFT JOIN singer 代表辅助查询歌手，也就是说肯定会查询出满足条件的所有歌曲
         4、song 表是从表，singer 表是主表，从表.外键 = 主表.主键
-        5、先按 create_time 降序排序，如果 create_time 相同，再按 id 降序排序
-        6、注意 SQL 语句的结尾不能写分号，因为我们要用 MyBatisPlus 提供的分页插件自动拼接分页语句
-        7、TODO: 按需追加查询条件
+        5、查询出满足条件的所有歌曲后
+            我们应该只过滤出那些没有被删掉的歌曲（即 song.deleted = 0）
+            我们还应该只过滤出那些歌手没有被删掉的歌曲（即 singer.deleted = 0），歌手一旦被删掉，就算歌曲没被删掉，也不展示了（类似于级联删除的效果）
+        6、先按 create_time 降序排序，如果 create_time 相同，再按 id 降序排序
+        7、注意 SQL 语句的结尾不能写分号，因为我们要用 MyBatisPlus 提供的分页插件自动拼接分页语句
+        8、TODO: 按需追加查询条件
     -->
     <select id="selectList" parameterType="SongListQuery" resultType="SongListDto">
         SELECT song.id       AS song_id,
@@ -31,6 +34,8 @@
         FROM song
                  LEFT JOIN singer ON song.singer_id = singer.id
         <where>
+            AND song.deleted = 0
+            AND singer.deleted = 0
             <if test="query.singerId != null">
                 AND song.singer_id = #{query.singerId}
             </if>

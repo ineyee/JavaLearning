@@ -8,6 +8,11 @@ public class ServiceException extends Exception {
         this.code = serviceError.getCode();
     }
 
+    public ServiceException(Integer code, String msg) {
+        super(msg);
+        this.code = code;
+    }
+
     private final Integer code;
 
     public int getCode() {

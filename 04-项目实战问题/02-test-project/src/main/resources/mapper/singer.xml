@@ -18,18 +18,22 @@
             singer 的字段对应 LEFT JOIN singer，代表是从 singer 里的查询
         3、FROM singer 代表主要查询歌手，LEFT JOIN song 代表辅助查询歌曲，也就是说肯定会查询出满足条件的所有歌手
         4、song 表是从表，singer 表是主表，从表.外键 = 主表.主键
-        5、对 SELECT FROM LEFT JOIN 的结果集通过 singer.id 分组，分组后再统计 song.id 不为空的数量——即歌曲数
-        6、我们虽然不用 singer.create_time 分组，但是 SQL 要求 ORDER BY 里的字段必须存在于 GROUP BY 里
-        7、、先按 create_time 降序排序，如果 create_time 相同，再按 id 降序排序
-        8、注意 SQL 语句的结尾不能写分号，因为我们要用 MyBatisPlus 提供的分页插件自动拼接分页语句
-        9、TODO: 按需追加查询条件
+        5、song.deleted = 0 的用途是指去歌曲表里匹配时，除了歌曲的外键得匹配上 singer.id，歌曲还得是未删除的，这样才能算对个数
+            比如说周杰伦有七里香、晴天、夜的第七章，但是夜的第七章在歌曲表里删除状态，那查询周杰伦的歌曲数就应该是 2 不是 3，得把删除掉的歌曲过滤掉
+        6、查询出满足条件的所有歌手后，过滤掉那些被删掉的歌手
+        7、对 SELECT FROM LEFT JOIN 的结果集通过 singer.id 分组，分组后再统计 song.id 不为空的数量——即歌曲数
+        8、我们虽然不用 singer.create_time 分组，但是 SQL 要求 ORDER BY 里的字段必须存在于 GROUP BY 里
+        9、先按 create_time 降序排序，如果 create_time 相同，再按 id 降序排序
+        10、注意 SQL 语句的结尾不能写分号，因为我们要用 MyBatisPlus 提供的分页插件自动拼接分页语句
+        11、TODO: 按需追加查询条件
     -->
     <select id="selectList" parameterType="SingerListQuery" resultType="SingerListDto">
         SELECT singer.id      AS singer_id,
                singer.`name`  AS singer_name,
                COUNT(song.id) AS song_count
         FROM singer
-                 LEFT JOIN song ON song.singer_id = singer.id
+                 LEFT JOIN song ON (song.singer_id = singer.id AND song.deleted = 0)
+        WHERE singer.deleted = 0
         GROUP BY singer.id, singer.create_time
         ORDER BY singer.create_time DESC, singer.id DESC
     </select>
