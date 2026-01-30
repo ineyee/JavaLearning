@@ -34,3 +34,8 @@ myBatis-plus:
       logic-delete-field: deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+# Swagger 相关配置，配置 swagger 框架的行为
+springdoc:
+  # 只扫描这些包下的接口
+  packages-to-scan: com.ineyee.controller

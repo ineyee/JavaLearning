@@ -15,6 +15,8 @@ import com.ineyee.pojo.req.SongUpdateReq;
 import com.ineyee.pojo.req.SongUpdateBatchReq;
 import com.ineyee.common.api.ListData;
 import com.ineyee.service.SongService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,52 +27,61 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/song")
+@Tag(name = "歌曲管理", description = "歌曲的增删改查接口")
 public class SongController {
     @Autowired
     private SongService songService;
 
+    @Operation(summary = "查询歌曲详情", description = "根据歌曲 ID 查询歌曲的详细信息")
     @GetMapping("/get")
     public HttpResult<SongDetailDto> get(@Valid SongGetQuery query) throws ServiceException {
         SongDetailDto data = songService.get(query);
         return HttpResult.ok(data);
     }
 
+    @Operation(summary = "查询歌曲列表", description = "分页查询歌曲列表，支持多条件筛选")
     @GetMapping("/list")
     public HttpResult<ListData<SongListDto>> list(@Valid SongListQuery query) {
         ListData<SongListDto> dataList = songService.list(query);
         return HttpResult.ok(dataList);
     }
 
+    @Operation(summary = "创建歌曲", description = "创建一首新歌曲")
     @PostMapping("/save")
     public HttpResult<Song> save(@Valid @RequestBody SongCreateReq req) throws ServiceException {
         Song data = songService.save(req);
         return HttpResult.ok(data);
     }
 
+    @Operation(summary = "批量创建歌曲", description = "批量创建多首歌曲")
     @PostMapping("/saveBatch")
     public HttpResult<List<Long>> saveBatch(@Valid @RequestBody SongCreateBatchReq req) throws ServiceException {
         List<Long> idList = songService.saveBatch(req);
         return HttpResult.ok(idList);
     }
 
+    @Operation(summary = "删除歌曲", description = "根据歌曲 ID 删除歌曲")
     @PostMapping("/remove")
     public HttpResult<Void> remove(@Valid @RequestBody SongDeleteReq req) throws ServiceException {
         songService.remove(req);
         return HttpResult.ok();
     }
 
+    @Operation(summary = "批量删除歌曲", description = "根据歌曲 ID 列表批量删除歌曲")
     @PostMapping("/removeBatch")
     public HttpResult<Void> removeBatch(@Valid @RequestBody SongDeleteBatchReq req) throws ServiceException {
         songService.removeBatch(req);
         return HttpResult.ok();
     }
 
+    @Operation(summary = "更新歌曲", description = "更新歌曲信息")
     @PostMapping("/update")
     public HttpResult<Void> update(@Valid @RequestBody SongUpdateReq req) throws ServiceException {
         songService.update(req);
         return HttpResult.ok();
     }
 
+    @Operation(summary = "批量更新歌曲", description = "批量更新多首歌曲信息")
     @PostMapping("/updateBatch")
     public HttpResult<Void> updateBatch(@Valid @RequestBody SongUpdateBatchReq req) throws ServiceException {
         songService.updateBatch(req);
