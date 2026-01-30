@@ -1161,24 +1161,24 @@ public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
 }
 ```
 
-## 九九、补充
+## ✅ 九九、补充
 
-#### 1、domain -> pojo
+#### ✅ 1、domain -> pojo
 
 响应体模型和请求参数模型统称为 POJO（Plain Ordinary Java Object、简单的 Java 对象）。
 
-###### 1.1 响应体模型
+###### ✅ 1.1 响应体模型
 
 之前的响应体模型，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。但是实际开发中“一个 domain 走天下”可能并不太合适，而是会有各种模型：
 
 ![image-20260112170830372](第 02 步-编写 Java 代码/img/image-20260112170830372.png)
 
-| 模型                                        | 职责                                                         | 阶段                                                | 是否必须有                                                   |
-| ------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------ |
-| PO：Persistent Object<br />持久化对象       | po 关注的是数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                 | po 必须有                                                    |
-| BO：Business Object<br />业务对象           | bo 关注的是业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表、也就是一个 po 就能完成，也可能需要联合多张表、也就是多个 po 才能完成（比如个人简介是一个 po、技术栈是一个 po、项目经验是一个 po，而个人简历则是一个 bo，由三个 po 联合完成）<br /><br />这个类内部一般就是编写构造方法、成员变量**（但是成员变量的类型可以跟数据库里不一样了，应该更加注重业务语义，比如数据库里用 0、1、2 这种整型来代表枚举，这个类里就可以用枚举类型了）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法** | 把 po 转换成 bo、把 bo 从数据层传到业务层           | bo 可以没有<br /><br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
-| DTO：Data Transfer Object<br />数据传输对象 | dto 关注的是数据传输效率<br /><br />po 和 bo 的属性其实都还是跟数据库表里的字段一一对应，只不过 po 没有业务语义、bo 有业务语义，但很多时候我们并不需要把 po 或 bo 里的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 或 bo 转换成 dto、把 dto 从业务层传到控制器层 | dto 可以没有<br /><br />但有的话，可以减少冗余数据传输、提高数据传输效率 |
-| VO：View Object<br />视图对象               | vo 关注的是前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象（比如 dto 里的数据是没有国际化的，而 vo 里的数据就是经过国际化后的数据）<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                | vo 可以没有<br /><br />但有的话，前端的界面展示会更加动态化  |
+| 模型                                        | 职责                                                         | 阶段                                                         | 是否必须有                                                   |
+| ------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| PO：Persistent Object<br />持久化对象       | po 关注的是数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                          | po 必须有                                                    |
+| DTO：Data Transfer Object<br />数据传输对象 | dto 关注的是数据传输<br /><br />po 的属性都是跟数据库表里的字段一一对应的，但很多时候我们并不需要把 po 里的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 转换成 dto 或从数据库表直接映射出 dto、把 dto 从业务层传到控制器层 | ① 单表查询时，从数据库表映射出来的是 po，如果 po 的数据没啥敏感数据，那也可以把 po 直接传到控制器层、此时 dto 不是必须（如 product 表）；但是如果 po 里有敏感数据，那就必须搞个对应的 dto 把敏感数据过滤掉，此时 dto 必须（如 user 表要过滤掉密码）<br />② 多表联查是直接从数据库表里映射出 dto，因为每个表的 po 仅仅是自己那张表的字段映射、它们肯定无法并且也不应该同时承载两个表的数据，所以只能是 dto 来同时承载两个表的数据，此时 dto 必须（如 singer&song 表） |
+| VO：View Object<br />视图对象               | vo 关注的是前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象（比如 dto 里的数据是没有国际化的，而 vo 里的数据就是经过国际化后的数据）<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                         | vo 可以没有<br /><br />但有的话，前端的界面展示会更加动态化  |
+| BO：Business Object<br />业务对象           | bo 关注的是业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表、也就是一个 po 就能完成，也可能需要联合多张表、也就是多个 po 才能完成（比如个人简介是一个 po、技术栈是一个 po、项目经验是一个 po，而个人简历则是一个 bo，由三个 po 联合完成）<br /><br />这个类内部一般就是编写构造方法、成员变量**（但是成员变量的类型可以跟数据库里不一样了，应该更加注重业务语义，比如数据库里用 0、1、2 这种整型来代表枚举，这个类里就可以用枚举类型了）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法** | 把 po 转换成 bo、把 bo 从数据层传到业务层                    | bo 可以没有<br /><br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
 
 ###### ✅ 1.2 请求参数模型
 
@@ -2104,199 +2104,3 @@ public class $!{tableName} {
 ###### ✅ 3.3 自定义数据库类型与 Java 类型映射
 
 ![image-20260121223652500](第 02 步-编写 Java 代码/img/image-20260121223652500.png)
-
-## 临时：几个 o 的转换
-
- **PO - 数据库层面**
-
-```java
- @Entity
-
- @Table(name = "orders")
-
- public class OrderPO {
-
-   @Id
-
-   private Long id;
-
-
-
-   // 数据库存储用整数，节省空间
-
-   @Column(name = "status")
-
-   private Integer status; // 0:待支付 1:已支付 2:已发货 3:已完成 
-
- 4:已取消
-
-
-
-   @Column(name = "created_at")
-
-   private Timestamp createdAt;
-
- }
-```
-
-
-
-
-
- **BO - 业务逻辑层面**
-
-
-
-```java
-public class OrderBO {
-
-   private Long id;
-
-
-
-   // 使用枚举，业务语义清晰
-
-   private OrderStatus status;
-
-
-
-   private LocalDateTime createdAt;
-
-
-
-   // 业务方法：状态流转逻辑
-
-   public void pay() {
-
-​     if (status != OrderStatus.PENDING_PAYMENT) {
-
-​       throw new BusinessException("订单状态不允许支付");
-
-​     }
-
-​     this.status = OrderStatus.PAID;
-
-   }
-
-
-
-   public void ship() {
-
-​     if (status != OrderStatus.PAID) {
-
-​       throw new BusinessException("订单未支付，不能发货");
-
-​     }
-
-​     this.status = OrderStatus.SHIPPED;
-
-   }
-
-
-
-   // 业务规则：是否可以取消
-
-   public boolean canCancel() {
-
-​     return status == OrderStatus.PENDING_PAYMENT
-
-​       || status == OrderStatus.PAID;
-
-   }
-
- }
-
-
-
- enum OrderStatus {
-
-   PENDING_PAYMENT, PAID, SHIPPED, COMPLETED, CANCELLED
-
- }
-```
-
-
-
-
-
- **DTO - 接口传输层面**
-
-```java
-// 给第三方物流系统的 DTO
-
- public class OrderShipmentDTO {
-
-   private String orderId;
-
-
-
-   // 简化状态，物流系统只关心是否需要发货
-
-   private String shipmentStatus; // "TO_SHIP", "SHIPPED"
-
-
-
-   private String recipientAddress;
-
- }
-
-
-
- // 给支付系统的 DTO
-
- public class OrderPaymentDTO {
-
-   private String orderId;
-
-   private String paymentStatus; // "UNPAID", "PAID"
-
-   private BigDecimal amount;
-
- }
-
-
-```
-
-
-
- 
-
-
-
- **VO - 前端展示层面**
-
-```java
- public class OrderVO {
-
-   private String orderId;
-
-
-
-   // 前端展示用中文描述
-
-   private String statusText; // 
-
- "待支付"、"已支付"、"已发货"、"已完成"、"已取消"
-
-
-
-   // 前端需要的状态颜色
-
-   private String statusColor; // "warning", "success", "info", 
-
- "default", "error"
-
-
-
-   // 前端需要的可操作按钮
-
-   private List<String> availableActions; // ["支付", "取消订单"]
-
-
-
-   // 格式化的时间
-
-   private String createdTime; // "2026-01-12 14:30:25"
-
- }
-```
