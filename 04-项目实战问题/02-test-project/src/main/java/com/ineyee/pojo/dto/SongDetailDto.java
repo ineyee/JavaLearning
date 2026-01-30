@@ -14,7 +14,7 @@ public class SongDetailDto {
     private String name;
     private String cover;
 
-    private SingerDto singer;
+    private SingerSummaryDto singer;
 
     public static SongDetailDto from(Song songPo, Singer singerPo) {
         SongDetailDto dto = new SongDetailDto();
@@ -23,7 +23,7 @@ public class SongDetailDto {
         dto.setUpdateTime(songPo.getUpdateTime());
         dto.setName(songPo.getName());
         dto.setCover(songPo.getCover());
-        dto.setSinger(SingerDto.from(singerPo));
+        dto.setSinger(SingerSummaryDto.from(singerPo));
         return dto;
     }
 }

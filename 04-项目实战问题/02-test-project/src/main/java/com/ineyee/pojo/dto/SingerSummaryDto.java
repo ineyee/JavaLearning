@@ -4,13 +4,13 @@ import com.ineyee.pojo.po.Singer;
 import lombok.Data;
 
 @Data
-public class SingerDto {
+public class SingerSummaryDto {
     private Long id;
     private String name;
     private Integer sex;
 
-    public static SingerDto from(Singer singerPo) {
-        SingerDto dto = new SingerDto();
+    public static SingerSummaryDto from(Singer singerPo) {
+        SingerSummaryDto dto = new SingerSummaryDto();
         dto.setId(singerPo.getId());
         dto.setName(singerPo.getName());
         dto.setSex(singerPo.getSex());

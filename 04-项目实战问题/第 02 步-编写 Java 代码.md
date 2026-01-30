@@ -27,21 +27,19 @@
 │  │  │  │  │  ├─controller/(表现层之控制器层)
 │  │  │  │  │  ├─mapper/(数据层的接口)
 │  │  │  │  │  ├─pojo/(表现层之模型层)
-│  │  │  │  │  │  ├──po/
 │  │  │  │  │  │  ├──dto/
-│  │  │  │  │  │  │  ├──SongListDto(歌曲列表 dto)
-│  │  │  │  │  │  │  ├──SongDetailDto(歌曲详情 dto)
-│  │  │  │  │  │  │  ├──SingerDto(歌曲详情 dto 里持有的极简歌手信息 dto)
-│  │  │  │  │  │  │  ├──SingerListDto(歌手列表 dto)
 │  │  │  │  │  │  │  ├──SingerDetailDto(歌手详情 dto)
-│  │  │  │  │  │  ├──bo/
-│  │  │  │  │  │  ├──vo/
+│  │  │  │  │  │  │  ├──SingerListDto(歌手列表 dto)
+│  │  │  │  │  │  │  ├──SingerSummaryDto(歌手摘要信息 dto，供其它地方嵌套使用)
+│  │  │  │  │  │  │  ├──SongDetailDto(歌曲详情 dto)
+│  │  │  │  │  │  │  ├──SongListDto(歌曲列表 dto)
+│  │  │  │  │  │  ├──po/
 │  │  │  │  │  │  ├──query/
 │  │  │  │  │  │  ├──req/
 │  │  │  │  │  ├─service/(业务层)
 │  │  │  │  │  ├─Application.java(项目的入口类)
 │  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
-│  │  │  │  ├─mappers/(数据层的实现)
+│  │  │  │  ├─mapper/(数据层的实现)
 │  │  │  │  ├─static/(SpringBoot 项目的静态资源固定放在 static 目录下)
 │  │  │  │  │  ├─img/(图片资源)
 │  │  │  │  │  │  ├─logo.png(http://localhost:8080/img/logo.png 即可访问到)
@@ -654,7 +652,7 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动配置参数是否必传的验证器、响应体自动转 JSON 字符串、请求参数和响应体的编码方式消息转换器（String 和 JSON 响应体的编码方式、默认就是 UTF-8，LocalDateTime 序列化为 ISO-8601 字符串格式等），我们同样不再需要像以前一样“在 Spring 的子配置文件里配置一大堆东西”。controller 里该用啥用啥，其它的我们啥也不用再干。
 
-## 九、多表 CRUD（需要自己编写 SQL 语句、以 singer&song 表为例）
+## 九、多表 CRUD（需要自己编写 SQL 语句来查询、需要自己编写 Java 代码来保证数据一致性、以 singer&song 表为例）
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
@@ -662,18 +660,20 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 #### ✅ 第 1 步：生成模板代码
 
-首先按单表 CRUD 的步骤，生成各层的模板代码，多表 CRUD 无非是在这些代码的基础上改改。
+首先按照单表 CRUD 的步骤，生成各层的模板代码，多表 CRUD 无非是在这些代码的基础上改改。
 
-#### ✅ 第 2 步：多表查询的实现
+#### ✅ 第 2 步：多表联查的实现
 
-###### ✅ 2.1 多表查询之列表查询 - 以歌曲列表界面为例
+> **多表联查主要是针对从表查询来说的，因为只有从表里有外键，主表查询其实就是单表查询（除非某些特殊场景需要读取从表的数据）**
+
+###### ✅ 2.1 多表联查之列表查询 - 以歌曲列表界面为例
 
 * （1）首先考虑接口应该返回什么样的数据结构给客户端
 
 因为歌曲列表界面只需要展示每首歌曲的名称、封面（当然 id 是必须的），还有歌曲所属歌手的名字，所以我们返回给客户端的数据结构应该如下**（列表的字段应该尽可能少——为了快，也就是从两个 po 里筛选出需要的）**：
 
 ```json
-// 扁平结构
+// 扁平结构（同时拥有两个表的数据）
 {
   "songId": 220,
   "songName": "七里香",
@@ -681,7 +681,7 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
   "singerName": "周杰伦"
 }
 
-// 嵌套结构
+// 嵌套结构（同时拥有两个表的数据）
 {
   "id": 220,
   "name": "七里香",
@@ -692,9 +692,9 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 }
 ```
 
-> **多表查询之列表查询时，推荐使用扁平结构。因为列表页讲究“快”，而这种扁平的数据结构，我们只需要编写最简单的多表查询 SQL 语句即可实现，数据库的查询效率是最高的；列表页还讲究“平”，即客户端拿到数据后最好不要再组织复杂的数据结构，而是直接使用。**
+> **多表联查之列表查询时，推荐使用扁平结构。因为列表页讲究“快”，而这种扁平的数据结构，我们只需要编写最简单的多表联查 SQL 语句即可实现，数据库的查询效率是最高的；列表页还讲究“平”，即客户端拿到数据后最好不要再组织复杂的数据结构，而是直接使用**
 
-* （2）有了接口的数据结构，pojo 层的 Dto 模型也就随之决定了，框架会自动把 Dto 模型转换成对应的数据结构
+* （2）有了接口的数据结构，pojo 层对应的 Dto 模型也就随之决定了**（多表联查是直接从数据库里查出 Dto，因为每个表的 Po 仅仅是自己那张表的字段映射、它们肯定无法并且也不应该同时承载两个表的数据，所以只能是 Dto 来同时承载两个表的数据）**，框架会自动把 Dto 模型转换成对应的数据结构
 
 ```java
 @Data
@@ -707,9 +707,9 @@ public class SongListDto {
 }
 ```
 
-* （3）接下来考虑怎么把 Po 转换成 Dto
+* （3）接下来需要考虑的是怎么把两个 Po 转换成一个 Dto
 
-我们的代码里已经有 Song 表对应的 Po 和 Singer 表对应的 Po 了，我们当然可以在 service 层通过 Java 代码来完成两个 Po 到 Dto 的转换，但是这会导致 N+1 查询问题，高并发直接炸：
+我们的代码里已经有 Song 表对应的 Po 和 Singer 表对应的 Po 了，我们当然可以**在 service 层通过 Java 代码来完成两个 Po 到 Dto 的转换，但是这会导致 N+1 查询问题，高并发直接炸：**
 
 ```java
 List<SongListDto> dtoList = new ArrayList<>();
@@ -730,7 +730,7 @@ for (Song song : songList) {
 }
 ```
 
-> **所以多表查询之列表查询时，推荐在 mapper 层完成 Dto 的聚合，而不是在 service 层。说白了就是用 SQL 语句直接查询出 Dto，而不在是 Po。**
+> **所以多表联查之列表查询时，推荐在 mapper 层完成 Dto 的聚合，而不是在 service 层。说白了就是用 SQL 语句直接查询出 Dto，而不再是 Po。**
 
 * （4）mapper 层自己定义接口方法、自己编写 SQL 语句实现接口方法
 
@@ -821,14 +821,14 @@ public HttpResult<ListData<SongListDto>> list(@Valid SongListQuery query) {
 }
 ```
 
-###### ✅ 2.2 多表查询之单个查询 - 以歌曲详情界面为例
+###### ✅ 2.2 多表联查之单个查询 - 以歌曲详情界面为例
 
 * （1）首先考虑接口应该返回什么样的数据结构给客户端
 
 因为歌曲详情界面需要展示的歌曲信息比较多，所以我们应该尽可能多的返回歌曲的字段，但是歌手的字段还是应该按需返回，我们返回给客户端的数据结构应该如下**（详情的字段应该尽可能多——为了全，也就是从主要 po 里过滤掉敏感的、从次要 po 里筛选出需要的）**：
 
 ```json
-// 嵌套结构
+// 嵌套结构（同时拥有两个表的数据）
 {
   "id": 220,
   "createTime": "2025-01-11T08:58:39",
@@ -842,7 +842,7 @@ public HttpResult<ListData<SongListDto>> list(@Valid SongListQuery query) {
   }
 }
 
-// 扁平结构
+// 扁平结构（同时拥有两个表的数据）
 {
   "songId": 220,
   "songCreateTime": "2025-01-11T08:58:39",
@@ -855,9 +855,9 @@ public HttpResult<ListData<SongListDto>> list(@Valid SongListQuery query) {
 }
 ```
 
-> **多表查询之单个查询时，推荐使用嵌套结构。因为详情页一般都有比较复杂的业务逻辑，而嵌套结构做起业务逻辑来更清晰，客户端拿到数据后最好也组织成对应的嵌套结构。**
+> **多表联查之单个查询时，推荐使用嵌套结构。因为详情页一般都有比较复杂的业务逻辑，而嵌套结构做起业务逻辑来更清晰，客户端拿到数据后最好也组织成对应的嵌套结构。**
 
-* （2）有了接口的数据结构，pojo 层的 Dto 模型也就随之决定了，框架会自动把 Dto 模型转换成对应的数据结构
+* （2）有了接口的数据结构，pojo 层对应的 Dto 模型也就随之决定了**（多表联查是直接从数据库里查出 Dto，因为每个表的 Po 仅仅是自己那张表的字段映射、它们肯定无法并且也不应该同时承载两个表的数据，所以只能是 Dto 来同时承载两个表的数据）**，框架会自动把 Dto 模型转换成对应的数据结构
 
 ```java
 @Data
@@ -868,7 +868,7 @@ public class SongDetailDto {
     private String name;
     private String cover;
 
-    private SingerDto singer;
+    private SingerSummaryDto singer;
 
     public static SongDetailDto from(Song songPo, Singer singerPo) {
         SongDetailDto dto = new SongDetailDto();
@@ -877,7 +877,7 @@ public class SongDetailDto {
         dto.setUpdateTime(songPo.getUpdateTime());
         dto.setName(songPo.getName());
         dto.setCover(songPo.getCover());
-        dto.setSinger(SingerDto.from(singerPo));
+        dto.setSinger(SingerSummaryDto.from(singerPo));
         return dto;
     }
 }
@@ -885,13 +885,13 @@ public class SongDetailDto {
 
 ```java
 @Data
-public class SingerDto {
+public class SingerSummaryDto {
     private Long id;
     private String name;
     private Integer sex;
 
-    public static SingerDto from(Singer singerPo) {
-        SingerDto dto = new SingerDto();
+    public static SingerSummaryDto from(Singer singerPo) {
+        SingerSummaryDto dto = new SingerSummaryDto();
         dto.setId(singerPo.getId());
         dto.setName(singerPo.getName());
         dto.setSex(singerPo.getSex());
@@ -900,11 +900,11 @@ public class SingerDto {
 }
 ```
 
-* （3）接下来考虑怎么把 Po 转换成 Dto
+* （3）接下来需要考虑的是怎么把两个 Po 转换成一个 Dto
 
 我们的代码里已经有 Song 表对应的 Po 和 Singer 表对应的 Po 了，我们当然可以在 service 层通过 Java 代码来完成两个 Po 到 Dto 的转换。
 
-> **多表查询之单个查询时，推荐在 service 层完成 Dto 的聚合，而不是在 mapper 层，因为这种情况下在 mapper 层自己写 SQL 语句将会非常复杂，但是在 service 层则只需要两次简单的查询 + 几句 Java 代码即可。也就是说这种情况下我们继续保持用模板代码默认的查询出 po 即可，并且也不用自己写 SQL 语句。**
+> **多表联查之单个查询时，推荐在 service 层完成 Dto 的聚合，而不是在 mapper 层，因为这种情况下在 mapper 层自己写 SQL 语句将会非常复杂，但是在 service 层则只需要两次简单的查询 + 几句 Java 代码即可。也就是说这种情况下我们继续保持用模板代码默认的查询出 po 即可，并且也不用自己写 SQL 语句。**
 
 * （4）mapper 层不用动
 * （5）service 层修改下模板代码的默认实现，完成 Dto 的聚合
