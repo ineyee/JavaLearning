@@ -7,4 +7,5 @@ import lombok.EqualsAndHashCode;
 @Data
 public class SongListQuery extends ListQuery {
     // TODO: 按需追加查询参数
+    private Long singerId;
 }

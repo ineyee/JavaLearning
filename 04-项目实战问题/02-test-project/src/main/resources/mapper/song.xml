@@ -30,6 +30,11 @@
                singer.sex    AS singer_sex
         FROM song
                  LEFT JOIN singer ON song.singer_id = singer.id
+        <where>
+            <if test="query.singerId != null">
+                AND song.singer_id = #{query.singerId}
+            </if>
+        </where>
         ORDER BY song.create_time DESC, song.id DESC
     </select>
 </mapper>
