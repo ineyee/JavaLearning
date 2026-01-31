@@ -8,6 +8,8 @@ import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
 import com.ineyee.common.api.ListData;
 import com.ineyee.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,53 +38,62 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/product")
+@Tag(name = "产品模块")
 public class ProductController {
     @Autowired
     private ProductService productService;
 
     @GetMapping("/get")
+    @Operation(summary = "获取产品详情")
     public HttpResult<Product> get(@Valid ProductGetQuery query) throws ServiceException {
         Product data = productService.get(query);
         return HttpResult.ok(data);
     }
 
     @GetMapping("/list")
+    @Operation(summary = "获取产品列表")
     public HttpResult<ListData<Product>> list(@Valid ProductListQuery query) {
         ListData<Product> dataList = productService.list(query);
         return HttpResult.ok(dataList);
     }
 
     @PostMapping("/save")
+    @Operation(summary = "保存产品")
     public HttpResult<Product> save(@Valid @RequestBody ProductCreateReq req) throws ServiceException {
         Product data = productService.save(req);
         return HttpResult.ok(data);
     }
 
     @PostMapping("/saveBatch")
+    @Operation(summary = "批量保存产品")
     public HttpResult<List<Long>> saveBatch(@Valid @RequestBody ProductCreateBatchReq req) throws ServiceException {
         List<Long> idList = productService.saveBatch(req);
         return HttpResult.ok(idList);
     }
 
     @PostMapping("/remove")
+    @Operation(summary = "删除产品")
     public HttpResult<Void> remove(@Valid @RequestBody ProductDeleteReq req) throws ServiceException {
         productService.remove(req);
         return HttpResult.ok();
     }
 
     @PostMapping("/removeBatch")
+    @Operation(summary = "批量删除产品")
     public HttpResult<Void> removeBatch(@Valid @RequestBody ProductDeleteBatchReq req) throws ServiceException {
         productService.removeBatch(req);
         return HttpResult.ok();
     }
 
     @PostMapping("/update")
+    @Operation(summary = "更新产品")
     public HttpResult<Void> update(@Valid @RequestBody ProductUpdateReq req) throws ServiceException {
         productService.update(req);
         return HttpResult.ok();
     }
 
     @PostMapping("/updateBatch")
+    @Operation(summary = "批量更新产品")
     public HttpResult<Void> updateBatch(@Valid @RequestBody ProductUpdateBatchReq req) throws ServiceException {
         productService.updateBatch(req);
         return HttpResult.ok();

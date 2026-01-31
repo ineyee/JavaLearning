@@ -2,6 +2,7 @@ package com.ineyee.common.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ineyee.common.api.error.CommonServiceError;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -44,9 +45,12 @@ public class HttpResult<T> {
     }
 
     @NotNull(message = "错误码不能为空")
+    @Schema(description = "错误码，0 代表成功，非 0 代表失败", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer code;
     @NotNull(message = "错误信息不能为空")
+    @Schema(description = "错误信息，成功时为 Success，失败时为相应的 msg", requiredMode = Schema.RequiredMode.REQUIRED)
     private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)  // null 时不序列化
+    @Schema(description = "响应有数据时才返回该字段，响应仅状态时不返回该字段", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private T data;
 }

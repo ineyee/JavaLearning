@@ -1,5 +1,6 @@
 package com.ineyee.pojo.req;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -23,5 +24,6 @@ public class ProductCreateBatchReq {
     // @NotEmpty = 不能为 null + 字符串不能为空串、集合里不能没有元素
     // @Valid 触发内层参数校验
     @NotEmpty(message = "productList 字段不能为空")
+    @Schema(description = "产品列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<@Valid ProductCreateReq> productList;
 }

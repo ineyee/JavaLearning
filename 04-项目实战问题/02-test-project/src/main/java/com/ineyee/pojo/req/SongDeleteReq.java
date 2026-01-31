@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Schema(description = "删除歌曲请求")
 public class SongDeleteReq {
-    @Schema(description = "歌曲 ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "id 字段不能为空")
+    @Schema(description = "歌曲 id", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 }
