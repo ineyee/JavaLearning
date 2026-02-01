@@ -4,7 +4,6 @@ import com.ineyee.common.api.HttpResult;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.SingerDetailDto;
 import com.ineyee.pojo.dto.SingerListDto;
-import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.query.SingerGetQuery;
 import com.ineyee.pojo.query.SingerListQuery;
 import com.ineyee.pojo.req.SingerCreateReq;
@@ -48,8 +47,8 @@ public class SingerController {
 
     @PostMapping("/save")
     @Operation(summary = "保存歌手")
-    public HttpResult<Singer> save(@Valid @RequestBody SingerCreateReq req) throws ServiceException {
-        Singer data = singerService.save(req);
+    public HttpResult<SingerDetailDto> save(@Valid @RequestBody SingerCreateReq req) throws ServiceException {
+        SingerDetailDto data = singerService.save(req);
         return HttpResult.ok(data);
     }
 

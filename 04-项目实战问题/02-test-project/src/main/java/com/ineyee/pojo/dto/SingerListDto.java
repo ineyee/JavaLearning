@@ -1,12 +1,16 @@
 package com.ineyee.pojo.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class SingerListDto {
+    @Schema(description = "歌手 id")
     private Long singerId;
+    @Schema(description = "歌手名称")
     private String singerName;
 
+    @Schema(description = "歌曲数量")
     private Integer songCount;
 }
 

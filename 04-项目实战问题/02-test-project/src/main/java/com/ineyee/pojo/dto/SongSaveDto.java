@@ -1,6 +1,5 @@
 package com.ineyee.pojo.dto;
 
-import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.po.Song;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -9,7 +8,7 @@ import org.springframework.beans.BeanUtils;
 import java.time.LocalDateTime;
 
 @Data
-public class SongDetailDto {
+public class SongSaveDto {
     @Schema(description = "歌曲 id")
     private Long id;
     @Schema(description = "歌曲创建时间")
@@ -21,13 +20,9 @@ public class SongDetailDto {
     @Schema(description = "歌曲封面")
     private String cover;
 
-    @Schema(description = "歌手信息")
-    private SingerSummaryDto singer;
-
-    public static SongDetailDto from(Song songPo, Singer singerPo) {
-        SongDetailDto dto = new SongDetailDto();
+    public static SongSaveDto from(Song songPo) {
+        SongSaveDto dto = new SongSaveDto();
         BeanUtils.copyProperties(songPo, dto);
-        dto.setSinger(SingerSummaryDto.from(singerPo));
         return dto;
     }
 }

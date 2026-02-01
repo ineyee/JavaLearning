@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.SongDetailDto;
 import com.ineyee.pojo.dto.SongListDto;
+import com.ineyee.pojo.dto.SongSaveDto;
 import com.ineyee.pojo.po.Song;
 import com.ineyee.pojo.query.SongGetQuery;
 import com.ineyee.pojo.query.SongListQuery;
@@ -22,7 +23,7 @@ public interface SongService extends IService<Song> {
 
     ListData<SongListDto> list(SongListQuery query);
 
-    Song save(SongCreateReq req) throws ServiceException;
+    SongSaveDto save(SongCreateReq req) throws ServiceException;
 
     List<Long> saveBatch(SongCreateBatchReq req) throws ServiceException;
 

@@ -2,6 +2,7 @@ package com.ineyee.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
@@ -20,7 +21,7 @@ public interface ProductService extends IService<Product> {
      * ② 数据库里没有这条数据时，该方法直接抛业务异常
      * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
-    Product get(ProductGetQuery query) throws ServiceException;
+    ProductDetailDto get(ProductGetQuery query) throws ServiceException;
 
     /**
      * 列表查询
@@ -32,7 +33,7 @@ public interface ProductService extends IService<Product> {
      * ① 列表查询专用响应模型.[pojo] 代表本次查询有数据
      * ② 列表查询专用响应模型.[] 代表本次查询没有数据，列表查询没数据时抛异常不太合理
      */
-    ListData<Product> list(ProductListQuery query);
+    ListData<ProductDetailDto> list(ProductListQuery query);
 
     /**
      * 单个保存
@@ -43,7 +44,7 @@ public interface ProductService extends IService<Product> {
      * ② 保存失败时，该方法直接抛业务异常
      * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
-    Product save(ProductCreateReq req) throws ServiceException;
+    ProductDetailDto save(ProductCreateReq req) throws ServiceException;
 
     /**
      * 批量保存

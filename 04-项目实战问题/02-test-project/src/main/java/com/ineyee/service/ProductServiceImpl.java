@@ -7,6 +7,7 @@ import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.error.ProductServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.ProductMapper;
+import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
@@ -24,7 +25,7 @@ import java.util.List;
 public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> implements ProductService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Product get(ProductGetQuery query) throws ServiceException {
+    public ProductDetailDto get(ProductGetQuery query) throws ServiceException {
         // 这里调用 MyBatisPlus 在 service 层提供的 get 方法，不再直接调用 mapper 层的 selectById 方法
         Product product = getById(query.getId());
         if (product == null) {
@@ -32,12 +33,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             // 能执行到这里就代表数据库里肯定没有这条数据，抛个业务异常
             throw new ServiceException(ProductServiceError.PRODUCT_NOT_EXIST);
         }
-        return product;
+        return ProductDetailDto.from(product);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ListData<Product> list(ProductListQuery query) {
+    public ListData<ProductDetailDto> list(ProductListQuery query) {
         // wrapper 用来添加查询条件
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
 
@@ -68,19 +69,25 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             // 这里调用 MyBatisPlus 在 service 层提供的 page 方法，不再直接调用 mapper 层的 selectPage 方法
             Page<Product> queryedPage = page(page, wrapper);
 
+            // po2dto
+            Page<ProductDetailDto> dtoPage = (Page<ProductDetailDto>) queryedPage.convert(ProductDetailDto::from);
+
             // 组装列表查询结果
-            return ListData.fromPage(queryedPage);
+            return ListData.fromPage(dtoPage);
         } else { // 不搞分页
             // 这里调用 MyBatisPlus 在 service 层提供的 list 方法，不再直接调用 mapper 层的 selectList 方法
             List<Product> productList = list(wrapper);
 
+            // po2dto
+            List<ProductDetailDto> dtoList = productList.stream().map(ProductDetailDto::from).toList();
+
             // 组装列表查询结果
-            return ListData.fromList(productList);
+            return ListData.fromList(dtoList);
         }
     }
 
     @Override
-    public Product save(ProductCreateReq req) throws ServiceException {
+    public ProductDetailDto save(ProductCreateReq req) throws ServiceException {
         Product product = new Product();
         product.setName(req.getName());
         product.setDescription(req.getDescription());
@@ -93,7 +100,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             // 能执行到这里就代表是有业务异常，但是也太好说具体什么业务异常，索性抛个通用的业务异常
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
-        return product;
+        return ProductDetailDto.from(product);
     }
 
     @Override

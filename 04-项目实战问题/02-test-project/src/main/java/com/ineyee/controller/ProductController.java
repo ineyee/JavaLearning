@@ -2,6 +2,7 @@ package com.ineyee.controller;
 
 import com.ineyee.common.api.HttpResult;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
@@ -45,22 +46,22 @@ public class ProductController {
 
     @GetMapping("/get")
     @Operation(summary = "获取产品详情")
-    public HttpResult<Product> get(@Valid ProductGetQuery query) throws ServiceException {
-        Product data = productService.get(query);
+    public HttpResult<ProductDetailDto> get(@Valid ProductGetQuery query) throws ServiceException {
+        ProductDetailDto data = productService.get(query);
         return HttpResult.ok(data);
     }
 
     @GetMapping("/list")
     @Operation(summary = "获取产品列表")
-    public HttpResult<ListData<Product>> list(@Valid ProductListQuery query) {
-        ListData<Product> dataList = productService.list(query);
+    public HttpResult<ListData<ProductDetailDto>> list(@Valid ProductListQuery query) {
+        ListData<ProductDetailDto> dataList = productService.list(query);
         return HttpResult.ok(dataList);
     }
 
     @PostMapping("/save")
     @Operation(summary = "保存产品")
-    public HttpResult<Product> save(@Valid @RequestBody ProductCreateReq req) throws ServiceException {
-        Product data = productService.save(req);
+    public HttpResult<ProductDetailDto> save(@Valid @RequestBody ProductCreateReq req) throws ServiceException {
+        ProductDetailDto data = productService.save(req);
         return HttpResult.ok(data);
     }
 

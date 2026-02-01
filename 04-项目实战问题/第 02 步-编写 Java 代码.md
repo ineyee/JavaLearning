@@ -28,11 +28,12 @@
 │  │  │  │  │  ├─mapper/(数据层的接口)
 │  │  │  │  │  ├─pojo/(表现层之模型层)
 │  │  │  │  │  │  ├──dto/
-│  │  │  │  │  │  │  ├──SingerDetailDto(歌手详情 dto)
-│  │  │  │  │  │  │  ├──SingerListDto(歌手列表 dto)
+│  │  │  │  │  │  │  ├──SingerDetailDto(歌手详情业务响应给客户端的 dto)
+│  │  │  │  │  │  │  ├──SingerListDto(歌手列表业务响应给客户端的 dto)
 │  │  │  │  │  │  │  ├──SingerSummaryDto(歌手摘要信息 dto，供其它地方嵌套使用)
-│  │  │  │  │  │  │  ├──SongDetailDto(歌曲详情 dto)
-│  │  │  │  │  │  │  ├──SongListDto(歌曲列表 dto)
+│  │  │  │  │  │  │  ├──SongDetailDto(歌曲详情业务响应给客户端的 dto)
+│  │  │  │  │  │  │  ├──SongListDto(歌曲列表业务响应给客户端的 dto)
+│  │  │  │  │  │  │  ├──SongSaveDto(歌曲保存业务响应给客户端的 dto)
 │  │  │  │  │  │  ├──po/
 │  │  │  │  │  │  ├──query/
 │  │  │  │  │  │  ├──req/
@@ -793,25 +794,26 @@ ListData<SongListDto> list(SongListQuery query);
 @Override
 @Transactional(propagation = Propagation.SUPPORTS)
 public ListData<SongListDto> list(SongListQuery query) {
-  Page<SongListDto> queriedPage = new Page<>();
+    Page<SongListDto> queriedPage = new Page<>();
 
-  if (query.getPageNum() != null && query.getPageSize() != null) {
-    queriedPage.setCurrent(query.getPageNum());
-    queriedPage.setSize(query.getPageSize());
-  } else {
-    queriedPage.setCurrent(1);
-    queriedPage.setSize(Long.MAX_VALUE);
-  }
+    if (query.getPageNum() != null && query.getPageSize() != null) {
+        queriedPage.setCurrent(query.getPageNum());
+        queriedPage.setSize(query.getPageSize());
+    } else {
+        queriedPage.setCurrent(1);
+        queriedPage.setSize(Long.MAX_VALUE);
+    }
 
-  // 上面已经泛型了 SongMapper，baseMapper 就是自动注入的 songMapper，不需要我们再手动注入了
-  List<SongListDto> list = baseMapper.selectList(queriedPage, query);
-  queriedPage.setRecords(list);
+    // 上面已经泛型了 SongMapper，baseMapper 就是自动注入的 songMapper，不需要我们再手动注入了
+    // 直接查出来的就是 dto
+    List<SongListDto> list = baseMapper.selectList(queriedPage, query);
+    queriedPage.setRecords(list);
 
-  if (query.getPageNum() != null && query.getPageSize() != null) {
-    return ListData.fromPage(queriedPage);
-  } else {
-    return ListData.fromList(list);
-  }
+    if (query.getPageNum() != null && query.getPageSize() != null) {
+        return ListData.fromPage(queriedPage);
+    } else {
+        return ListData.fromList(list);
+    }
 }
 ```
 
@@ -876,11 +878,7 @@ public class SongDetailDto {
 
     public static SongDetailDto from(Song songPo, Singer singerPo) {
         SongDetailDto dto = new SongDetailDto();
-        dto.setId(songPo.getId());
-        dto.setCreateTime(songPo.getCreateTime());
-        dto.setUpdateTime(songPo.getUpdateTime());
-        dto.setName(songPo.getName());
-        dto.setCover(songPo.getCover());
+        BeanUtils.copyProperties(songPo, dto);
         dto.setSinger(SingerSummaryDto.from(singerPo));
         return dto;
     }
@@ -896,9 +894,7 @@ public class SingerSummaryDto {
 
     public static SingerSummaryDto from(Singer singerPo) {
         SingerSummaryDto dto = new SingerSummaryDto();
-        dto.setId(singerPo.getId());
-        dto.setName(singerPo.getName());
-        dto.setSex(singerPo.getSex());
+        BeanUtils.copyProperties(singerPo, dto);
         return dto;
     }
 }
@@ -918,25 +914,21 @@ SongDetailDto get(SongGetQuery query) throws ServiceException;
 ```
 
 ```java
-private final SingerMapper singerMapper;
-public SongServiceImpl(SingerMapper singerMapper) {
-  this.singerMapper = singerMapper;
-}
-
 @Override
 @Transactional(propagation = Propagation.SUPPORTS)
 public SongDetailDto get(SongGetQuery query) throws ServiceException {
-  Song songPo = getById(query.getId());
-  if (songPo == null) {
-    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-  }
+    Song songPo = getById(query.getId());
+    if (songPo == null) {
+        throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+    }
 
-  Singer singerPo = singerMapper.selectById(songPo.getSingerId());
-  if (singerPo == null) {
-    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-  }
+    Singer singerPo = singerMapper.selectById(songPo.getSingerId());
+    if (singerPo == null) {
+        throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+    }
 
-  return SongDetailDto.from(songPo, singerPo);
+    // po2dto
+    return SongDetailDto.from(songPo, singerPo);
 }
 ```
 
@@ -977,49 +969,53 @@ songService.save(req); // 保存成功了，但是这条歌曲数据是无效的
 
 ```java
 @Override
-public Song save(SongCreateReq req) throws ServiceException {
-  // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
-  Singer singer = singerMapper.selectById(req.getSingerId());
-  if (singer == null) {
-    throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST);
-  }
-  // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+public SongSaveDto save(SongCreateReq req) throws ServiceException {
+    // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+    Singer singer = singerMapper.selectById(req.getSingerId());
+    if (singer == null) {
+        throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST);
+    }
+    // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
 
-  Song entity = new Song();
-  BeanUtils.copyProperties(req, entity);
-  if (!save(entity)) {
-    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-  }
-  return entity;
+    // req2po
+    Song entity = new Song();
+    BeanUtils.copyProperties(req, entity);
+    if (!save(entity)) {
+        throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+    }
+
+    // po2dto
+    return SongSaveDto.from(entity);
 }
 ```
 
 ```java
 @Override
 public List<Long> saveBatch(SongCreateBatchReq req) throws ServiceException {
-  // =========== 保存前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
-  List<Long> singerIdList = req.getSongList().stream().map(SongCreateReq::getSingerId).toList();
-  List<Singer> singerList = singerMapper.selectByIds(singerIdList);
-  List<Long> existSingerIdList = singerList.stream().map(Singer::getId).toList();
-  List<Long> notExistSingerIdList = new ArrayList<>(singerIdList);
-  notExistSingerIdList.removeAll(existSingerIdList);
-  if (!notExistSingerIdList.isEmpty()) {
-    throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST.getCode(), SingerServiceError.SINGER_NOT_EXIST.getMessage() + notExistSingerIdList);
-  }
-  // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
+    // =========== 保存前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+    List<Long> singerIdList = req.getSongList().stream().map(SongCreateReq::getSingerId).toList();
+    List<Singer> singerList = singerMapper.selectByIds(singerIdList);
+    List<Long> existSingerIdList = singerList.stream().map(Singer::getId).toList();
+    List<Long> notExistSingerIdList = new ArrayList<>(singerIdList);
+    notExistSingerIdList.removeAll(existSingerIdList);
+    if (!notExistSingerIdList.isEmpty()) {
+        throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST.getCode(), SingerServiceError.SINGER_NOT_EXIST.getMessage() + notExistSingerIdList);
+    }
+    // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
 
-  List<Song> entityList = new ArrayList<>();
-  req.getSongList().forEach(item -> {
-    Song entity = new Song();
-    BeanUtils.copyProperties(item, entity);
-    entityList.add(entity);
-  });
-  if (!saveBatch(entityList)) {
-    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-  }
-  List<Long> idList = new ArrayList<>();
-  entityList.forEach(item -> idList.add(item.getId()));
-  return idList;
+    List<Song> entityList = new ArrayList<>();
+    req.getSongList().forEach(item -> {
+        // req2po
+        Song entity = new Song();
+        BeanUtils.copyProperties(item, entity);
+        entityList.add(entity);
+    });
+    if (!saveBatch(entityList)) {
+        throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+    }
+    List<Long> idList = new ArrayList<>();
+    entityList.forEach(item -> idList.add(item.getId()));
+    return idList;
 }
 ```
 
@@ -1116,48 +1112,50 @@ songService.update(req); // 修改成功了，但是这条歌曲数据是无效�
 ```java
 @Override
 public void update(SongUpdateReq req) throws ServiceException {
-  // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
-  if (req.getSingerId() != null) { // 先看看更新字段里有没有 singerId 字段
-    Singer singer = singerMapper.selectById(req.getSingerId());
-    if (singer == null) {
-      throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST);
+    // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
+    if (req.getSingerId() != null) { // 先看看更新字段里有没有 singerId 字段
+        Singer singer = singerMapper.selectById(req.getSingerId());
+        if (singer == null) {
+            throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST);
+        }
     }
-  }
-  // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
+    // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
 
-  Song entity = new Song();
-  BeanUtils.copyProperties(req, entity);
-  if (!updateById(entity)) {
-    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-  }
+    // req2po
+    Song entity = new Song();
+    BeanUtils.copyProperties(req, entity);
+    if (!updateById(entity)) {
+        throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+    }
 }
 ```
 
 ```java
 @Override
 public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
-  // =========== 更新前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
-  List<Long> singerIdList = req.getSongList().stream().map(SongUpdateReq::getSingerId).filter(Objects::nonNull).toList();
-  if (!singerIdList.isEmpty()) { // 先看看更新字段里有没有 singerId 字段
-    List<Singer> singerList = singerMapper.selectByIds(singerIdList);
-    List<Long> existSingerIdList = singerList.stream().map(Singer::getId).toList();
-    List<Long> notExistSingerIdList = new ArrayList<>(singerIdList);
-    notExistSingerIdList.removeAll(existSingerIdList);
-    if (!notExistSingerIdList.isEmpty()) {
-      throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST.getCode(), SingerServiceError.SINGER_NOT_EXIST.getMessage() + notExistSingerIdList);
+    // =========== 更新前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+    List<Long> singerIdList = req.getSongList().stream().map(SongUpdateReq::getSingerId).filter(Objects::nonNull).toList();
+    if (!singerIdList.isEmpty()) { // 先看看更新字段里有没有 singerId 字段
+        List<Singer> singerList = singerMapper.selectByIds(singerIdList);
+        List<Long> existSingerIdList = singerList.stream().map(Singer::getId).toList();
+        List<Long> notExistSingerIdList = new ArrayList<>(singerIdList);
+        notExistSingerIdList.removeAll(existSingerIdList);
+        if (!notExistSingerIdList.isEmpty()) {
+            throw new ServiceException(SingerServiceError.SINGER_NOT_EXIST.getCode(), SingerServiceError.SINGER_NOT_EXIST.getMessage() + notExistSingerIdList);
+        }
     }
-  }
-  // =========== 更新前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
+    // =========== 更新前校验主表——歌手表——里是否存在当前所有的歌手 id ===========
 
-  List<Song> entityList = new ArrayList<>();
-  req.getSongList().forEach(item -> {
-    Song entity = new Song();
-    BeanUtils.copyProperties(item, entity);
-    entityList.add(entity);
-  });
-  if (!updateBatchById(entityList)) {
-    throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-  }
+    List<Song> entityList = new ArrayList<>();
+    req.getSongList().forEach(item -> {
+        // req2po
+        Song entity = new Song();
+        BeanUtils.copyProperties(item, entity);
+        entityList.add(entity);
+    });
+    if (!updateBatchById(entityList)) {
+        throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+    }
 }
 ```
 
@@ -1176,7 +1174,7 @@ public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
 | 模型                                        | 职责                                                         | 阶段                                                         | 是否必须有                                                   |
 | ------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | PO：Persistent Object<br />持久化对象       | po 关注的是数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                          | po 必须有                                                    |
-| DTO：Data Transfer Object<br />数据传输对象 | dto 关注的是数据传输<br /><br />po 的属性都是跟数据库表里的字段一一对应的，但很多时候我们并不需要把 po 里的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 转换成 dto 或从数据库表直接映射出 dto、把 dto 从业务层传到控制器层 | ① 单表查询时，从数据库表映射出来的是 po，如果 po 的数据没啥敏感数据，那也可以把 po 直接传到控制器层、此时 dto 不是必须（如 product 表）；但是如果 po 里有敏感数据，那就必须搞个对应的 dto 把敏感数据过滤掉，此时 dto 必须（如 user 表要过滤掉密码）<br />② 多表联查是直接从数据库表里映射出 dto，因为每个表的 po 仅仅是自己那张表的字段映射、它们肯定无法并且也不应该同时承载两个表的数据，所以只能是 dto 来同时承载两个表的数据，此时 dto 必须（如 singer&song 表） |
+| DTO：Data Transfer Object<br />数据传输对象 | dto 关注的是数据传输<br /><br />po 的属性都是跟数据库表里的字段一一对应的，但很多时候我们并不需要把 po 里的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 转换成 dto 或从数据库表直接映射出 dto、把 dto 从业务层传到控制器层 | ① 单表查询时，从数据库表映射出来的是 po，无论 po 里有没有敏感数据（如 product 表里就没有、user 表里就有密码这种敏感数据），我们都应该为 po 创建对应的 dto，**没有敏感数据时就直接把 po 里所有的属性都复制到 dto 里（这样做以后扩展起来非常方便、因为我们无法确保 product 表里以后永远不会新增敏感数据）**，有敏感数据时就把 po 里敏感数据以外的属性都复制到 dto 里<br />② 多表联查是直接从数据库表里映射出 dto，因为每个表的 po 仅仅是自己那张表的字段映射、它们肯定无法并且也不应该同时承载两个表的数据，所以只能是 dto 来同时承载两个表的数据，此时 dto 必须（如 singer&song 表）<br />③ 保存时，我们不是会直接返回保存成功的那条完整数据嘛，最好也不要直接返回 po，也搞个 dto 返回，同样的道理、因为我们不一定总是要返回 po 的全部字段<br /><br />**总之一句话：我们响应给客户端的模型起码得是 dto 起步、最好不要直接返回 po。其实也就 get、list、save 这三种类型的接口需要搞搞，其它几个接口都是仅响应状态的** |
 | VO：View Object<br />视图对象               | vo 关注的是前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象（比如 dto 里的数据是没有国际化的，而 vo 里的数据就是经过国际化后的数据）<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                         | vo 可以没有<br /><br />但有的话，前端的界面展示会更加动态化  |
 | BO：Business Object<br />业务对象           | bo 关注的是业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表、也就是一个 po 就能完成，也可能需要联合多张表、也就是多个 po 才能完成（比如个人简介是一个 po、技术栈是一个 po、项目经验是一个 po，而个人简历则是一个 bo，由三个 po 联合完成）<br /><br />这个类内部一般就是编写构造方法、成员变量**（但是成员变量的类型可以跟数据库里不一样了，应该更加注重业务语义，比如数据库里用 0、1、2 这种整型来代表枚举，这个类里就可以用枚举类型了）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法** | 把 po 转换成 bo、把 bo 从数据层传到业务层                    | bo 可以没有<br /><br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
 
@@ -1189,7 +1187,7 @@ public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
   * 表单提交时，不需要注解修饰、把所有参数都接收到一个请求参数模型里
   * JSON 提交时，使用 @RequestBody 注解修饰、把所有参数都接收到一个请求参数模型里
 
-把所有参数都接收到一个请求参数模型里的好处是可以设置参数是否必传（@Valid + @NotNull | @NotEmpty | @NotBlank）、参数统一管理 & 扩展参数方便，所以该创建类就创建类、不要觉得累赘。请求参数模型一般有下面几种：
+把所有参数都接收到一个请求参数模型里的好处是可以设置参数是否必传（@Valid + @NotNull | @NotEmpty | @NotBlank）、参数统一管理 & 扩展参数方便，所以**该创建类就创建类、不要觉得累赘、为每个接口都创建一个对应的请求参数模型也不为过**。请求参数模型一般有下面几种：
 
 ```
 ├─pojo/

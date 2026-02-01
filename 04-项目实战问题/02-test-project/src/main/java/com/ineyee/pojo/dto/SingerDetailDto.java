@@ -1,25 +1,28 @@
 package com.ineyee.pojo.dto;
 
 import com.ineyee.pojo.po.Singer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 
 @Data
 public class SingerDetailDto {
+    @Schema(description = "歌手 id")
     private Long id;
+    @Schema(description = "歌手创建时间")
     private LocalDateTime createTime;
+    @Schema(description = "歌手更新时间")
     private LocalDateTime updateTime;
+    @Schema(description = "歌手名称")
     private String name;
+    @Schema(description = "歌手性别")
     private Integer sex;
 
     public static SingerDetailDto from(Singer singerPo) {
         SingerDetailDto dto = new SingerDetailDto();
-        dto.setId(singerPo.getId());
-        dto.setCreateTime(singerPo.getCreateTime());
-        dto.setUpdateTime(singerPo.getUpdateTime());
-        dto.setName(singerPo.getName());
-        dto.setSex(singerPo.getSex());
+        BeanUtils.copyProperties(singerPo, dto);
         return dto;
     }
 }

@@ -22,7 +22,7 @@ public interface SingerService extends IService<Singer> {
 
     ListData<SingerListDto> list(SingerListQuery query);
 
-    Singer save(SingerCreateReq req) throws ServiceException;
+    SingerDetailDto save(SingerCreateReq req) throws ServiceException;
 
     List<Long> saveBatch(SingerCreateBatchReq req) throws ServiceException;
 

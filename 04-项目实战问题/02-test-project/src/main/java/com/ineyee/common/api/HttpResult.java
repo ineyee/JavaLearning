@@ -45,12 +45,12 @@ public class HttpResult<T> {
     }
 
     @NotNull(message = "错误码不能为空")
-    @Schema(description = "错误码，0 代表成功，非 0 代表失败", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "错误码，0 代表成功，非 0 代表失败")
     private Integer code;
     @NotNull(message = "错误信息不能为空")
-    @Schema(description = "错误信息，成功时为 Success，失败时为相应的 msg", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "错误信息，成功时为 Success，失败时为相应的 msg")
     private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)  // null 时不序列化
-    @Schema(description = "响应有数据时才返回该字段，响应仅状态时不返回该字段", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "响应有数据时才返回该字段，响应仅状态时不返回该字段")
     private T data;
 }

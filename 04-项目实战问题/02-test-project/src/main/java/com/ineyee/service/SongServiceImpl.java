@@ -9,6 +9,7 @@ import com.ineyee.mapper.SingerMapper;
 import com.ineyee.mapper.SongMapper;
 import com.ineyee.pojo.dto.SongDetailDto;
 import com.ineyee.pojo.dto.SongListDto;
+import com.ineyee.pojo.dto.SongSaveDto;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.po.Song;
 import com.ineyee.pojo.query.SongGetQuery;
@@ -51,6 +52,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
 
+        // po2dto
         return SongDetailDto.from(songPo, singerPo);
     }
 
@@ -68,6 +70,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         }
 
         // 上面已经泛型了 SongMapper，baseMapper 就是自动注入的 songMapper，不需要我们再手动注入了
+        // 直接查出来的就是 dto
         List<SongListDto> list = baseMapper.selectList(queriedPage, query);
         queriedPage.setRecords(list);
 
@@ -79,7 +82,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public Song save(SongCreateReq req) throws ServiceException {
+    public SongSaveDto save(SongCreateReq req) throws ServiceException {
         // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
         Singer singer = singerMapper.selectById(req.getSingerId());
         if (singer == null) {
@@ -87,12 +90,15 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         }
         // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
 
+        // req2po
         Song entity = new Song();
         BeanUtils.copyProperties(req, entity);
         if (!save(entity)) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
-        return entity;
+
+        // po2dto
+        return SongSaveDto.from(entity);
     }
 
     @Override
@@ -110,6 +116,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
         List<Song> entityList = new ArrayList<>();
         req.getSongList().forEach(item -> {
+            // req2po
             Song entity = new Song();
             BeanUtils.copyProperties(item, entity);
             entityList.add(entity);
@@ -147,6 +154,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         }
         // =========== 更新前校验主表——歌手表——里是否存在当前歌手 id ===========
 
+        // req2po
         Song entity = new Song();
         BeanUtils.copyProperties(req, entity);
         if (!updateById(entity)) {
@@ -171,6 +179,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
         List<Song> entityList = new ArrayList<>();
         req.getSongList().forEach(item -> {
+            // req2po
             Song entity = new Song();
             BeanUtils.copyProperties(item, entity);
             entityList.add(entity);
