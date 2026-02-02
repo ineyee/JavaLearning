@@ -8,6 +8,7 @@ import com.ineyee.common.api.error.ProductServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.mapper.ProductMapper;
 import com.ineyee.pojo.dto.ProductDetailDto;
+import com.ineyee.pojo.dto.ProductListDto;
 import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
@@ -38,7 +39,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public ListData<ProductDetailDto> list(ProductListQuery query) {
+    public ListData<ProductListDto> list(ProductListQuery query) {
         // wrapper 用来添加查询条件
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
 
@@ -70,7 +71,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             Page<Product> queryedPage = page(page, wrapper);
 
             // po2dto
-            Page<ProductDetailDto> dtoPage = (Page<ProductDetailDto>) queryedPage.convert(ProductDetailDto::from);
+            Page<ProductListDto> dtoPage = (Page<ProductListDto>) queryedPage.convert(ProductListDto::from);
 
             // 组装列表查询结果
             return ListData.fromPage(dtoPage);
@@ -79,7 +80,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             List<Product> productList = list(wrapper);
 
             // po2dto
-            List<ProductDetailDto> dtoList = productList.stream().map(ProductDetailDto::from).toList();
+            List<ProductListDto> dtoList = productList.stream().map(ProductListDto::from).toList();
 
             // 组装列表查询结果
             return ListData.fromList(dtoList);
@@ -87,7 +88,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     }
 
     @Override
-    public ProductDetailDto save(ProductCreateReq req) throws ServiceException {
+    public Long save(ProductCreateReq req) throws ServiceException {
         Product product = new Product();
         product.setName(req.getName());
         product.setDescription(req.getDescription());
@@ -100,7 +101,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             // 能执行到这里就代表是有业务异常，但是也太好说具体什么业务异常，索性抛个通用的业务异常
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
-        return ProductDetailDto.from(product);
+        return product.getId();
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.ineyee.controller;
 import com.ineyee.common.api.HttpResult;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
+import com.ineyee.pojo.dto.ProductListDto;
 import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
@@ -53,16 +54,16 @@ public class ProductController {
 
     @GetMapping("/list")
     @Operation(summary = "获取产品列表")
-    public HttpResult<ListData<ProductDetailDto>> list(@Valid ProductListQuery query) {
-        ListData<ProductDetailDto> dataList = productService.list(query);
+    public HttpResult<ListData<ProductListDto>> list(@Valid ProductListQuery query) {
+        ListData<ProductListDto> dataList = productService.list(query);
         return HttpResult.ok(dataList);
     }
 
     @PostMapping("/save")
     @Operation(summary = "保存产品")
-    public HttpResult<ProductDetailDto> save(@Valid @RequestBody ProductCreateReq req) throws ServiceException {
-        ProductDetailDto data = productService.save(req);
-        return HttpResult.ok(data);
+    public HttpResult<Long> save(@Valid @RequestBody ProductCreateReq req) throws ServiceException {
+        Long id = productService.save(req);
+        return HttpResult.ok(id);
     }
 
     @PostMapping("/saveBatch")

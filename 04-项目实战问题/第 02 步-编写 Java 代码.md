@@ -1,6 +1,6 @@
 设计并创建好数据库和表之后，我们就可以编写 Java 代码了。
 
-## ✅ 一、SpringBoot + MyBatis 项目目录结构划分
+## 一、SpringBoot + MyBatis 项目目录结构划分
 
 ```
 ├─${project-name}/(项目名)
@@ -30,17 +30,37 @@
 │  │  │  │  │  │  ├──dto/
 │  │  │  │  │  │  │  ├──SingerDetailDto(歌手详情业务响应给客户端的 dto)
 │  │  │  │  │  │  │  ├──SingerListDto(歌手列表业务响应给客户端的 dto)
-│  │  │  │  │  │  │  ├──SingerSummaryDto(歌手摘要信息 dto，供其它地方嵌套使用)
+│  │  │  │  │  │  │  ├──SingerSummaryDto(歌手摘要信息 dto，供歌曲详情 dto 里嵌套使用)
 │  │  │  │  │  │  │  ├──SongDetailDto(歌曲详情业务响应给客户端的 dto)
 │  │  │  │  │  │  │  ├──SongListDto(歌曲列表业务响应给客户端的 dto)
-│  │  │  │  │  │  │  ├──SongSaveDto(歌曲保存业务响应给客户端的 dto)
 │  │  │  │  │  │  ├──po/
-│  │  │  │  │  │  ├──query/
-│  │  │  │  │  │  ├──req/
+│  │  │  │  │  │  │  ├──Siner(歌手 po)
+│  │  │  │  │  │  │  ├──Song(歌曲 po)
+│  │  │  │  │  │  ├─query/
+│  │  │  │  │  │  │  ├─ListQuery
+│  │  │  │  │  │  │  ├─SingerGetQuery(获取歌手详情请求参数)
+│  │  │  │  │  │  │  ├─SingerListQuery extends ListQuery(获取歌手列表请求参数)
+│  │  │  │  │  │  │  ├─SongGetQuery(获取歌曲详情请求参数)
+│  │  │  │  │  │  │  ├─SongListQuery extends ListQuery(获取歌曲列表请求参数)
+│  │  │  │  │  │  ├─req/
+│  │  │  │  │  │  │  ├─SingerCreateReq(创建歌手请求参数)
+│  │  │  │  │  │  │  ├─SingerCreateBatchReq(批量创建获取歌手请求参数)
+│  │  │  │  │  │  │  ├─SingerDeleteReq(删除歌手请求参数)
+│  │  │  │  │  │  │  ├─SingerDeleteBatchReq(批量删除歌手请求参数)
+│  │  │  │  │  │  │  ├─SingerUpdateReq(更新歌手请求参数)
+│  │  │  │  │  │  │  ├─SingerUpdateBatchReq(批量更新歌手请求参数)
+│  │  │  │  │  │  │  ├─SongCreateReq(创建歌曲请求参数)
+│  │  │  │  │  │  │  ├─SongCreateBatchReq(批量创建获取歌曲请求参数)
+│  │  │  │  │  │  │  ├─SongDeleteReq(删除歌曲请求参数)
+│  │  │  │  │  │  │  ├─SongDeleteBatchReq(批量删除歌曲请求参数)
+│  │  │  │  │  │  │  ├─SongUpdateReq(更新歌曲请求参数)
+│  │  │  │  │  │  │  ├─SongUpdateBatchReq(批量更新歌曲请求参数)
 │  │  │  │  │  ├─service/(业务层)
 │  │  │  │  │  ├─Application.java(项目的入口类)
 │  │  │  ├─resources/(我们编写的配置文件都放在这个文件夹里，如 .properties、.xml 文件)
 │  │  │  │  ├─mapper/(数据层的实现)
+│  │  │  │  │  ├─singer.xml(歌手自己编写 SQL 的实现)
+│  │  │  │  │  ├─song.xmll(歌曲自己编写 SQL 的实现)
 │  │  │  │  ├─static/(SpringBoot 项目的静态资源固定放在 static 目录下)
 │  │  │  │  │  ├─img/(图片资源)
 │  │  │  │  │  │  ├─logo.png(http://localhost:8080/img/logo.png 即可访问到)
@@ -52,7 +72,7 @@
 │  ├─pom.xml(项目的配置文件，里面记录着项目的很多信息)
 ```
 
-## ✅ 二、创建 yml 配置文件，Tomcat 部署配置
+## 二、创建 yml 配置文件，Tomcat 部署配置
 
 ```yaml
 # application.yml
@@ -169,7 +189,7 @@ cors:
     - http://8.136.43.114:8888
 ```
 
-## ✅ 三、编辑 pom.xml 文件，Maven 项目配置
+## 三、编辑 pom.xml 文件，Maven 项目配置
 
 ```xml
 <!-- pom.xml -->
@@ -266,11 +286,11 @@ cors:
 </project>
 ```
 
-## ✅ 四、添加依赖
+## 四、添加依赖
 
 > SpringBoot 官方提供的 starter 都是以 spring-boot-starter-xxx 开头，非 SpringBoot 官方提供的 starter 都是以 xxx-spring-boot-starter 结尾
 
-#### ✅ 1、Spring、SpringMVC 相关依赖
+#### 1、Spring、SpringMVC 相关依赖
 
 * （必选）spring-boot-starter-web
 
@@ -319,7 +339,7 @@ cors:
 </dependency>
 ```
 
-#### ✅ 2、MyBatis、Spring 整合 MyBatis 相关依赖
+#### 2、MyBatis、Spring 整合 MyBatis 相关依赖
 
 * （必选）mybatis-spring-boot-starter
 
@@ -373,7 +393,7 @@ cors:
 </dependency>
 ```
 
-#### ✅ 3、其它依赖
+#### 3、其它依赖
 
 * （可选）单元测试
 
@@ -393,7 +413,7 @@ cors:
 </dependency>
 ```
 
-## ✅ 五、创建项目的入口类和入口方法，跟 pojo、controller、service、mapper 目录平级
+## 五、创建项目的入口类和入口方法，跟 pojo、controller、service、mapper 目录平级
 
 ```java
 // 创建项目的入口类，我们一般把它命名为 Application
@@ -413,13 +433,13 @@ public class Application {
 }
 ```
 
-## ✅ 六、SLF4J + Logback 日志系统搞一下
+## 六、SLF4J + Logback 日志系统搞一下
 
-#### ✅ 1、添加 logger 的依赖
+#### 1、添加 logger 的依赖
 
 SpringBoot 项目的 spring-boot-starter-web 会默认添加 Logback 依赖，而 Logback 依赖会默认添加 SLF4J 依赖，所以我们不需要再手动添加。
 
-#### ✅ 2、创建 logger 的配置文件
+#### 2、创建 logger 的配置文件
 
 > 名字固定为 logback-spring.xml
 
@@ -538,7 +558,7 @@ SpringBoot 项目的 spring-boot-starter-web 会默认添加 Logback 依赖，�
 </configuration>
 ```
 
-#### ✅ 3、编写 Java 代码，输出日志
+#### 3、编写 Java 代码，输出日志
 
 > 实际开发中，建议为每个类写一个独立的 logger，而不是整个项目只写一个全局的 logger。因为“整个项目只写一个全局的 logger”无法区分日志来源于哪个包哪个类哪行代码、无法按包或按类进行日志级别控制
 
@@ -595,19 +615,40 @@ public class TestService {
 }
 ```
 
-## ✅ 七、common 目录里的东西
+## 七、common 目录里的东西
 
 common 目录里的东西基本都是固定的，可以直接拷贝一份到项目里，后续再根据实际业务做扩展。
 
-## ✅ 八、单表 CRUD（可以完全利用 MyBatisPlus、以 product 表为例）
+## 八、单表 CRUD（可以完全利用 MyBatisPlus、以 product 表为例）
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-#### ✅ 1、表现层之模型层 pojo 👉🏻 用 EasyCode 自动生成完整代码
+#### 1、表现层之模型层 pojo 👉🏻 用 EasyCode 自动生成 pojo 的完整代码或模板代码
 
-之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，如果我们手动创建每个 po 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成 po 的完整代码：
+之前我们是根据每张表手动创建每个 domain 的，但实际开发中有那么多张表，如果我们手动创建每个 po、dto、query、req 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成这些 pojo 的完整代码或模板代码：
+
+###### 1.1 响应体模型 po、dto
+
+我们会固定为每张表生成一个 po，以及 po 对应的 detailDto、listDto，当然后续可以根据业务需要自行创建更多的业务 dto，因为**我们响应给客户端的模型起码得是 dto 起步、最好不要直接返回 po，返回 dto 方便以后扩展**：
+
+* Product 这个 po 是对数据库表字段的映射、里面的代码就是完整的。**自动生成后可以不用动**
+* ProductDetailDto 这个 dto 默认是把 po 里的字段全都拿过来了，供 get 详情接口的返回值使用，所以字段应该尽可能地全。**自动生成后要去改改，根据实际情况删掉不应该返回给客户端的敏感字段、比如 deleted 软删除字段，这里单表 po 到 detailDto 的转换是在 service 层完成的（后面多表 po 到 detailDto 的转换也是在 service 层完成的）**
+* ProductListDto 这个 dto 默认一个字段也没有，供 list 列表接口返回值使用，所以字段应该尽可能地少。**自动生成后要去改改，根据实际情况从 po 里筛选需要的字段加进来，这里单表 po 到 listDto 的转换是在 service 层完成的（后面多表 po 到 listDto 的转换则是在 mapper 层完成的）**
+
+###### 1.2 请求参数模型 query、req
+
+我们会固定为 get 接口、list 接口、save 接口、saveBatch 接口、remove 接口、removeBatch 接口、update 接口、updateBatch 接口创建对应的请求参数模型，当然后续可以根据接口需要自行创建更多的请求参数模型：
+
+* ProductGetQuery 这个 query 默认只有一个必选参数 id，代表通过 id 查询详情。**自动生成后可以不用动**
+* ProductListQuery 这个 query 默认有分页查询参数、模糊搜索参数，但都是可选参数。**自动生成后可以根据实际情况去添加各种业务上的查询参数**
+* ProductCreateReq 这个 req 默认是把 po 里能自动填充（id、create_time、update_time、deleted）以外的所有字段全都拿过来了。**自动生成后可以根据实际情况去修改，并添加字段是否必传的注解**
+* ProductCreateBatchReq 这个 req 默认是 ProductCreateReq 的数组，必选参数。**自动生成后可以不用动，只需要维护好 ProductCreateReq 的字段即可**
+* ProductDeleteReq 这个 req 默认只有一个必选参数 id，代表通过 id 删除。**自动生成后可以不用动**
+* ProductDeleteBatchReq 这个 req 默认是 ProductDeleteReq 的数组，必选参数。**自动生成后可以不用动，只需要维护好 ProductDeleteReq 的字段即可**
+* ProductUpdateReq 这个 req 默认是把 po 里能自动填充（id、create_time、update_time、deleted）以外的所有字段全都拿过来了 + 一个必选参数 id。**自动生成后可以根据实际情况去修改，并添加字段是否必传的注解**
+* ProductUpdateBatchReq 这个 req 默认是 ProductUpdateReq 的数组，必选参数。**自动生成后可以不用动，只需要维护好 ProductUpdateReq 的字段即可**
 
 ![image-20260126205258861](第 02 步-编写 Java 代码/img/image-20260126205258861.png)
 
@@ -619,59 +660,59 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 ![image-20260126210000428](第 02 步-编写 Java 代码/img/image-20260126210000428.png)
 
-#### ✅ 2、数据层 mapper 👉🏻 用 EasyCode + MyBatisPlus 自动生成完整代码
+#### 2、数据层 mapper 👉🏻 用 EasyCode + MyBatisPlus 自动生成完整代码
 
-###### ✅ 2.1 Java 代码
+###### 2.1 Java 代码
 
-之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，如果我们手动创建每个 mapper 接口类和 mapper 实现的话就显得效率非常低，所以我们一般都是用 EasyCode + MyBatisPlus 来自动生成 mapper 接口类和 mapper 实现的完整代码：
+之前我们是根据每张表手动创建一个对应的 mapper 接口类，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法；然后再手动创建一个对应的 mapper 实现，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库。但实际开发中有那么多张表，如果我们手动创建每个 mapper 接口类和 mapper 实现的话就显得效率非常低，所以我们一般都是用 EasyCode + MyBatisPlus 来自动生成 mapper 接口类和 mapper 实现的完整代码，**自动生成后可以不用动**：
 
 ![image-20260126210425093](第 02 步-编写 Java 代码/img/image-20260126210425093.png)
 
-###### ✅ 2.2 配置
+###### 2.2 配置
 
 把数据层 mapper 相关配置的值都写在 application.yml（MyBatisPlus）、application-dev.yml（开发环境的数据源） 和 application-prd.yml（生产环境的数据源） 这三个配置文件里。
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，并且在 yml 配置文件里做好配置，SpringBoot 就会自动创建 DruidDataSource、SqlSessionFactoryBean 等对象，并通过属性绑定技术把 yml 配置文件里的值自动绑定到这些对象上去，其它的我们啥也不用再干，不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。
 
-#### ✅ 3、业务层 service 👉🏻 用 EasyCode + MyBatisPlus 自动生成 80% 的代码
+#### 3、业务层 service 👉🏻 用 EasyCode + MyBatisPlus 自动生成 80% 的代码
 
-###### ✅ 3.1 Java 代码
+###### 3.1 Java 代码
 
-之前我们是根据每张表手动创建一个对应的 service 接口类，为这个接口类添加 get、list、save、saveBatch、remove、removeBatch、update、updateBatch 等方法；然后再手动创建一个对应的 serviceImpl 实现，在这个 serviceImpl 实现里调用数据层的 API 来实现业务。但实际开发中有那么多张表，如果我们手动创建每个 service 接口类和 serviceImpl 实现的话就显得效率非常低，所以我们一般都是用 EasyCode + MyBatisPlus 来自动生成 service 接口类和 serviceImpl 实现 80% 的代码：
+之前我们是根据每张表手动创建一个对应的 service 接口类，为这个接口类添加 get、list、save、saveBatch、remove、removeBatch、update、updateBatch 等方法；然后再手动创建一个对应的 serviceImpl 实现，在这个 serviceImpl 实现里调用数据层的 API 来实现业务。但实际开发中有那么多张表，如果我们手动创建每个 service 接口类和 serviceImpl 实现的话就显得效率非常低，所以我们一般都是用 EasyCode + MyBatisPlus 来自动生成 service 接口类和 serviceImpl 实现 80% 的代码，**自动生成后可以根据实际业务需求去改改**：
 
 ![image-20260126220228073](第 02 步-编写 Java 代码/img/image-20260126220228073.png)
 
-###### ✅ 3.2 配置
+###### 3.2 配置
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动创建和配置事务管理器 DataSourceTransactionManager 对象，并自动启动事务管理 @EnableTransactionManagement，我们同样不再需要像以前一样“在 Spring 的主配置文件里配置一大堆东西”。只需要在想使用事务管理的 Service 类上加一个 @Transactional 注解就完事了，这样一来这个业务类里所有的方法都会自动加上事务管理的代码，当然我们也可以只在某一个方法上加上一个 @Transactional 注解，其它的我们啥也不用再干。
 
-#### ✅ 4、表现层之控制器层 controller 👉🏻 用 EasyCode 自动生成模板代码
+#### 4、表现层之控制器层 controller 👉🏻 用 EasyCode 自动生成模板代码
 
-###### ✅ 4.1 Java 代码
+###### 4.1 Java 代码
 
-之前我们是根据每张表手动创建每个 controller 的，但实际开发中有那么多张表，如果我们手动创建每个 controller 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成 controller 的模板代码、真正的接口我们自己来实现：
+之前我们是根据每张表手动创建每个 controller 的，但实际开发中有那么多张表，如果我们手动创建每个 controller 的话就显得效率非常低，所以我们一般都是用 EasyCode 来自动生成 controller 的模板代码、真正的接口我们自己来实现，**自动生成后可以根据实际业务需求去改改**：
 
 ![image-20260127081151049](第 02 步-编写 Java 代码/img/image-20260127081151049.png)
 
-###### ✅ 4.2 配置
+###### 4.2 配置
 
 只要我们在前面“添加依赖”那里引入了相应的 starter，SpringBoot 就会自动配置参数是否必传的验证器、响应体自动转 JSON 字符串、请求参数和响应体的编码方式消息转换器（String 和 JSON 响应体的编码方式、默认就是 UTF-8，LocalDateTime 序列化为 ISO-8601 字符串格式等），我们同样不再需要像以前一样“在 Spring 的子配置文件里配置一大堆东西”。controller 里该用啥用啥，其它的我们啥也不用再干。
 
-## ✅ 九、多表 CRUD（需要自己编写 SQL 语句来查询、需要自己编写 Java 代码来保证增删改数据一致性、以 singer&song 表为例）
+## 九、多表 CRUD（需要自己编写 SQL 语句来查询、需要自己编写 Java 代码来保证增删改数据一致性、以 singer&song 表为例）
 
 > * 一般来说一个项目对应一个数据库，比如 hello-project-architecture 这个项目和数据库
 > * 一个数据库里可以有多张表，比如 user、product 这两张表
 > * 一张表对应一组 mapper、service、pojo、controller，比如 UserMapper、UserService、UserXxo、UserController、ProductMapper、ProductService、ProductXxo、ProductController 这两组
 
-#### ✅ 第 1 步：生成模板代码
+#### 第 1 步：生成模板代码
 
 首先按照单表 CRUD 的步骤，生成各层的模板代码，多表 CRUD 无非是在这些代码的基础上改改。
 
-#### ✅ 第 2 步：多表联查的实现
+#### 第 2 步：多表联查的实现
 
 > **多表联查主要是针对从表查询来说的，因为只有从表里有外键，主表查询其实就是单表查询（除非某些特殊场景需要读取从表的数据）**
 
-###### ✅ 2.1 多表联查之列表查询 - 以歌曲列表界面为例
+###### 2.1 多表联查之列表查询 - 以歌曲列表界面为例
 
 * （1）首先考虑接口应该返回什么样的数据结构给客户端
 
@@ -827,7 +868,7 @@ public HttpResult<ListData<SongListDto>> list(@Valid SongListQuery query) {
 }
 ```
 
-###### ✅ 2.2 多表联查之单个查询 - 以歌曲详情界面为例
+###### 2.2 多表联查之单个查询 - 以歌曲详情界面为例
 
 * （1）首先考虑接口应该返回什么样的数据结构给客户端
 
@@ -942,11 +983,11 @@ return HttpResult.ok(data);
 }
 ```
 
-#### ✅ 第 3 步：多表增删改数据一致性的处理
+#### 第 3 步：多表增删改数据一致性的处理
 
 > **多表联查主要是针对从表查询来说的，因为只有从表里有外键，主表查询其实就是单表查询（除非某些特殊场景需要读取从表的数据）**
 
-###### ✅ 3.1 从表 save 时的数据一致性问题及处理
+###### 3.1 从表 save 时的数据一致性问题及处理
 
 * 问题场景
 
@@ -1019,7 +1060,7 @@ public List<Long> saveBatch(SongCreateBatchReq req) throws ServiceException {
 }
 ```
 
-###### ✅ 3.2 主表 delete 时的数据一致性问题及处理
+###### 3.2 主表 delete 时的数据一致性问题及处理
 
 * 问题场景
 
@@ -1089,7 +1130,7 @@ req.setId(970L); // 歌手删除成功了，但是歌曲表里还残留该歌手
 
   ![image-20260130142415028](第 02 步-编写 Java 代码/img/image-20260130142415028.png)
 
-###### ✅ 3.3 从表 update 时的数据一致性问题及处理
+###### 3.3 从表 update 时的数据一致性问题及处理
 
 * 问题场景
 
@@ -1159,13 +1200,13 @@ public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
 }
 ```
 
-## ✅ 九九、补充
+## 九九、补充
 
-#### ✅ 1、domain -> pojo
+#### 1、domain -> pojo
 
 响应体模型和请求参数模型统称为 POJO（Plain Ordinary Java Object、简单的 Java 对象）。
 
-###### ✅ 1.1 响应体模型
+###### 1.1 响应体模型
 
 之前的响应体模型，我们是搞了一个 domain 目录，然后在 domain 目录下创建数据库里每张表对应的 Xxx domain 类，这些 Xxx domain 类就是纯粹地存储数据，domain 的字段必须和数据库表里的字段一一对应。总之是“一个 domain 走天下”：从数据库表映射出 domain、把 domain 从数据层传到业务层、把 domain 从业务层传到控制器层、把 domain 返回给客户端。但是实际开发中“一个 domain 走天下”可能并不太合适，而是会有各种模型：
 
@@ -1174,11 +1215,11 @@ public void updateBatch(SongUpdateBatchReq req) throws ServiceException {
 | 模型                                        | 职责                                                         | 阶段                                                         | 是否必须有                                                   |
 | ------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | PO：Persistent Object<br />持久化对象       | po 关注的是数据库存储<br /><br />po 其实就对应我们原来的 domain，po 就是纯粹地存储数据，po 的字段必须和数据库表里的字段一一对应<br /><br />这个类内部一般就是编写构造方法、成员变量、setter&getter 方法、toString 方法 | 从数据库表映射出 po                                          | po 必须有                                                    |
-| DTO：Data Transfer Object<br />数据传输对象 | dto 关注的是数据传输<br /><br />po 的属性都是跟数据库表里的字段一一对应的，但很多时候我们并不需要把 po 里的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 把 po 转换成 dto 或从数据库表直接映射出 dto、把 dto 从业务层传到控制器层 | ① 单表查询时，从数据库表映射出来的是 po，无论 po 里有没有敏感数据（如 product 表里就没有、user 表里就有密码这种敏感数据），我们都应该为 po 创建对应的 dto，**没有敏感数据时就直接把 po 里所有的属性都复制到 dto 里（这样做以后扩展起来非常方便、因为我们无法确保 product 表里以后永远不会新增敏感数据）**，有敏感数据时就把 po 里敏感数据以外的属性都复制到 dto 里<br />② 多表联查是直接从数据库表里映射出 dto，因为每个表的 po 仅仅是自己那张表的字段映射、它们肯定无法并且也不应该同时承载两个表的数据，所以只能是 dto 来同时承载两个表的数据，此时 dto 必须（如 singer&song 表）<br />③ 保存时，我们不是会直接返回保存成功的那条完整数据嘛，最好也不要直接返回 po，也搞个 dto 返回，同样的道理、因为我们不一定总是要返回 po 的全部字段<br /><br />**总之一句话：我们响应给客户端的模型起码得是 dto 起步、最好不要直接返回 po。其实也就 get、list、save 这三种类型的接口需要搞搞，其它几个接口都是仅响应状态的** |
+| DTO：Data Transfer Object<br />数据传输对象 | dto 关注的是数据传输<br /><br />po 的属性都是跟数据库表里的字段一一对应的，但很多时候我们并不需要把 po 里的全部属性都返回给客户端，而是会根据业务需要删减或增加某些属性，只返回必要的属性，这就是 dto 对象、dto 对象就用来封装这些必要的属性<br /><br />这个类内部一般就是编写**需要返回给客户端的必要属性** | 单表查询时把 po 转换成 dto 或多表联查时直接从数据库表映射出 dto、把 dto 从业务层传到控制器层 | ① 单表查询时，从数据库表映射出来的是 po，无论 po 里有没有敏感数据（如 product 表里就没有、user 表里就有密码这种敏感数据），我们都应该为 po 创建对应的 dto，**没有敏感数据时就直接把 po 里所有的属性都复制到 dto 里（这样做以后扩展起来非常方便、因为我们无法确保 product 表里以后永远不会新增敏感数据）**，有敏感数据时就把 po 里敏感数据以外的属性都复制到 dto 里<br />② 多表联查是直接从数据库表里映射出 dto，因为每个表的 po 仅仅是自己那张表的字段映射、它们肯定无法并且也不应该同时承载两个表的数据，所以只能是 dto 来同时承载两个表的数据，此时 dto 必须（如 singer&song 表）<br />**总之一句话：我们响应给客户端的模型起码得是 dto 起步、最好不要直接返回 po，返回 dto 方便以后扩展。其实也就 get、list 这两种类型的接口需要搞搞，其它几个接口都是仅响应状态的** |
 | VO：View Object<br />视图对象               | vo 关注的是前端展示<br /><br />控制器层收到 dto 对象后，并不会把 dto 对象直接返回给客户端、dto 对象只是预返回对象，而是会把 dto 对象再转换成 vo 对象，所谓 vo 对象就是前端拿到数据后就能直接拿来展示的对象（比如 dto 里的数据是没有国际化的，而 vo 里的数据就是经过国际化后的数据）<br /><br />这个类内部一般就是编写 **dto 里的数据“翻译”成前端界面能直接展示的数据** | 把 dto 转换成 vo、把 vo 返回给客户端                         | vo 可以没有<br /><br />但有的话，前端的界面展示会更加动态化  |
 | BO：Business Object<br />业务对象           | bo 关注的是业务<br /><br />一个业务就对应一个 bo，一个业务可能只需要一张表、也就是一个 po 就能完成，也可能需要联合多张表、也就是多个 po 才能完成（比如个人简介是一个 po、技术栈是一个 po、项目经验是一个 po，而个人简历则是一个 bo，由三个 po 联合完成）<br /><br />这个类内部一般就是编写构造方法、成员变量**（但是成员变量的类型可以跟数据库里不一样了，应该更加注重业务语义，比如数据库里用 0、1、2 这种整型来代表枚举，这个类里就可以用枚举类型了）**、setter&getter 方法、toString 方法、**业务逻辑相关的大量方法** | 把 po 转换成 bo、把 bo 从数据层传到业务层                    | bo 可以没有<br /><br />但有的话，业务语义更加清晰、业务逻辑也可以抽取到这里复用 |
 
-###### ✅ 1.2 请求参数模型
+###### 1.2 请求参数模型
 
 之前我们学习了很多种接收请求参数的方式，现在汇总敲定一下规范：
 
@@ -1374,7 +1415,7 @@ public class ProductUpdateBatchReq {
 }
 ```
 
-#### ✅ 2、MyBatisPlus（单表 CRUD 利器、多表 CRUD 不管）
+#### 2、MyBatisPlus（单表 CRUD 利器、多表 CRUD 不管）
 
 一看到 MyBatisPlus 这个名字里的“MyBatis”，我们可能会认为它跟 MyBatis 一样是个数据层的框架；一看到 MyBatisPlus 这个名字里的“Plus”，我们可能会认为它是 MyBatis 的增强版、比 MyBatis 的 API 更好用了；换句话说我们可能会认为 MyBatisPlus 是一个更好用的数据层框架，我们可以用它替换掉 MyBatis 来实现数据层，其实这个理解是错误的。
 
@@ -1478,7 +1519,7 @@ public class MyBatisPlusMetaObjectHandler implements MetaObjectHandler {
 }
 ```
 
-###### ✅ 2.1 对数据层的影响
+###### 2.1 对数据层的影响
 
 之前我们是根据每张表手动创建一个对应的 mapper 接口类 ①，为这个接口类添加 get、list、insert、insertBatch、delete、deleteBatch、update、updateBatch 等方法 ②；然后再手动创建一个对应的 mapper 实现 ③，在这个 mapper 实现里编写对应的 SQL 语句来访问数据库 ④。
 
@@ -1495,7 +1536,7 @@ public interface ProductMapper extends BaseMapper<Product> {
 }
 ```
 
-###### ✅ 2.2 对业务层的影响
+###### 2.2 对业务层的影响
 
 之前我们是根据每张表手动创建一个对应的 service 接口类 ①，为这个接口类添加 get、list、save、saveBatch、remove、removeBatch、update、updateBatch 等方法 ②；然后再手动创建一个对应的 serviceImpl 实现 ③，在这个 serviceImpl 实现里调用数据层的 API 来实现业务 ④。
 
@@ -1529,9 +1570,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 }
 ```
 
-#### ✅ 3、EasyCode（自动生成代码的插件）
+#### 3、EasyCode（自动生成代码的插件）
 
-###### ✅ 3.1 安装 EasyCode
+###### 3.1 安装 EasyCode
 
 * 是一款基于 IntelliJ IDEA 开发的**代码生成插件**
 * 支持**同时生成多张表的代码，每张表可以有独立的配置信息**
@@ -1539,7 +1580,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
 ![image-20260126230925354](第 02 步-编写 Java 代码/img/image-20260126230925354.png)
 
-###### ✅ 3.2 自定义代码模板
+###### 3.2 自定义代码模板
 
 ![image-20260121223011159](第 02 步-编写 Java 代码/img/image-20260121223011159.png)
 
@@ -1574,6 +1615,54 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
       #end
       private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
   #end
+  }
+  ```
+
+  * detailDto
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  ##保存文件（宏定义）
+  #save("/pojo/dto", "DetailDto.java")
+  ##包路径（宏定义）
+  #setPackageSuffix("pojo.dto")
+  ##自动导入包（全局变量）
+  $!{autoImport.vm}
+  import com.ineyee.pojo.po.$!{tableInfo.name};
+  import lombok.Data;
+  import org.springframework.beans.BeanUtils;
+  
+  @Data
+  public class $!{tableInfo.name}DetailDto {
+  #foreach($column in $tableInfo.fullColumn)
+  #if($column.name != "deleted")
+      private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
+  #end
+  #end
+  
+      public static $!{tableInfo.name}DetailDto from($!{tableInfo.name} #set($entityName = $!{tableInfo.name})#set($firstChar = $entityName.substring(0,1).toLowerCase())#set($rest = $entityName.substring(1))${firstChar}${rest}Po) {
+          $!{tableInfo.name}DetailDto dto = new $!{tableInfo.name}DetailDto();
+          BeanUtils.copyProperties(#set($entityName = $!{tableInfo.name})#set($firstChar = $entityName.substring(0,1).toLowerCase())#set($rest = $entityName.substring(1))${firstChar}${rest}Po, dto);
+          return dto;
+      }
+  }
+  ```
+
+  * listDto
+
+  ```velocity
+  ##导入宏定义
+  $!{define.vm}
+  ##保存文件（宏定义）
+  #save("/pojo/dto", "ListDto.java")
+  ##包路径（宏定义）
+  #setPackageSuffix("pojo.dto")
+  import lombok.Data;
+  
+  @Data
+  public class $!{tableInfo.name}ListDto {
+  
   }
   ```
 
@@ -1630,7 +1719,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
   public class $!{tableName}{
       // TODO: 根据接口需求在这里给属性添加相应的校验规则
   #foreach($column in $tableInfo.fullColumn)
-  #if($column.name != 'id' && $column.name != 'createTime' && $column.name != 'updateTime')
+  #if($column.name != 'id' && $column.name != 'createTime' && $column.name != 'updateTime' && $column.name != 'deleted')
     private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
   #end
   #end
@@ -1819,7 +1908,9 @@ $!{define.vm}
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import $!{tableInfo.savePackageName}.common.api.exception.ServiceException;
-import $!{tableInfo.savePackageName}.pojo.po.$!{entityName};
+import $!{tableInfo.savePackageName}.common.api.ListData;
+import $!{tableInfo.savePackageName}.pojo.po.$!{entityName}DeatailDto;
+import $!{tableInfo.savePackageName}.pojo.po.$!{entityName}ListDto;
 import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}GetQuery;
 import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}ListQuery;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}CreateReq;
@@ -1828,16 +1919,15 @@ import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteBatchReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateBatchReq;
-import $!{tableInfo.savePackageName}.pojo.vo.ListData;
 
 import java.util.List;
 
 public interface $!{tableName} extends IService<$!{entityName}> {
-  $!{entityName} get($!{entityName}GetQuery query) throws ServiceException;
+  $!{entityName}DeatailDto get($!{entityName}GetQuery query) throws ServiceException;
 
-  ListData<$!{entityName}> list($!{entityName}ListQuery query);
+  ListData<$!{entityName}ListDto> list($!{entityName}ListQuery query);
 
-  $!{entityName} save($!{entityName}CreateReq req) throws ServiceException;
+  Long save($!{entityName}CreateReq req) throws ServiceException;
 
   List<Long> saveBatch($!{entityName}CreateBatchReq req) throws ServiceException;
 
@@ -1864,9 +1954,12 @@ $!{define.vm}
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import $!{tableInfo.savePackageName}.common.api.ListData;
 import $!{tableInfo.savePackageName}.common.api.error.CommonServiceError;
 import $!{tableInfo.savePackageName}.common.api.exception.ServiceException;
 import $!{tableInfo.savePackageName}.mapper.$!{entityName}Mapper;
+import $!{tableInfo.savePackageName}.pojo.dto.$!{entityName}DetailDto;
+import $!{tableInfo.savePackageName}.pojo.dto.$!{entityName}ListDto;
 import $!{tableInfo.savePackageName}.pojo.po.$!{entityName};
 import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}GetQuery;
 import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}ListQuery;
@@ -1876,7 +1969,6 @@ import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteBatchReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateBatchReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateReq;
-import $!{tableInfo.savePackageName}.pojo.vo.ListData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -1890,17 +1982,17 @@ import java.util.List;
 public class $!{tableName} extends ServiceImpl<$!{entityName}Mapper, $!{entityName}> implements $!{entityName}Service {
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public $!{entityName} get($!{entityName}GetQuery query) throws ServiceException {
+  public $!{entityName}DetailDto get($!{entityName}GetQuery query) throws ServiceException {
       $!{entityName} data = getById(query.getId());
       if (data == null) {
           throw new ServiceException(CommonServiceError.REQUEST_ERROR);
       }
-      return data;
+      return $!{entityName}DetailDto.from(data);
   }
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public ListData<$!{entityName}> list($!{entityName}ListQuery query) {
+  public ListData<$!{entityName}ListDto> list($!{entityName}ListQuery query) {
       LambdaQueryWrapper<$!{entityName}> wrapper = new LambdaQueryWrapper<>();
       // TODO: 按需追加查询条件
 
@@ -1910,21 +2002,23 @@ public class $!{tableName} extends ServiceImpl<$!{entityName}Mapper, $!{entityNa
       if (query.getPageNum() != null && query.getPageSize() != null) {
           Page<$!{entityName}> page = new Page<>(query.getPageNum(), query.getPageSize());
           Page<$!{entityName}> queriedPage = page(page, wrapper);
-          return ListData.fromPage(queriedPage);
+          Page<$!{entityName}ListDto> dtoPage = (Page<$!{entityName}ListDto>) queriedPage.convert($!{entityName}ListDto::from);
+          return ListData.fromPage(dtoPage);
       } else {
           List<$!{entityName}> dataList = list(wrapper);
-          return ListData.fromList(dataList);
+          List<$!{entityName}ListDto> dtoList =  dataList.stream().map($!{entityName}ListDto::from).toList();
+          return ListData.fromList(dtoList);
       }
   }
 
   @Override
-  public $!{entityName} save($!{entityName}CreateReq req) throws ServiceException {
+  public Long save($!{entityName}CreateReq req) throws ServiceException {
       $!{entityName} entity = new $!{entityName}();
       BeanUtils.copyProperties(req, entity);
       if (!save(entity)) {
           throw new ServiceException(CommonServiceError.REQUEST_ERROR);
       }
-      return entity;
+      return entity.getId();
   }
 
   @Override
@@ -2023,8 +2117,10 @@ $!{define.vm}
 #set($serviceName = $!tool.append($!entityVar, "Service"))
 
 import $!{tableInfo.savePackageName}.common.api.HttpResult;
+import $!{tableInfo.savePackageName}.common.api.ListData;
 import $!{tableInfo.savePackageName}.common.api.exception.ServiceException;
-import $!{tableInfo.savePackageName}.pojo.po.$!{entityName};
+import $!{tableInfo.savePackageName}.pojo.dto.$!{entityName}DetailDto;
+import $!{tableInfo.savePackageName}.pojo.dto.$!{entityName}ListDto;
 import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}GetQuery;
 import $!{tableInfo.savePackageName}.pojo.query.$!{entityName}ListQuery;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}CreateReq;
@@ -2033,7 +2129,6 @@ import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}DeleteBatchReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateReq;
 import $!{tableInfo.savePackageName}.pojo.req.$!{entityName}UpdateBatchReq;
-import $!{tableInfo.savePackageName}.pojo.vo.ListData;
 import $!{tableInfo.savePackageName}.service.$!{entityName}Service;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -2050,21 +2145,21 @@ public class $!{tableName} {
   private $!{entityName}Service $!{serviceName};
 
   @GetMapping("/get")
-  public HttpResult<$!{entityName}> get(@Valid $!{entityName}GetQuery query) throws ServiceException {
-      $!{entityName} data = $!{serviceName}.get(query);
+  public HttpResult<$!{entityName}DetailDto> get(@Valid $!{entityName}GetQuery query) throws ServiceException {
+      $!{entityName}DetailDto data = $!{serviceName}.get(query);
       return HttpResult.ok(data);
   }
 
   @GetMapping("/list")
-  public HttpResult<ListData<$!{entityName}>> list(@Valid $!{entityName}ListQuery query) {
-      ListData<$!{entityName}> dataList = $!{serviceName}.list(query);
+  public HttpResult<ListData<$!{entityName}ListDto>> list(@Valid $!{entityName}ListQuery query) {
+      ListData<$!{entityName}ListDto> dataList = $!{serviceName}.list(query);
       return HttpResult.ok(dataList);
   }
 
   @PostMapping("/save")
-  public HttpResult<$!{entityName}> save(@Valid @RequestBody $!{entityName}CreateReq req) throws ServiceException {
-      $!{entityName} data = $!{serviceName}.save(req);
-      return HttpResult.ok(data);
+  public HttpResult<Long> save(@Valid @RequestBody $!{entityName}CreateReq req) throws ServiceException {
+      Long id = $!{serviceName}.save(req);
+      return HttpResult.ok(id);
   }
 
   @PostMapping("/saveBatch")
@@ -2099,6 +2194,6 @@ public class $!{tableName} {
 }
 ```
 
-###### ✅ 3.3 自定义数据库类型与 Java 类型映射
+###### 3.3 自定义数据库类型与 Java 类型映射
 
 ![image-20260121223652500](第 02 步-编写 Java 代码/img/image-20260121223652500.png)

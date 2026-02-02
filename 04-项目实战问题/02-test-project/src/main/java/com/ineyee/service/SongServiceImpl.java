@@ -9,7 +9,6 @@ import com.ineyee.mapper.SingerMapper;
 import com.ineyee.mapper.SongMapper;
 import com.ineyee.pojo.dto.SongDetailDto;
 import com.ineyee.pojo.dto.SongListDto;
-import com.ineyee.pojo.dto.SongSaveDto;
 import com.ineyee.pojo.po.Singer;
 import com.ineyee.pojo.po.Song;
 import com.ineyee.pojo.query.SongGetQuery;
@@ -82,7 +81,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public SongSaveDto save(SongCreateReq req) throws ServiceException {
+    public Long save(SongCreateReq req) throws ServiceException {
         // =========== 保存前校验主表——歌手表——里是否存在当前歌手 id ===========
         Singer singer = singerMapper.selectById(req.getSingerId());
         if (singer == null) {
@@ -98,7 +97,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         }
 
         // po2dto
-        return SongSaveDto.from(entity);
+        return entity.getId();
     }
 
     @Override

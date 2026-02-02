@@ -63,14 +63,14 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
     }
 
     @Override
-    public SingerDetailDto save(SingerCreateReq req) throws ServiceException {
+    public Long save(SingerCreateReq req) throws ServiceException {
         Singer entity = new Singer();
         BeanUtils.copyProperties(req, entity);
         if (!save(entity)) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
         }
 
-        return SingerDetailDto.from(entity);
+        return entity.getId();
     }
 
     @Override

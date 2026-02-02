@@ -47,9 +47,9 @@ public class SingerController {
 
     @PostMapping("/save")
     @Operation(summary = "保存歌手")
-    public HttpResult<SingerDetailDto> save(@Valid @RequestBody SingerCreateReq req) throws ServiceException {
-        SingerDetailDto data = singerService.save(req);
-        return HttpResult.ok(data);
+    public HttpResult<Long> save(@Valid @RequestBody SingerCreateReq req) throws ServiceException {
+        Long id = singerService.save(req);
+        return HttpResult.ok(id);
     }
 
     @PostMapping("/saveBatch")
