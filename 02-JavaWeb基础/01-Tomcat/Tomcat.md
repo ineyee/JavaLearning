@@ -163,7 +163,7 @@ war 包类似于 jar 包，都是压缩文件。war 包是 JavaWeb 项目的包�
 * Build - Build Artifacts - ${项目名}:war（代表把项目打包成 war 包，再部署到 Tomcat 上去，适用于发布阶段）
 * 这样对 JaveWeb 项目打包后，产物是一个 war 压缩包：${项目名}.war，放在 target 目录下
 * 我们需要把产物 war 包名改成 ${Application context}.war，以便将来访问
-* 把产物 war 包直接复制到 ${TOMCAT_HOME}/webapps  目录下
+* 把产物 war 包直接复制到 ${TOMCAT_HOME}/webapps  目录下（war 包会自动解压）
 * 启动 Tomcat
 * 然后我们去浏览器里通过“http://localhost:9999/helloTomcat”来访问，项目默认返回的是 webapp 目录下的 index.jsp 文件，我们还可以通过“http://localhost:9999/helloTomcat/login.html”来访问我们自己创建的登录页面，验证是否部署成功
 
@@ -180,7 +180,7 @@ war 包类似于 jar 包，都是压缩文件。war 包是 JavaWeb 项目的包�
 
 * 我们需要把产物文件夹名改成 ${Application context} 或把产物 war 包名改成 ${Application context}.war，以便将来访问
 
-* 把产物文件夹或 war 包放到指定的路径，这里假设我们的产物文件夹或 war 包放在桌面上
+* 把产物文件夹或 war 包放到指定的路径，这里假设我们的产物文件夹或 war 包放在桌面上（war 包会自动解压）
 
 * 在 ${TOMCAT_HOME}/conf/Catalina/localhost 文件夹下创建一个 xml 文件，xml 文件名为 ${Application context}，以便将来访问
 
