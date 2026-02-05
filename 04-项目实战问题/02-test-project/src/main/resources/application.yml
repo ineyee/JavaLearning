@@ -5,7 +5,7 @@ spring:
     # 通过子配置文件名来"引入、激活"子配置文件，这里是个数组
     # 开发环境用 dev，生产环境用 prd
     active:
-      - dev
+      - prd
   mvc:
     servlet:
       # DispatcherServlet 的加载时机：默认是 -1（延迟加载，第一次请求接口时才初始化）
