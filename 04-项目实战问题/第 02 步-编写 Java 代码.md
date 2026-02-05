@@ -158,7 +158,7 @@ cors:
 # 假设在生产环境下端口号是 8888，Application Context Path 是 /tp
 server:
   # 监听的端口，默认是 8080
-  port: 8080
+  port: 8888
   # Application Context Path，默认是 /，注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的
   servlet:
     context-path: "/tp"
@@ -476,52 +476,55 @@ SpringBoot 项目的 spring-boot-starter-web 会默认添加 Logback 依赖，�
         </encoder>
     </appender>
 
+    <!-- 定义一个输出目标：文件 -->
+    <appender name="rollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 文件的输出格式与编码方式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--
+                输出格式
+                    %highlight：彩色输出，文件里面没有彩色
+                    %d：时间
+                    %p：日志级别
+                    %t：线程
+                    %c：消息是在哪个类里输出的
+                    %m：消息
+                    %n：换行
+            -->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5p] [%t] [%c]: %m%n</pattern>
+            <!-- 编码方式：UTF-8 -->
+            <charset>UTF-8</charset>
+        </encoder>
+        <!-- 文件的路径 -->
+        <file>${LOG_FILE_HOME}/app.log</file>
+        <!--
+            文件的滚动策略，基于文件大小和时间
+                每隔一天，自动生成新文件，以当天日期命名
+                同一天内单个文件最大 100M，超过 100M 时自动生成新文件，以当天日期命名
+                所有文件总大小最大 10G，超过 10G 时自动清理最早的文件
+                自动清理超过 30 天的文件
+
+            /var/log/${AppName}/
+            ├─app.log                 <- 当前
+            ├─app.log.2026.01.04.0    <- 今天的第 1 个文件（100M）
+            ├─app.log.2026.01.04.1    <- 今天的第 2 个文件（100M）
+            ├─app.log.2026.01.03.0    <- 昨天的文件
+        -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 自动生成的新文件名，时间精确到天，支持压缩文件（可节省 70%~90% 的存储空间） -->
+            <fileNamePattern>${LOG_FILE_HOME}/app.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <!-- 单个文件最大大小 -->
+            <maxFileSize>100MB</maxFileSize>
+            <!-- 所有文件总大小 -->
+            <totalSizeCap>10GB</totalSizeCap>
+            <!-- 最多保留多少天，这里的单位取决于 fileNamePattern 里的时间精确到什么单位 -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
     <!-- 把 rollingFileAppender 搞成异步的，这样一来把日志写入到文件的操作就会变成异步的 -->
     <appender name="asyncRollingFileAppender" class="ch.qos.logback.classic.AsyncAppender">
-        <!-- 定义一个输出目标：文件 -->
-        <appender name="rollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <!-- 文件的输出格式与编码方式 -->
-            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                <!--
-                    输出格式
-                        %highlight：彩色输出，文件里面没有彩色
-                        %d：时间
-                        %p：日志级别
-                        %t：线程
-                        %c：消息是在哪个类里输出的
-                        %m：消息
-                        %n：换行
-                -->
-                <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5p] [%t] [%c]: %m%n</pattern>
-                <!-- 编码方式：UTF-8 -->
-                <charset>UTF-8</charset>
-            </encoder>
-            <!-- 文件的路径 -->
-            <file>${LOG_FILE_HOME}/app.log</file>
-            <!--
-                文件的滚动策略，基于文件大小和时间
-                    每隔一天，自动生成新文件，以当天日期命名
-                    同一天内单个文件最大 100M，超过 100M 时自动生成新文件，以当天日期命名
-                    所有文件总大小最大 10G，超过 10G 时自动清理最早的文件
-                    自动清理超过 30 天的文件
-
-                /var/log/${AppName}/
-                ├─app.log                 <- 当前
-                ├─app.log.2026.01.04.0    <- 今天的第 1 个文件（100M）
-                ├─app.log.2026.01.04.1    <- 今天的第 2 个文件（100M）
-                ├─app.log.2026.01.03.0    <- 昨天的文件
-            -->
-            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <!-- 自动生成的新文件名，时间精确到天，支持压缩文件（可节省 70%~90% 的存储空间） -->
-                <fileNamePattern>${LOG_FILE_HOME}/app.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
-                <!-- 单个文件最大大小 -->
-                <maxFileSize>100MB</maxFileSize>
-                <!-- 所有文件总大小 -->
-                <totalSizeCap>10GB</totalSizeCap>
-                <!-- 最多保留多少天，这里的单位取决于 fileNamePattern 里的时间精确到什么单位 -->
-                <maxHistory>30</maxHistory>
-            </rollingPolicy>
-        </appender>
+        <!-- 引用上面定义的 rollingFileAppender -->
+        <appender-ref ref="rollingFileAppender"/>
     </appender>
 
     <!--

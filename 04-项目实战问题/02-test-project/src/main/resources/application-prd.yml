@@ -2,7 +2,7 @@
 # 假设在生产环境下端口号是 8888，Application Context Path 是 /tp
 server:
   # 监听的端口，默认是 8080
-  port: 8080
+  port: 8888
   # Application Context Path，默认是 /，注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的
   servlet:
     context-path: "/tp"
