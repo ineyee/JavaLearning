@@ -16,8 +16,8 @@ MySQL Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯�
 
 #### 1、安装 Navicat GUI 工具
 
-* Navicat 下载地址：https://www.navicat.com.cn/download/navicat-for-mysql    https://www.mac78.com/924.html#J_DLIPPCont    https://www.macwk.com/soft/navicat-premium
-* 这里选择下载：Navicat for MySQL 17.1.9
+* Navicat 下载地址：https://www.macwk.com/soft/navicat-premium
+* 这里选择下载：Navicat Premium 16.3.7
 * 下载完双击安装即可，macOS 上会默认安装在应用程序
 
 #### 2、使用 Navicat GUI 工具操作 MySQL 数据库
