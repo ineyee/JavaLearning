@@ -4,7 +4,7 @@
 
 MongoDB Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯定也会设置监听某个端口（默认 27017）来跟客户端通信（如 mongodb 命令行工具、各种编程语言的驱动、GUI 工具等），MongoDB Server 内部又存放着一个或多个 MongoDB 数据库
 
-* MongoDB 下载地址：https://www.mongodb.com/try/download/community
+* MongoDB 下载地址：https://fastdl.mongodb.org/osx/mongodb-macos-arm64-8.2.5.tgz
 
 * 这里选择下载 MongoDB Community 8.2.5
 
