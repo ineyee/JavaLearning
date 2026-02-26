@@ -75,13 +75,12 @@ MongoDB Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯
       user: "root",        // 你的用户名
       pwd: "MongoDB666!",  // 你的密码
       roles: [
-        { role: "userAdminAnyDatabase", db: "admin" },  // 管理员权限
-        { role: "readWriteAnyDatabase", db: "admin" }   // 可选：对所有数据库有读写权限
+        { role: "root", db: "admin" } // role = root：代表当前用户为超级管理员角色；db = admin：代表是在 admin 这个数据库里创建的当前用户
       ]
     })
     ```
-
-  * 停止 MongoDB 服务，重新启动 MongoDB 服务
+    
+* 停止 MongoDB 服务，重新启动 MongoDB 服务
 
 ## 二、本机安装 Navicat
 
