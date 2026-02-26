@@ -1,12 +1,17 @@
 package com.ineyee.controller;
 
 import com.ineyee.common.api.HttpResult;
+import com.ineyee.common.api.ListData;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
+import com.ineyee.pojo.dto.ProductListDto;
+import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
+import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
 import com.ineyee.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +31,13 @@ public class ProductController {
     public HttpResult<ProductDetailDto> get(@Valid ProductGetQuery query) throws ServiceException {
         ProductDetailDto data = productService.get(query);
         return HttpResult.ok(data);
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "获取产品列表")
+    public HttpResult<ListData<ProductListDto>> list(@Valid ProductListQuery query) {
+        ListData<ProductListDto> dataList = productService.list(query);
+        return HttpResult.ok(dataList);
     }
 
     @PostMapping("/save")

@@ -16,6 +16,10 @@ public class ListData<T> {
         return new ListData<>(queryedPage.getRecords(), queryedPage.getCurrent(), queryedPage.getSize(), queryedPage.getTotal(), queryedPage.getPages());
     }
 
+    public static <T> ListData<T> fromPageMongoDB(org.springframework.data.domain.Page<T> queryedPage) {
+        return new ListData<>(queryedPage.getContent(), (long) queryedPage.getNumber() + 1, (long) queryedPage.getSize(), queryedPage.getTotalElements(), (long) queryedPage.getTotalPages());
+    }
+
     /**
      * 非分页列表
      */

@@ -676,15 +676,15 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 #### 2、数据层 repository
 
-spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 MyBatisPlus 的 BaseMapper 接口，提供了【增删改 + 基本查】方法来访问 MongoDB 数据库。所以除非有聚合查的 xxx，否则就用提供的方法来访问数据库。
+spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 MyBatisPlus 的 BaseMapper 接口，提供了【增删改 + 基本查】方法来访问 MongoDB 数据库，尽量优先用 repository 来访问数据库，复杂操作再用   来访问数据库。
 
 #### 3、业务层 service
 
-自动注入 repository 对象，调用 repository 层的 api 即可。
+自动注入 repository 对象、mongoTemplate 对象，调用数据层的 api 即可。
 
 #### 4、表现层之控制器层 controller
 
-自动注入 service 对象，调用 service 层的 api 即可。
+自动注入 service 对象，调用业务层的 api 即可。
 
 
 
@@ -693,144 +693,6 @@ spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 My
 
 
   ```java
-
-
-  8.5 创建 Service 层
-
-  package com.ineyee.service;
-
-  import com.ineyee.common.api.ListData;
-  import com.ineyee.common.api.exception.ServiceException;
-  import com.ineyee.pojo.dto.UserDetailDto;
-  import com.ineyee.pojo.dto.UserListDto;
-  import com.ineyee.pojo.query.UserGetQuery;
-  import com.ineyee.pojo.query.UserListQuery;
-  import com.ineyee.pojo.req.UserCreateReq;
-  import com.ineyee.pojo.req.UserUpdateReq;
-
-  import java.util.List;
-
-  public interface UserService {
-      UserDetailDto get(UserGetQuery query) throws ServiceException;
-      ListData<UserListDto> list(UserListQuery query);
-      String save(UserCreateReq req) throws ServiceException;
-      void remove(String id) throws ServiceException;
-      void update(UserUpdateReq req) throws ServiceException;
-  }
-
-  package com.ineyee.service;
-
-  import com.ineyee.common.api.ListData;
-  import com.ineyee.common.api.error.CommonServiceError;
-  import com.ineyee.common.api.exception.ServiceException;
-  import com.ineyee.pojo.document.User;
-  import com.ineyee.pojo.dto.UserDetailDto;
-  import com.ineyee.pojo.dto.UserListDto;
-  import com.ineyee.pojo.query.UserGetQuery;
-  import com.ineyee.pojo.query.UserListQuery;
-  import com.ineyee.pojo.req.UserCreateReq;
-  import com.ineyee.pojo.req.UserUpdateReq;
-  import com.ineyee.repository.UserRepository;
-  import lombok.extern.slf4j.Slf4j;
-  import org.springframework.beans.BeanUtils;
-  import org.springframework.beans.factory.annotation.Autowired;
-  import org.springframework.data.domain.Page;
-  import org.springframework.data.domain.PageRequest;
-  import org.springframework.data.domain.Pageable;
-  import org.springframework.data.domain.Sort;
-  import org.springframework.data.mongodb.core.MongoTemplate;
-  import org.springframework.data.mongodb.core.query.Criteria;
-  import org.springframework.data.mongodb.core.query.Query;
-  import org.springframework.data.support.PageableExecutionUtils;
-  import org.springframework.stereotype.Service;
-
-  import java.time.LocalDateTime;
-  import java.util.List;
-  import java.util.Optional;
-
-  @Slf4j
-  @Service
-  public class UserServiceImpl implements UserService {
-
-      @Autowired
-      private UserRepository userRepository;
-
-      @Autowired
-      private MongoTemplate mongoTemplate;  // 用于复杂查询
-
-      @Override
-      public ListData<UserListDto> list(UserListQuery query) {
-          // 构建查询条件
-          Query mongoQuery = new Query();
-
-          // 添加查询条件
-          if (query.getName() != null && !query.getName().isEmpty()) {
-              mongoQuery.addCriteria(Criteria.where("name").regex(query.getName(), "i"));
-          }
-          if (query.getMinAge() != null && query.getMaxAge() != null) {
-              mongoQuery.addCriteria(Criteria.where("age").gte(query.getMinAge()).lte(query.getMaxAge()));
-          }
-
-          // 添加排序
-          mongoQuery.with(Sort.by(Sort.Direction.DESC, "createTime", "id"));
-
-          // 分页查询
-          if (query.getPageNum() != null && query.getPageSize() != null) {
-              Pageable pageable = PageRequest.of(
-                  query.getPageNum().intValue() - 1,  // MongoDB 页码从 0 开始
-                  query.getPageSize().intValue()
-              );
-              mongoQuery.with(pageable);
-
-              List<User> users = mongoTemplate.find(mongoQuery, User.class);
-              long total = mongoTemplate.count(Query.of(mongoQuery).limit(-1).skip(-1), User.class);
-
-              Page<User> page = PageableExecutionUtils.getPage(users, pageable, () -> total);
-              Page<UserListDto> dtoPage = page.map(UserListDto::from);
-
-              return ListData.fromPage(dtoPage);
-          } else {
-              List<User> users = mongoTemplate.find(mongoQuery, User.class);
-              List<UserListDto> dtoList = users.stream().map(UserListDto::from).toList();
-              return ListData.fromList(dtoList);
-          }
-      }
-  }
-
-  8.6 创建 Controller 层
-
-  package com.ineyee.controller;
-
-  import com.ineyee.common.api.HttpResult;
-  import com.ineyee.common.api.ListData;
-  import com.ineyee.common.api.exception.ServiceException;
-  import com.ineyee.pojo.dto.UserDetailDto;
-  import com.ineyee.pojo.dto.UserListDto;
-  import com.ineyee.pojo.query.UserGetQuery;
-  import com.ineyee.pojo.query.UserListQuery;
-  import com.ineyee.pojo.req.UserCreateReq;
-  import com.ineyee.pojo.req.UserUpdateReq;
-  import com.ineyee.service.UserService;
-  import jakarta.validation.Valid;
-  import lombok.extern.slf4j.Slf4j;
-  import org.springframework.beans.factory.annotation.Autowired;
-  import org.springframework.web.bind.annotation.*;
-
-  @Slf4j
-  @RestController
-  @RequestMapping("/user")
-  public class UserController {
-
-      @Autowired
-      private UserService userService;
-
-      @GetMapping("/list")
-      public HttpResult<ListData<UserListDto>> list(@Valid UserListQuery query) {
-          ListData<UserListDto> dataList = userService.list(query);
-          return HttpResult.ok(dataList);
-      }
-  }
-
   九、MongoDB 高级特性
 
   9.1 索引创建

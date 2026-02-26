@@ -1,8 +1,11 @@
 package com.ineyee.service;
 
+import com.ineyee.common.api.ListData;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
+import com.ineyee.pojo.dto.ProductListDto;
 import com.ineyee.pojo.query.ProductGetQuery;
+import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
 
 public interface ProductService {
@@ -16,6 +19,18 @@ public interface ProductService {
      * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
     ProductDetailDto get(ProductGetQuery query) throws ServiceException;
+
+    /**
+     * 列表查询
+     *
+     * @param query 请求参数模型
+     * @return 列表查询专用响应模型
+     * 之前的查询结果仅仅是 List<T>，所以我们就通过返回值直接返回了
+     * 但是现在的查询结果需要有 List<T>、pageNum、pageSize、total、totalPages，所以我们就定义了一个 ListData<T> 来专门返回
+     * ① 列表查询专用响应模型.[pojo] 代表本次查询有数据
+     * ② 列表查询专用响应模型.[] 代表本次查询没有数据，列表查询没数据时抛异常不太合理
+     */
+    ListData<ProductListDto> list(ProductListQuery query);
 
     /**
      * 单个保存

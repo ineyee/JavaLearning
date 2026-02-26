@@ -1,22 +1,31 @@
 package com.ineyee.service;
 
+import com.ineyee.common.api.ListData;
 import com.ineyee.common.api.error.ProductServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
+import com.ineyee.pojo.dto.ProductListDto;
 import com.ineyee.pojo.po.Designer;
 import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
+import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
 import com.ineyee.repository.ProductRepository;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,7 +35,7 @@ public class ProductServiceImpl implements ProductService {
 
     // MongoTemplate：spring-boot-starter-data-mongodb 的核心操作类，提供对 MongoDB 的底层操作能力
     @Autowired
-    private MongoTemplate mongoTemplate; // 用来执行【数组类型字段的元素操作 + 】等复杂操作
+    private MongoTemplate mongoTemplate; // 用来执行【列表查询 + 数组类型字段的元素操作】等需自定义查询条件、更新规则的复杂操作
 
     @Override
     public ProductDetailDto get(ProductGetQuery query) throws ServiceException {
@@ -40,6 +49,60 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return ProductDetailDto.from(optionalProduct.get());
+    }
+
+    @Override
+    public ListData<ProductListDto> list(ProductListQuery query) {
+        // 构建查询条件
+        Query mongoQuery = new Query();
+
+        // 过滤软删除的数据
+        mongoQuery.addCriteria(Criteria.where("deleted").is(0));
+
+        // 自定义参数
+        Criteria priceCriteria = Criteria.where("price");
+        boolean hasPriceCondition = false;
+        if (query.getMinPrice() != null) {
+            priceCriteria.gte(new org.bson.types.Decimal128(query.getMinPrice()));
+            hasPriceCondition = true;
+        }
+        if (query.getMaxPrice() != null) {
+            priceCriteria.lte(new org.bson.types.Decimal128(query.getMaxPrice()));
+            hasPriceCondition = true;
+        }
+        if (hasPriceCondition) {
+            mongoQuery.addCriteria(priceCriteria);
+        }
+
+        // 排序：先按价格降序排序，如果价格相同、再按 _id 升序排序
+        mongoQuery.with(Sort.by(Sort.Direction.DESC, "price").and(Sort.by(Sort.Direction.ASC, "_id")));
+
+        // 有模糊搜索参数
+        if (query.getKeyword() != null && !query.getKeyword().isEmpty()) {
+            // 在 name 字段中模糊搜索
+            mongoQuery.addCriteria(Criteria.where("name").regex(query.getKeyword(), "i"));
+        }
+
+        // 分页查询
+        if (query.getPageNum() != null && query.getPageSize() != null) {
+            Pageable pageable = PageRequest.of(
+                    query.getPageNum().intValue() - 1,  // MongoDB 页码从 0 开始
+                    query.getPageSize().intValue()
+            );
+            mongoQuery.with(pageable);
+
+            List<Product> products = mongoTemplate.find(mongoQuery, Product.class);
+            long total = mongoTemplate.count(Query.of(mongoQuery).limit(-1).skip(-1), Product.class);
+
+            Page<Product> page = PageableExecutionUtils.getPage(products, pageable, () -> total);
+            Page<ProductListDto> dtoPage = page.map(ProductListDto::from);
+
+            return ListData.fromPageMongoDB(dtoPage);
+        } else {
+            List<Product> products = mongoTemplate.find(mongoQuery, Product.class);
+            List<ProductListDto> dtoList = products.stream().map(ProductListDto::from).toList();
+            return ListData.fromList(dtoList);
+        }
     }
 
     @Override
