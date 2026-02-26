@@ -59,9 +59,9 @@ public interface ProductService {
     void update(ProductUpdateReq req) throws ServiceException;
 
     // 嵌套的设计师操作
-    void addDesigner(String productId, Designer designer) throws ServiceException;
+    void addDesigner(ProductDesignerCreateReq req) throws ServiceException;
 
-    void removeDesigner(String productId, String designerName) throws ServiceException;
+    void removeDesigner(ProductDesignerRemoveReq req) throws ServiceException;
 
-    void updateDesigner(String productId, String designerName, Designer designer) throws ServiceException;
+    void updateDesigner(ProductDesignerUpdateReq req) throws ServiceException;
 }

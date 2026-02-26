@@ -795,22 +795,6 @@ spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 My
               return ListData.fromList(dtoList);
           }
       }
-
-      @Override
-      public void update(UserUpdateReq req) throws ServiceException {
-          Optional<User> userOpt = userRepository.findById(req.getId());
-          if (userOpt.isEmpty()) {
-              throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-          }
-
-          User user = userOpt.get();
-          if (req.getName() != null) user.setName(req.getName());
-          if (req.getAge() != null) user.setAge(req.getAge());
-          if (req.getEmail() != null) user.setEmail(req.getEmail());
-          user.setUpdateTime(LocalDateTime.now());
-
-          userRepository.save(user);
-      }
   }
 
   8.6 创建 Controller 层
@@ -844,12 +828,6 @@ spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 My
       public HttpResult<ListData<UserListDto>> list(@Valid UserListQuery query) {
           ListData<UserListDto> dataList = userService.list(query);
           return HttpResult.ok(dataList);
-      }
-
-      @PostMapping("/update")
-      public HttpResult<Void> update(@Valid @RequestBody UserUpdateReq req) throws ServiceException {
-          userService.update(req);
-          return HttpResult.ok();
       }
   }
 

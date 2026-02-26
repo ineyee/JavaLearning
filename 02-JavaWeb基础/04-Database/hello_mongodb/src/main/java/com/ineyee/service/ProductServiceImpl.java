@@ -6,9 +6,7 @@ import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.po.Designer;
 import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
-import com.ineyee.pojo.req.ProductCreateReq;
-import com.ineyee.pojo.req.ProductDeleteReq;
-import com.ineyee.pojo.req.ProductUpdateReq;
+import com.ineyee.pojo.req.*;
 import com.ineyee.repository.ProductRepository;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
@@ -101,12 +99,15 @@ public class ProductServiceImpl implements ProductService {
      * 场景 1：向数组添加元素
      * 例如：添加一个新设计师
      */
-    public void addDesigner(String productId, Designer designer) {
+    public void addDesigner(ProductDesignerCreateReq req) {
+        String productId = req.getProductId();
+        DesignerCreateReq designer = req.getDesigner();
+
         // ObjectId：MongoDB 的主键类型，将字符串形式的 ID 转换为 MongoDB 的 ObjectId 类型
         // Criteria（条件）：构建具体的查询条件，支持链式 API 来构建复杂的查询条件
         // - Criteria.where("_id").is(new ObjectId(productId))：指定查询条件为 _id 等于 productId
         // Query：封装查询条件为查询对象，类似 SQL 的 WHERE 子句
-        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)));
+        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0));
 
         // Update：构建更新规则，类似于 SQL 的 SET 子句
         // - new Update()：创建一个更新对象
@@ -131,9 +132,12 @@ public class ProductServiceImpl implements ProductService {
      * 场景 2：从数组删除元素
      * 例如：删除名字为"${designerName}"的设计师（实际开发中可根据 designerId 来删，我们这里的 demo 里没有 id 字段，所以就用 name 了）
      */
-    public void removeDesigner(String productId, String designerName) throws ServiceException {
+    public void removeDesigner(ProductDesignerRemoveReq req) throws ServiceException {
+        String productId = req.getProductId();
+        String designerName = req.getDesignerName();
+
         // 找到要更新的那条数据
-        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)));
+        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0));
         // 从数组里删除名字为"$designerName"的元素
         Update update = new Update().pull("designerList", Query.query(Criteria.where("name").is(designerName)));
         // 执行更新操作
@@ -153,9 +157,13 @@ public class ProductServiceImpl implements ProductService {
      * 例如：更新名字为"${designerName}"的设计师的年龄（实际开发中可根据 designerId 来更新，我们这里的 demo 里没有 id 字段，所以就用 name 了）
      * 注意：$ 操作符只会更新第一个匹配的元素
      */
-    public void updateDesigner(String productId, String designerName, Designer designer) throws ServiceException {
+    public void updateDesigner(ProductDesignerUpdateReq req) throws ServiceException {
+        String productId = req.getProductId();
+        String designerName = req.getDesignerName();
+        DesignerUpdateReq designer = req.getDesigner();
+
         // 找到要更新的那条数据
-        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId))
+        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0)
                 .and("designerList.name").is(designerName));
         // 更新数组中符合条件的元素
         // 更新下客户端传过来的字段，所以这里要判断掉 Designer 里的所有可更新字段

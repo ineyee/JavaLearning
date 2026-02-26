@@ -51,22 +51,22 @@ public class ProductController {
 
     @PostMapping("/addDesigner")
     @Operation(summary = "添加设计师")
-    public HttpResult<Void> addDesigner(@Valid @RequestBody ProductAddDesignerReq req) throws ServiceException {
-        productService.addDesigner(req.getProductId(), req.getDesigner());
+    public HttpResult<Void> addDesigner(@Valid @RequestBody ProductDesignerCreateReq req) throws ServiceException {
+        productService.addDesigner(req);
         return HttpResult.ok();
     }
 
     @PostMapping("/removeDesigner")
     @Operation(summary = "删除设计师")
-    public HttpResult<Void> removeDesigner(@Valid @RequestBody ProductRemoveDesignerReq req) throws ServiceException {
-        productService.removeDesigner(req.getProductId(), req.getDesignerName());
+    public HttpResult<Void> removeDesigner(@Valid @RequestBody ProductDesignerRemoveReq req) throws ServiceException {
+        productService.removeDesigner(req);
         return HttpResult.ok();
     }
 
-    @PostMapping("/updateDesignerAge")
+    @PostMapping("/updateDesigner")
     @Operation(summary = "更新设计师")
-    public HttpResult<Void> updateDesigner(@Valid @RequestBody ProductUpdateDesignerReq req) throws ServiceException {
-        productService.updateDesigner(req.getProductId(), req.getDesignerName(), req.getDesigner());
+    public HttpResult<Void> updateDesigner(@Valid @RequestBody ProductDesignerUpdateReq req) throws ServiceException {
+        productService.updateDesigner(req);
         return HttpResult.ok();
     }
 }
