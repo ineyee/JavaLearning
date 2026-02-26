@@ -27,7 +27,7 @@ public class ProductUpdateReq {
     @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String name;
     @Schema(description = "产品描述", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String description;
+    private String desc;
     @Schema(description = "产品价格", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private BigDecimal price;
     @Schema(description = "设计师列表", requiredMode = Schema.RequiredMode.NOT_REQUIRED)

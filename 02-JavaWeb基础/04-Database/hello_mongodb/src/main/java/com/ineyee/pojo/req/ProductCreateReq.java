@@ -30,7 +30,7 @@ public class ProductCreateReq {
     private String name;
     @Length(min = 0, max = 10, message = "description 字段长度必须在 0 ~ 10 之间")
     @Schema(description = "产品描述", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String description;
+    private String desc;
     @NotNull(message = "price 字段不能为空")
     @Schema(description = "产品价格", requiredMode = Schema.RequiredMode.REQUIRED)
     private BigDecimal price;

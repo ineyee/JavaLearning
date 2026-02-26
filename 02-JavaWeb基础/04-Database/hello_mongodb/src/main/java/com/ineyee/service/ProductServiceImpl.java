@@ -5,6 +5,7 @@ import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
+import com.ineyee.pojo.req.ProductCreateReq;
 import com.ineyee.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailDto get(ProductGetQuery query) throws ServiceException {
         // 这里调用 MongoDB 在 repository 层提供的 findById 方法
         Optional<Product> product = productRepository.findById(query.getId());
+        // 查询出来时，手动判断下是否软删除
         if (product.isEmpty() || product.get().getDeleted() == 1) {
             // 如果数据库执行 MQL 时发生了异常，就会抛出系统异常，根本执行不到这里
             // 能执行到这里就代表数据库里肯定没有这条数据，抛个业务异常
@@ -27,5 +29,20 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return ProductDetailDto.from(product.get());
+    }
+
+    @Override
+    public String save(ProductCreateReq req) throws ServiceException {
+        Product product = new Product();
+        product.setName(req.getName());
+        product.setDesc(req.getDesc());
+        product.setPrice(req.getPrice());
+        product.setDesignerList(req.getDesignerList());
+        // 新增数据时，手动设置下软删除字段的初始值
+        product.setDeleted(0);
+
+        // 这里调用 MongoDB 在 repository 层提供的 insert 方法
+        Product savedProduct = productRepository.insert(product);
+        return savedProduct.getId();
     }
 }

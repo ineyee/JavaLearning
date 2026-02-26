@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Document(collection = "product") // 指定数据库里对应的集合名称，一个集合对应一个 po
+@Document(collection = "product") // 指定数据库里对应的集合名称
 public class Product {
     @Id // 用 Id 注解，指定该属性在数据库里对应的字段名为 _id
     private String id;

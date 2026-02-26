@@ -58,17 +58,17 @@
 # application.yml
 
 spring:
-    profiles:
-      # 通过子配置文件名来"引入、激活"子配置文件，这里是个数组
-      # 开发环境用 dev，生产环境用 prd
-      active:
-        - dev
-    mvc:
-      servlet:
-        # DispatcherServlet 的加载时机：默认是 -1（延迟加载，第一次请求接口时才初始化）
-        # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
-        load-on-startup: 0
-        
+  profiles:
+    # 通过子配置文件名来"引入、激活"子配置文件，这里是个数组
+    # 开发环境用 dev，生产环境用 prd
+    active:
+      - dev
+  mvc:
+    servlet:
+      # DispatcherServlet 的加载时机：默认是 -1（延迟加载，第一次请求接口时才初始化）
+      # 设置为 >=0 表示在项目启动时就初始化 DispatcherServlet，数字越小优先级越高
+      load-on-startup: 0
+
 # MyBatisPlus 相关配置（MyBatis 相关配置转交给了 MyBatisPlus）
 myBatis-plus:
   configuration:
@@ -91,11 +91,19 @@ myBatis-plus:
       logic-delete-field: deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+# Swagger 相关配置，配置 swagger 框架的行为
+springdoc:
+  # 只扫描这些包下的接口
+  packages-to-scan: com.ineyee.controller
 ```
 
 ```yaml
 # application-dev.yml
 
+# 服务器相关配置（SpringBoot 内置的 Web 容器 Tomcat）
+# 假设在开发环境下端口号是 9999，Application Context Path 是 /tp-dev
+server:
   # 监听的端口，默认是 8080
   port: 9999
   # Application Context Path，默认是 /，注意前面的 / 不能少，这个应用上下文就是 Tomcat 用来查找对应的项目的
@@ -339,13 +347,57 @@ cors:
 </dependency>
 ```
 
-#### 2、MongoDB 相关依赖
+#### 2、MyBatis、Spring 整合 MyBatis 相关依赖
+
+* （必选）mybatis-spring-boot-starter
 
 ```xml
-<!-- MongoDB 相关依赖 -->
+<!--
+    添加一个 mybatis-spring-boot-starter 依赖，需要指定版本号，因为 mybatis-spring-boot-starter 是 MyBatis 官方提供的 starter，不是 SpringBoot 官方提供的 starter，所以 spring-boot-starter-parent 不会帮我们管理它的版本
+    这个库里已经帮我们添加了 MyBatis、Spring 整合 MyBatis 常用的依赖，就不用我们自己手动添加一大堆依赖了
+
+    mybatis
+    mybatis-spring
+    spring-jdbc
+-->
 <dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-starter-data-mongodb</artifactId>
+    <groupId>org.mybatis.spring.boot</groupId>
+    <artifactId>mybatis-spring-boot-starter</artifactId>
+    <version>3.0.5</version>
+</dependency>
+```
+
+* （必选）然后我们知道 MyBatis 对应的是之前的 JDBC API，所以我们还需要安装数据库驱动、连接池
+
+```xml
+<!-- 可以不指定版本号，因为 MySQL 太常用了、spring-boot-starter-parent 会管理它的版本 -->
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+</dependency>
+<!-- 必须指定版本号，因为它是阿里巴巴的第三方库，SpringBoot 不管理它的版本 -->
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>druid-spring-boot-starter</artifactId>
+    <version>1.2.23</version>
+</dependency>
+```
+
+* （可选）MyBatisPlus 相关的库，单表 CRUD 利器、多表 CRUD 不管
+
+```xml
+<!-- MyBatisPlus -->
+<dependency>
+  <groupId>com.baomidou</groupId>
+  <artifactId>mybatis-plus-boot-starter</artifactId>
+  <version>3.5.15</version>
+  <scope>compile</scope>
+</dependency>
+<!-- MyBatisPlus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
+<dependency>
+  <groupId>com.baomidou</groupId>
+  <artifactId>mybatis-plus-jsqlparser</artifactId>
+  <version>3.5.15</version>
 </dependency>
 ```
 
@@ -369,7 +421,17 @@ cors:
 </dependency>
 ```
 
-## 五、创建项目的入口类和入口方法，跟 pojo、controller、service、repository 目录平级
+#### 4、MongoDB 相关依赖
+
+```xml
+<!-- MongoDB 相关依赖 -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-data-mongodb</artifactId>
+</dependency>
+```
+
+## 五、创建项目的入口类和入口方法，跟 pojo、controller、service、mapper 目录平级
 
 ```java
 @EnableMongoAuditing  // 启用 MongoDB 审计功能，自动维护数据的创建时间和更新时间
@@ -589,36 +651,44 @@ common 目录里的东西基本都是固定的，可以直接拷贝一份到项�
 
 ###### 1.1 响应体模型 po、dto
 
-> MongoDB 里对象可以通过 map 或数组直接嵌套其他对象，其它对象不需要有自己独立的集合
-> MySQL 里对象和其他对象的嵌套关系都是通过多表关联实现的，所以其它对象都需要有自己独立的表
+> 之前使用 MySQL 的时候，我们会为每张表都创建一个对应的 po、po 肯定是某张表在 Java 代码里的投影，所以 po 和表肯定是一对一的。这主要是因为 MySQL 里对象和其它对象的嵌套关系都是通过多表关联实现的，所以其它对象都有自己独立的表
 >
-> 所以在 MySQL 里我们总是为每张表创建一个 po，一个 po 必然对应着一张表
-> 但是在 MongoDB 里我们除了要为每个集合创建一个 po，还得为嵌套对象创建对应的 po，此时嵌套对象 po 是没有对应集合的
+> 但是现在使用 MongoDB 的时候，MongoDB 里的对象可以通过 map 或数组直接嵌套其它对象，其它对象不需要有自己独立的集合，所以我们同样会为每个集合都创建一个对应的 po、并且还得为嵌套对象创建对应的 po，所以 po 和集合就不是一对一了，po 数会多于集合数，即一个集合肯定对应着一个 po、但一个 po 不一定有对应的集合
 
 我们会固定为每个集合生成一个 po，以及 po 对应的 detailDto、listDto，当然后续可以根据业务需要自行创建更多的业务 dto，因为**我们响应给客户端的模型起码得是 dto 起步、最好不要直接返回 po，返回 dto 方便以后扩展**：
 
-- Product 这个 po 是对数据库表字段的映射、里面的代码就是完整的。**自动生成后可以不用动**
-- ProductDetailDto 这个 dto 默认是把 po 里的字段全都拿过来了，供 get 详情接口的返回值使用，所以字段应该尽可能地全。**自动生成后要去改改，根据实际情况删掉不应该返回给客户端的敏感字段、比如 deleted 软删除字段，这里单表 po 到 detailDto 的转换是在 service 层完成的（后面多表 po 到 detailDto 的转换也是在 service 层完成的）**
-- ProductListDto 这个 dto 默认一个字段也没有，供 list 列表接口返回值使用，所以字段应该尽可能地少。**自动生成后要去改改，根据实际情况从 po 里筛选需要的字段加进来，这里单表 po 到 listDto 的转换是在 service 层完成的（后面多表 po 到 listDto 的转换则是在 mapper 层完成的）**
+- Product 这个 po 是对数据库表字段的映射
+- ProductDetailDto 这个 dto 默认是把 po 里的字段全都拿过来了，供 get 详情接口的返回值使用，所以字段应该尽可能地全。**根据实际情况删掉不应该返回给客户端的敏感字段、比如 deleted 软删除字段，这里 po 到 detailDto 的转换是在 service 层完成的**
+- ProductListDto 这个 dto 默认一个字段也没有，供 list 列表接口返回值使用，所以字段应该尽可能地少。**根据实际情况从 po 里筛选需要的字段加进来，这里 po 到 listDto 的转换是在 service 层完成的**
 
 ###### 1.2 请求参数模型 query、req
 
 我们会固定为 get 接口、list 接口、save 接口、saveBatch 接口、remove 接口、removeBatch 接口、update 接口、updateBatch 接口创建对应的请求参数模型，当然后续可以根据接口需要自行创建更多的请求参数模型：
 
-- ProductGetQuery 这个 query 默认只有一个必选参数 id，代表通过 id 查询详情。**自动生成后可以不用动**
-- ProductListQuery 这个 query 默认有分页查询参数、模糊搜索参数，但都是可选参数。**自动生成后可以根据实际情况去添加各种业务上的查询参数**
-- ProductCreateReq 这个 req 默认是把 po 里能自动填充（id、create_time、update_time、deleted）以外的所有字段全都拿过来了。**自动生成后可以根据实际情况去修改，并添加字段是否必传的注解**
-- ProductCreateBatchReq 这个 req 默认是 ProductCreateReq 的数组，必选参数。**自动生成后可以不用动，只需要维护好 ProductCreateReq 的字段即可**
-- ProductDeleteReq 这个 req 默认只有一个必选参数 id，代表通过 id 删除。**自动生成后可以不用动**
-- ProductDeleteBatchReq 这个 req 默认是 ProductDeleteReq 的数组，必选参数。**自动生成后可以不用动，只需要维护好 ProductDeleteReq 的字段即可**
-- ProductUpdateReq 这个 req 默认是把 po 里能自动填充（id、create_time、update_time、deleted）以外的所有字段全都拿过来了 + 一个必选参数 id。**自动生成后可以根据实际情况去修改，并添加字段是否必传的注解**
-- ProductUpdateBatchReq 这个 req 默认是 ProductUpdateReq 的数组，必选参数。**自动生成后可以不用动，只需要维护好 ProductUpdateReq 的字段即可**
+- ProductGetQuery 这个 query 默认只有一个必选参数 id，代表通过 id 查询详情
+- ProductListQuery 这个 query 默认有分页查询参数、模糊搜索参数，但都是可选参数。**可以根据实际情况去添加各种业务上的查询参数**
+- ProductCreateReq 这个 req 默认是把 po 里能自动填充（id、create_time、update_time、deleted）以外的所有字段全都拿过来了。**可以根据实际情况去修改，并添加字段是否必传的注解**
+- ProductCreateBatchReq 这个 req 默认是 ProductCreateReq 的数组，必选参数。**可以不用动，只需要维护好 ProductCreateReq 的字段即可**
+- ProductDeleteReq 这个 req 默认只有一个必选参数 id，代表通过 id 删除
+- ProductDeleteBatchReq 这个 req 默认是 ProductDeleteReq 的数组，必选参数。**可以不用动，只需要维护好 ProductDeleteReq 的字段即可**
+- ProductUpdateReq 这个 req 默认是把 po 里能自动填充（id、create_time、update_time、deleted）以外的所有字段全都拿过来了 + 一个必选参数 id。**可以根据实际情况去修改，并添加字段是否必传的注解**
+- ProductUpdateBatchReq 这个 req 默认是 ProductUpdateReq 的数组，必选参数。**可以不用动，只需要维护好 ProductUpdateReq 的字段即可**
 
 #### 2、数据层 repository
 
 spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 MyBatisPlus 的 BaseMapper 接口，提供了【增删改 + 基本查】方法来访问 MongoDB 数据库。所以除非有聚合查的 xxx，否则就用提供的方法来访问数据库。
 
 #### 3、业务层 service
+
+自动注入 repository 对象，调用 repository 层的 api 即可。
+
+#### 4、表现层之控制器层 controller
+
+自动注入 service 对象，调用 service 层的 api 即可。
+
+
+
+
 
 
 
@@ -736,18 +806,6 @@ spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 My
       }
 
       @Override
-      public String save(UserCreateReq req) throws ServiceException {
-          User user = new User();
-          BeanUtils.copyProperties(req, user);
-          user.setCreateTime(LocalDateTime.now());
-          user.setUpdateTime(LocalDateTime.now());
-          user.setDeleted(false);
-
-          User savedUser = userRepository.save(user);
-          return savedUser.getId();
-      }
-
-      @Override
       public void remove(String id) throws ServiceException {
           if (!userRepository.existsById(id)) {
               throw new ServiceException(CommonServiceError.REQUEST_ERROR);
@@ -799,22 +857,10 @@ spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 My
       @Autowired
       private UserService userService;
 
-      @GetMapping("/get")
-      public HttpResult<UserDetailDto> get(@Valid UserGetQuery query) throws ServiceException {
-          UserDetailDto data = userService.get(query);
-          return HttpResult.ok(data);
-      }
-
       @GetMapping("/list")
       public HttpResult<ListData<UserListDto>> list(@Valid UserListQuery query) {
           ListData<UserListDto> dataList = userService.list(query);
           return HttpResult.ok(dataList);
-      }
-
-      @PostMapping("/save")
-      public HttpResult<String> save(@Valid @RequestBody UserCreateReq req) throws ServiceException {
-          String id = userService.save(req);
-          return HttpResult.ok(id);
       }
 
       @PostMapping("/remove")
