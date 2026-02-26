@@ -99,9 +99,12 @@ public class ProductServiceImpl implements ProductService {
      * 场景 1：向数组添加元素
      * 例如：添加一个新设计师
      */
-    public void addDesigner(ProductDesignerCreateReq req) {
+    public void addDesigner(DesignerCreateReq req) {
         String productId = req.getProductId();
-        DesignerCreateReq designer = req.getDesigner();
+        Designer designer = new Designer();
+        designer.setName(req.getName());
+        designer.setAge(req.getAge());
+        designer.setSex(req.getSex());
 
         // ObjectId：MongoDB 的主键类型，将字符串形式的 ID 转换为 MongoDB 的 ObjectId 类型
         // Criteria（条件）：构建具体的查询条件，支持链式 API 来构建复杂的查询条件
@@ -132,7 +135,7 @@ public class ProductServiceImpl implements ProductService {
      * 场景 2：从数组删除元素
      * 例如：删除名字为"${designerName}"的设计师（实际开发中可根据 designerId 来删，我们这里的 demo 里没有 id 字段，所以就用 name 了）
      */
-    public void removeDesigner(ProductDesignerRemoveReq req) throws ServiceException {
+    public void removeDesigner(DesignerRemoveReq req) throws ServiceException {
         String productId = req.getProductId();
         String designerName = req.getDesignerName();
 
@@ -157,10 +160,12 @@ public class ProductServiceImpl implements ProductService {
      * 例如：更新名字为"${designerName}"的设计师的年龄（实际开发中可根据 designerId 来更新，我们这里的 demo 里没有 id 字段，所以就用 name 了）
      * 注意：$ 操作符只会更新第一个匹配的元素
      */
-    public void updateDesigner(ProductDesignerUpdateReq req) throws ServiceException {
+    public void updateDesigner(DesignerUpdateReq req) throws ServiceException {
         String productId = req.getProductId();
         String designerName = req.getDesignerName();
-        DesignerUpdateReq designer = req.getDesigner();
+        Designer designer = new Designer();
+        if (req.getAge() != null) designer.setAge(req.getAge());
+        if (req.getSex() != null) designer.setSex(req.getSex());
 
         // 找到要更新的那条数据
         Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0)

@@ -51,21 +51,21 @@ public class ProductController {
 
     @PostMapping("/addDesigner")
     @Operation(summary = "添加设计师")
-    public HttpResult<Void> addDesigner(@Valid @RequestBody ProductDesignerCreateReq req) throws ServiceException {
+    public HttpResult<Void> addDesigner(@Valid @RequestBody DesignerCreateReq req) throws ServiceException {
         productService.addDesigner(req);
         return HttpResult.ok();
     }
 
     @PostMapping("/removeDesigner")
     @Operation(summary = "删除设计师")
-    public HttpResult<Void> removeDesigner(@Valid @RequestBody ProductDesignerRemoveReq req) throws ServiceException {
+    public HttpResult<Void> removeDesigner(@Valid @RequestBody DesignerRemoveReq req) throws ServiceException {
         productService.removeDesigner(req);
         return HttpResult.ok();
     }
 
     @PostMapping("/updateDesigner")
     @Operation(summary = "更新设计师")
-    public HttpResult<Void> updateDesigner(@Valid @RequestBody ProductDesignerUpdateReq req) throws ServiceException {
+    public HttpResult<Void> updateDesigner(@Valid @RequestBody DesignerUpdateReq req) throws ServiceException {
         productService.updateDesigner(req);
         return HttpResult.ok();
     }

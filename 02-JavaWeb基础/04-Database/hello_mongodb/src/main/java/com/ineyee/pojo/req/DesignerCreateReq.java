@@ -6,6 +6,10 @@ import lombok.Data;
 
 @Data
 public class DesignerCreateReq {
+    @NotBlank(message = "productId 字段不能为空")
+    @Schema(description = "产品 id", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String productId;
+
     @NotBlank(message = "name 字段不能为空")
     @Schema(description = "设计师名称", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;

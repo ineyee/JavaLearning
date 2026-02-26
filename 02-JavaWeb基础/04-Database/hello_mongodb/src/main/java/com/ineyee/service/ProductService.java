@@ -1,15 +1,9 @@
 package com.ineyee.service;
 
-import com.ineyee.common.api.ListData;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
-import com.ineyee.pojo.dto.ProductListDto;
-import com.ineyee.pojo.po.Designer;
 import com.ineyee.pojo.query.ProductGetQuery;
-import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
-
-import java.util.List;
 
 public interface ProductService {
     /**
@@ -59,9 +53,9 @@ public interface ProductService {
     void update(ProductUpdateReq req) throws ServiceException;
 
     // 嵌套的设计师操作
-    void addDesigner(ProductDesignerCreateReq req) throws ServiceException;
+    void addDesigner(DesignerCreateReq req) throws ServiceException;
 
-    void removeDesigner(ProductDesignerRemoveReq req) throws ServiceException;
+    void removeDesigner(DesignerRemoveReq req) throws ServiceException;
 
-    void updateDesigner(ProductDesignerUpdateReq req) throws ServiceException;
+    void updateDesigner(DesignerUpdateReq req) throws ServiceException;
 }
