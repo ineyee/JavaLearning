@@ -1,5 +1,3 @@
-# application.yml
-
 spring:
   profiles:
     # 通过子配置文件名来"引入、激活"子配置文件，这里是个数组

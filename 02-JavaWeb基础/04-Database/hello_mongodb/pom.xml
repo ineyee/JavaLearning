@@ -1,21 +1,194 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.ineyee</groupId>
-  <artifactId>hello_mongodb</artifactId>
-  <packaging>war</packaging>
-  <version>1.0.0</version>
-  <name>hello_mongodb Maven Webapp</name>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <finalName>hello_mongodb</finalName>
-  </build>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+        声明 pom.xml 文件的版本，就像 .html 文件里声明是 H5 那样，决定了该文件里能写什么标签不能写什么标签
+        目前都使用 4.0.0，是必要元素
+    -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        groupId：com.ineyee，公司域名倒写，我们创建项目时填写的
+        artifactId：默认就是项目名，我们创建项目时填写的
+        version：1.0.0，项目版本号，我们创建项目时填写的
+    -->
+    <groupId>com.ineyee</groupId>
+    <artifactId>hello_mongodb</artifactId>
+    <version>1.0.0</version>
+
+    <!--
+        添加 parent 标签，让当前项目继承自 spring-boot-starter-parent 项目
+        这个项目里已经帮我们锁定了一堆常用三方库的版本，从而避免开发中依赖间的版本冲突
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+    </parent>
+
+    <!-- 所有的依赖 -->
+    <dependencies>
+        <!--
+            添加一个 spring-boot-devtools 依赖，不用指定版本号，因为上面 spring-boot-starter-parent 项目里已经帮我们锁定好了
+            这个库里已经帮我们添加了热部署功能，debug 模式下，它会监控 classpath 里字节码的变化（不是 target 里的），完成热部署
+            也就是说，开发过程中，我们修改了代码，只需要重新 build 构建下项目，classpath 里字节码就会发生变化（不是 target 里的，所以只能用 IDEA 自带的 build，不能用 maven 的），就能完成热部署了，不用重新运行项目
+
+            热部署 = 修改代码 + [fn cmd f9] 构建项目 + 查看效果
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+
+        <!--
+            属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
+            在编译期间帮助生成 setter、getter、toString 等代码
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <!--
+            属性绑定相关依赖：把 yml 配置文件里属性的值一次性注入到某个对象的属性上去
+            在 application-*.yml 配置文件里编写属性名时能提示
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+
+        <!--
+            添加一个 spring-boot-starter-web 依赖，不用指定版本号，因为上面 spring-boot-starter-parent 项目里已经帮我们锁定好了
+            这个库里已经帮我们添加了 Spring、SpringMVC 常用的依赖，还有 Tomcat 和日志打印相关依赖，就不用我们自己手动添加一大堆依赖了
+
+            spring-context
+            spring-webmvc
+            spring-boot-starter-tomcat、jakarta.servlet-api
+            jackson-databind
+            logback-classic
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!--
+            spring-boot-starter-aop
+                aspectj
+                aspectjweaver
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <!--
+            spring-boot-starter-validation
+                jakarta.validation-api 是接口库
+                hibernate-validator 是实现库
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- MongoDB 相关依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
+        <!--
+            添加一个 mybatis-spring-boot-starter 依赖，需要指定版本号，因为 mybatis-spring-boot-starter 是 MyBatis 官方提供的 starter，不是 SpringBoot 官方提供的 starter，所以 spring-boot-starter-parent 不会帮我们管理它的版本
+            这个库里已经帮我们添加了 MyBatis、Spring 整合 MyBatis 常用的依赖，就不用我们自己手动添加一大堆依赖了
+
+            mybatis
+            mybatis-spring
+            spring-jdbc
+        -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>3.0.5</version>
+        </dependency>
+
+        <!-- 可以不指定版本号，因为 MySQL 太常用了、spring-boot-starter-parent 会管理它的版本 -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+        <!-- 必须指定版本号，因为它是阿里巴巴的第三方库，SpringBoot 不管理它的版本 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.23</version>
+        </dependency>
+
+        <!-- MyBatisPlus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.15</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- MyBatisPlus JSqlParser 依赖，3.5.9+ 版本需要单独引入才能使用分页插件 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+            <version>3.5.15</version>
+        </dependency>
+
+        <!--
+            单元测试：
+            JUnit Jupiter（JUnit 5）
+            Mockito（Mock 框架）
+            AssertJ（断言库）
+            Hamcrest（匹配器）
+            Spring Test（Spring 测试支持）
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- swagger 依赖 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.5.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- 属性信息 -->
+    <properties>
+        <!-- 告诉 Maven 编译、打包源码时使用 UTF-8，避免有些环境（如 Windows 服务器）使用系统默认的 GBK、ISO-8859-1 编码 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 告诉 Maven 编译器插件，把源码编译成兼容 JDK8 的字节码文件 -->
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <!-- 构建信息，比如输出产物的名字、插件配置等 -->
+    <build>
+        <!-- 输出产物的名字 -->
+        <finalName>hmd</finalName>
+        <!-- 插件配置 -->
+        <plugins>
+            <!-- 开发结束后把项目打包成 runnable jar 的插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!--
+        打包方式，比如 jar、war 等
+        如果不写这个标签，默认是打包成 jar
+        之前没用 SpringBoot 的时候，需要打包成 war，然后部署在 Tomcat 上运行
+        现在用了 SpringBoot，内置了 Tomcat，可以直接打包成 runnable jar 运行
+    -->
+    <packaging>jar</packaging>
 </project>
