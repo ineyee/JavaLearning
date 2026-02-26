@@ -5,6 +5,7 @@ import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.req.ProductCreateReq;
+import com.ineyee.pojo.req.ProductDeleteReq;
 import com.ineyee.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,5 +34,12 @@ public class ProductController {
     public HttpResult<String> save(@Valid @RequestBody ProductCreateReq req) throws ServiceException {
         String id = productService.save(req);
         return HttpResult.ok(id);
+    }
+
+    @PostMapping("/remove")
+    @Operation(summary = "删除产品")
+    public HttpResult<Void> remove(@Valid @RequestBody ProductDeleteReq req) throws ServiceException {
+        productService.remove(req);
+        return HttpResult.ok();
     }
 }

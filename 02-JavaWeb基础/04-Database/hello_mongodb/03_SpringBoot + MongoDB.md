@@ -759,15 +759,6 @@ spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 My
       private MongoTemplate mongoTemplate;  // 用于复杂查询
 
       @Override
-      public UserDetailDto get(UserGetQuery query) throws ServiceException {
-          Optional<User> userOpt = userRepository.findById(query.getId());
-          if (userOpt.isEmpty()) {
-              throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-          }
-          return UserDetailDto.from(userOpt.get());
-      }
-
-      @Override
       public ListData<UserListDto> list(UserListQuery query) {
           // 构建查询条件
           Query mongoQuery = new Query();
@@ -803,14 +794,6 @@ spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 My
               List<UserListDto> dtoList = users.stream().map(UserListDto::from).toList();
               return ListData.fromList(dtoList);
           }
-      }
-
-      @Override
-      public void remove(String id) throws ServiceException {
-          if (!userRepository.existsById(id)) {
-              throw new ServiceException(CommonServiceError.REQUEST_ERROR);
-          }
-          userRepository.deleteById(id);
       }
 
       @Override
@@ -861,12 +844,6 @@ spring-boot-starter-data-mongodb 提供了 MongoRepository 接口，类似于 My
       public HttpResult<ListData<UserListDto>> list(@Valid UserListQuery query) {
           ListData<UserListDto> dataList = userService.list(query);
           return HttpResult.ok(dataList);
-      }
-
-      @PostMapping("/remove")
-      public HttpResult<Void> remove(@RequestParam String id) throws ServiceException {
-          userService.remove(id);
-          return HttpResult.ok();
       }
 
       @PostMapping("/update")

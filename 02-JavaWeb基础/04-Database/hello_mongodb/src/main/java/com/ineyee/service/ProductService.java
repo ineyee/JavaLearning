@@ -34,4 +34,15 @@ public interface ProductService {
      * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
     String save(ProductCreateReq req) throws ServiceException;
+
+    /**
+     * 单个删除
+     *
+     * @param req 请求参数模型
+     * @return void
+     * ① 删除成功时，该方法才会正常结束
+     * ② 删除失败时，该方法直接抛业务异常
+     * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     */
+    void remove(ProductDeleteReq req) throws ServiceException;
 }
