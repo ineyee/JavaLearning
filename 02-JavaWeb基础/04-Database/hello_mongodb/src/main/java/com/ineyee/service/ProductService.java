@@ -4,6 +4,7 @@ import com.ineyee.common.api.ListData;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.dto.ProductListDto;
+import com.ineyee.pojo.po.Designer;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
@@ -45,4 +46,22 @@ public interface ProductService {
      * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
      */
     void remove(ProductDeleteReq req) throws ServiceException;
+
+    /**
+     * 单个更新
+     *
+     * @param req 请求参数模型
+     * @return void
+     * ① 更新成功时，该方法才会正常结束
+     * ② 更新失败时，该方法直接抛业务异常
+     * @throws ServiceException 业务层不负责处理异常，往上抛即可，最终会抛到 controller 层统一处理异常
+     */
+    void update(ProductUpdateReq req) throws ServiceException;
+
+    // 嵌套的设计师操作
+    void addDesigner(String productId, Designer designer) throws ServiceException;
+
+    void removeDesigner(String productId, String designerName) throws ServiceException;
+
+    void updateDesigner(String productId, String designerName, Designer designer) throws ServiceException;
 }

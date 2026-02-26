@@ -4,8 +4,7 @@ import com.ineyee.common.api.HttpResult;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.query.ProductGetQuery;
-import com.ineyee.pojo.req.ProductCreateReq;
-import com.ineyee.pojo.req.ProductDeleteReq;
+import com.ineyee.pojo.req.*;
 import com.ineyee.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,6 +39,34 @@ public class ProductController {
     @Operation(summary = "删除产品")
     public HttpResult<Void> remove(@Valid @RequestBody ProductDeleteReq req) throws ServiceException {
         productService.remove(req);
+        return HttpResult.ok();
+    }
+
+    @PostMapping("/update")
+    @Operation(summary = "更新产品")
+    public HttpResult<Void> update(@Valid @RequestBody ProductUpdateReq req) throws ServiceException {
+        productService.update(req);
+        return HttpResult.ok();
+    }
+
+    @PostMapping("/addDesigner")
+    @Operation(summary = "添加设计师")
+    public HttpResult<Void> addDesigner(@Valid @RequestBody ProductAddDesignerReq req) throws ServiceException {
+        productService.addDesigner(req.getProductId(), req.getDesigner());
+        return HttpResult.ok();
+    }
+
+    @PostMapping("/removeDesigner")
+    @Operation(summary = "删除设计师")
+    public HttpResult<Void> removeDesigner(@Valid @RequestBody ProductRemoveDesignerReq req) throws ServiceException {
+        productService.removeDesigner(req.getProductId(), req.getDesignerName());
+        return HttpResult.ok();
+    }
+
+    @PostMapping("/updateDesignerAge")
+    @Operation(summary = "更新设计师")
+    public HttpResult<Void> updateDesigner(@Valid @RequestBody ProductUpdateDesignerReq req) throws ServiceException {
+        productService.updateDesigner(req.getProductId(), req.getDesignerName(), req.getDesigner());
         return HttpResult.ok();
     }
 }

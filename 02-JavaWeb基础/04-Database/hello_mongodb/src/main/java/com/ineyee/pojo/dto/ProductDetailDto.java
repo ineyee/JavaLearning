@@ -1,5 +1,6 @@
 package com.ineyee.pojo.dto;
 
+import com.ineyee.pojo.po.Designer;
 import com.ineyee.pojo.po.Product;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class ProductDetailDto {
@@ -22,6 +24,8 @@ public class ProductDetailDto {
     private String desc;
     @Schema(description = "产品价格")
     private BigDecimal price;
+    @Schema(description = "产品设计师列表")
+    private List<Designer> designerList;
 
     public static ProductDetailDto from(Product productPo) {
         ProductDetailDto dto = new ProductDetailDto();
