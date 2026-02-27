@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @Document(collection = "product") // 指定数据库里对应的集合名称
 public class Product {
-    @Id // 用 Id 注解，指定该属性在数据库里对应的字段名为 _id
+    @Id // 用 Id 注解，指定该属性在数据库里对应的字段名为 _id。这里用 String 类型方便处理，而不用数据库里的 ObjectID 类型，会自动完成 ObjectID 到 String 的转换
     private String id;
     @CreatedDate // 自动维护创建时间
     @Field("create_time") // 用 Field 注解，指定该属性在数据库里对应的字段名，默认就是属性名，相同的话可以省略。MongoDB 不会自动下划线转驼峰

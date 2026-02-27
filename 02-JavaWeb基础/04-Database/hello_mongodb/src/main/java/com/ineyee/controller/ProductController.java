@@ -5,13 +5,11 @@ import com.ineyee.common.api.ListData;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.dto.ProductListDto;
-import com.ineyee.pojo.po.Product;
 import com.ineyee.pojo.query.ProductGetQuery;
 import com.ineyee.pojo.query.ProductListQuery;
 import com.ineyee.pojo.req.*;
 import com.ineyee.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -63,9 +61,9 @@ public class ProductController {
 
     @PostMapping("/addDesigner")
     @Operation(summary = "添加设计师")
-    public HttpResult<Void> addDesigner(@Valid @RequestBody DesignerCreateReq req) throws ServiceException {
-        productService.addDesigner(req);
-        return HttpResult.ok();
+    public HttpResult<String> addDesigner(@Valid @RequestBody DesignerCreateReq req) throws ServiceException {
+        String name = productService.addDesigner(req);
+        return HttpResult.ok(name);
     }
 
     @PostMapping("/removeDesigner")

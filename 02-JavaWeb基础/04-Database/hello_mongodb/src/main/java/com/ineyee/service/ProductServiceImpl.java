@@ -1,6 +1,7 @@
 package com.ineyee.service;
 
 import com.ineyee.common.api.ListData;
+import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.error.ProductServiceError;
 import com.ineyee.common.api.exception.ServiceException;
 import com.ineyee.pojo.dto.ProductDetailDto;
@@ -53,13 +54,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ListData<ProductListDto> list(ProductListQuery query) {
-        // 构建查询条件
+        // 封装查询对象
         Query mongoQuery = new Query();
 
-        // 过滤软删除的数据
+        // 只查询出没有被软删除的数据
         mongoQuery.addCriteria(Criteria.where("deleted").is(0));
 
-        // 自定义参数
+        // 自定义的查询条件，这里是价格
         Criteria priceCriteria = Criteria.where("price");
         boolean hasPriceCondition = false;
         if (query.getMinPrice() != null) {
@@ -74,17 +75,17 @@ public class ProductServiceImpl implements ProductService {
             mongoQuery.addCriteria(priceCriteria);
         }
 
-        // 排序：先按价格降序排序，如果价格相同、再按 _id 升序排序
+        // 排序条件：先按价格降序排序，如果价格相同、再按 _id 升序排序
         mongoQuery.with(Sort.by(Sort.Direction.DESC, "price").and(Sort.by(Sort.Direction.ASC, "_id")));
 
-        // 有模糊搜索参数
+        // 有模糊搜索参数条件
         if (query.getKeyword() != null && !query.getKeyword().isEmpty()) {
             // 在 name 字段中模糊搜索
             mongoQuery.addCriteria(Criteria.where("name").regex(query.getKeyword(), "i"));
         }
 
-        // 分页查询
         if (query.getPageNum() != null && query.getPageSize() != null) {
+            // 分页查询
             Pageable pageable = PageRequest.of(
                     query.getPageNum().intValue() - 1,  // MongoDB 页码从 0 开始
                     query.getPageSize().intValue()
@@ -99,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
 
             return ListData.fromPageMongoDB(dtoPage);
         } else {
+            // 非分页查询
             List<Product> products = mongoTemplate.find(mongoQuery, Product.class);
             List<ProductListDto> dtoList = products.stream().map(ProductListDto::from).toList();
             return ListData.fromList(dtoList);
@@ -156,13 +158,16 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
-    // ========== 以下是使用 MongoTemplate 精确操作数组元素的方法（增删改数组里的元素对于产品来说都是更新它的数组字段） ==========
+    // ====================
+    // 以下是使用 MongoTemplate 精确操作数组元素的方法（增删改数组里的元素对于产品来说都是更新它的数组字段）
+    // 因为 MongoDB 不像 MySQL 那样，Designer 没有自己的单独集合，所以我们不能单独操作 Designer，对 Designer 的操作都得转换成对它父对象 Product 的操作，因此都得传递一个 productId 进来
+    // ====================
 
     /**
      * 场景 1：向数组添加元素
-     * 例如：添加一个新设计师
+     * 例如：添加一个新设计师（实际开发中可可以返回 designerId，我们这里的 demo 里没有 id 字段，所以就用 name 了）
      */
-    public void addDesigner(DesignerCreateReq req) {
+    public String addDesigner(DesignerCreateReq req) throws ServiceException {
         String productId = req.getProductId();
         Designer designer = new Designer();
         designer.setName(req.getName());
@@ -170,14 +175,16 @@ public class ProductServiceImpl implements ProductService {
         designer.setSex(req.getSex());
 
         // ObjectId：MongoDB 的主键类型，将字符串形式的 ID 转换为 MongoDB 的 ObjectId 类型
-        // Criteria（条件）：构建具体的查询条件，支持链式 API 来构建复杂的查询条件
-        // - Criteria.where("_id").is(new ObjectId(productId))：指定查询条件为 _id 等于 productId
-        // Query：封装查询条件为查询对象，类似 SQL 的 WHERE 子句
-        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0));
+        // Criteria（条件）：构建查询条件，支持链式 API 来构建复杂的查询条件，类似于 MyBatisPlus 的 wrapper
+        // - 查询条件为：_id == 0 productId && deleted == 0
+        Criteria criteria = Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0);
+        // Query：把查询条件封装为查询对象，类似于 SQL 的 WHERE 子句
+        Query query = new Query();
+        query.addCriteria(criteria);
 
         // Update：构建更新规则，类似于 SQL 的 SET 子句
         // - new Update()：创建一个更新对象
-        // - addToSet("designerList", newDesigner)：以 addToSet 的方式往 designerList 数组里添加一个元素 designer，也可以使用 push
+        // - addToSet("designerList", designer)：以 addToSet 的方式往 designerList 数组里添加一个元素 designer，也可以使用 push
         Update update = new Update().addToSet("designerList", designer);
 
         // 执行更新操作
@@ -185,11 +192,21 @@ public class ProductServiceImpl implements ProductService {
         // query：按照 query 对象指定的查询条件，找到要更新的那条数据
         // update：按照 update 对象指定的更新规则，更新数据
         // Product.class：告诉 MongoDB 要操作哪个集合
-        mongoTemplate.updateFirst(query, update, Product.class);
+        UpdateResult result = mongoTemplate.updateFirst(query, update, Product.class);
+        // 没有找到任何一条数据，说明产品不存在
+        if (result.getMatchedCount() == 0) {
+            throw new ServiceException(ProductServiceError.PRODUCT_NOT_EXIST);
+        }
+        // 产品存在，但是没有修改任何一条数据，说明添加失败
+        if (result.getModifiedCount() == 0) {
+            throw new ServiceException(CommonServiceError.REQUEST_ERROR);
+        }
+
+        return designer.getName();
 
         // 等价的 MongoDB 更新语句：
         // db.product.updateOne(
-        //   { "_id": ObjectId("699e6aac131e0d5a83054acf") },
+        //   { "_id": ObjectId("699e6aac131e0d5a83054acf"), "deleted": 0 },
         //   { "$addToSet": { "designerList": { "name": "苹果最牛新设计师", "age": 30, "sex": "男" } } }
         // )
     }
@@ -203,9 +220,15 @@ public class ProductServiceImpl implements ProductService {
         String designerName = req.getDesignerName();
 
         // 找到要更新的那条数据
-        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0));
+        // 构建查询条件
+        Criteria criteria = Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0);
+        // 封装查询对象
+        Query query = new Query();
+        query.addCriteria(criteria);
+
         // 从数组里删除名字为"$designerName"的元素
         Update update = new Update().pull("designerList", Query.query(Criteria.where("name").is(designerName)));
+
         // 执行更新操作
         UpdateResult result = mongoTemplate.updateFirst(query, update, Product.class);
         // 没有找到任何一条数据，说明产品不存在
@@ -226,26 +249,29 @@ public class ProductServiceImpl implements ProductService {
     public void updateDesigner(DesignerUpdateReq req) throws ServiceException {
         String productId = req.getProductId();
         String designerName = req.getDesignerName();
-        Designer designer = new Designer();
-        if (req.getAge() != null) designer.setAge(req.getAge());
-        if (req.getSex() != null) designer.setSex(req.getSex());
 
         // 找到要更新的那条数据
-        Query query = new Query(Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0)
-                .and("designerList.name").is(designerName));
+        // 构建查询条件
+        Criteria criteria = Criteria.where("_id").is(new ObjectId(productId)).and("deleted").is(0)
+                .and("designerList.name").is(designerName);
+        // 封装查询对象
+        Query query = new Query();
+        query.addCriteria(criteria);
+
         // 更新数组中符合条件的元素
-        // 更新下客户端传过来的字段，所以这里要判断掉 Designer 里的所有可更新字段
+        // 更新下客户端传过来的字段，所以这里要判断掉 DesignerUpdateReq 里的所有可更新字段
         Update update = new Update();
-        if (designer.getAge() != null) {
-            update.set("designerList.$.age", designer.getAge());
+        if (req.getAge() != null) {
+            update.set("designerList.$.age", req.getAge());
         }
-        if (designer.getSex() != null) {
-            update.set("designerList.$.sex", designer.getSex());
+        if (req.getSex() != null) {
+            update.set("designerList.$.sex", req.getSex());
         }
         if (update.getUpdateObject().isEmpty()) {
             // 没有字段需要更新
             return;
         }
+
         // 执行更新操作
         UpdateResult result = mongoTemplate.updateFirst(query, update, Product.class);
         // 没有找到任何一条数据，说明产品不存在
