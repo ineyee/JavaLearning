@@ -22,6 +22,8 @@ MongoDB Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯
     # -------------------------------
     storage:
       dbPath: /usr/local/mongodb-macos-aarch64--8.2.5/data/db    # 数据库存放路径（生产环境需要修改）
+    #   journal:
+    #     enabled: true # MongoDB 4.0 以后默认就开启了 journal 日志，它用来记录对数据库的操作日志，可以防止宕机时的数据丢失问题
     
     # -------------------------------
     # 2️⃣ 日志相关配置
@@ -79,7 +81,7 @@ MongoDB Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯
       ]
     })
     ```
-    
+  
 * 停止 MongoDB 服务，重新启动 MongoDB 服务
 
 ## 二、本机安装 Navicat
