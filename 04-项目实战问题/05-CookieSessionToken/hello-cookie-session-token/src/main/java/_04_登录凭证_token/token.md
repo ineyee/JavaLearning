@@ -44,26 +44,25 @@
 
 #### 3、分布式部署下的 session 问题
 
-在单机部署的情况下，session 是没有问题的，比如：客户端访问服务器 1 来登录，登录成功后 session 对象就会存储在这台服务器上；客户端下次继续访问服务器 1 来支付、携带了 session，我们可以在当前服务器上获取到对应的 session 对象，可以正常执行后续的操作
+在单机部署的情况下，session 是没有问题的，比如：客户端访问服务器 1 来登录，登录成功后 session 对象就会存储在这台服务器上；客户端下次继续访问服务器 1 来支付、携带了 session，我们可以在当前服务器上获取到对应的 session 对象并验证，session 验证通过后可以正常执行后续的操作
 
-但是在分布式部署的情况下，session 就有问题了，比如：客户端要登录，这一次 Nginx 负载均衡服务器把这个登录请求转发给了服务器 3，那登录成功后 session 对象就会存储在服务器 3 上；客户端下次要支付、携带了 session，这一次 Nginx 负载均衡服务器把这个登录请求转发给了服务器 1，但是服务器 1 上并没有存储刚才的 session 会话对象，于是这个用户会被判定为没有登录，这就出错了
+但是在分布式部署的情况下，session 就有问题了，比如：客户端要登录，这一次 Nginx 负载均衡服务器把这个登录请求转发给了服务器 3，那登录成功后 session 对象就会存储在服务器 3 上；客户端下次要支付、携带了 session，这一次 Nginx 负载均衡服务器把这个支付请求转发给了服务器 1，但是服务器 1 上并没有存储刚才的 session 对象，于是这个用户会被判定为没有登录，这就出错了
 
-因此我们需要处理这个分布式部署下的 session 问题，解决的方案就是：客户端要登录，这一次 Nginx 负载均衡服务器把这个登录请求转发给了服务器 3，那登录成功后 session 对象不存储在服务器 3 上，而是存储在 Redis 分布式缓存服务器上；客户端下次要支付、携带了 session，这一次 Nginx 负载均衡服务器把这个登录请求转发给了服务器 1，但是不要在服务器 1 上获取 session 会话对象，而是去 Redis 分布式缓存服务器上获取，这样一来就能正常获取到了，可以正常执行后续的操作。**Redis session 共享这个方案的确可以解决问题，但是多了一层 Redis 访问、性能下降，系统复杂度也上升了很多，Redis 成了单点、即多个应用服务器都得访问 Redis、一旦 Redis 故障、就算应用服务器都 ok、所有业务也都无法正常运转**
+因此我们需要处理这个分布式部署下的 session 问题，解决的方案就是：客户端要登录，这一次 Nginx 负载均衡服务器把这个登录请求转发给了服务器 3，那登录成功后 session 对象不存储在服务器 3 上，而是存储在 Redis 分布式缓存服务器上；客户端下次要支付、携带了 session，这一次 Nginx 负载均衡服务器把这个支付请求转发给了服务器 1，但是不要在服务器 1 上获取 session 对象，而是去 Redis 分布式缓存服务器上获取并验证，这样一来就能正常获取到了，session 验证通过后可以正常执行后续的操作。**利用 Redis 共享 session 这个方案的确可以解决问题，但是多了一层 Redis 访问、性能下降，系统复杂度也上升了很多，Redis 成了单点、即多个应用服务器都得访问 Redis、一旦 Redis 故障、就算应用服务器都 ok、所有业务也都无法正常运转**
 
 那还有什么其它方案也能解决分布式部署下的 session 问题吗？那就是“索性放弃 session，使用 token”
 
 ## 二、token 是什么
 
-首先说一下 cookie 和 session 存在的问题，详见下面。而 token 可以解决它们的问题：
-* 在移动互联网的背景下，token 统一了各个客户端的实现方案、大家都按一套来，后端的实现也是统一一套
-* 在分布式系统和服务器集群的背景下，我们只需要让所有的用户系统用非对称加密里的同一个私钥来生成 token，其它系统和服务器都用非对称加密里对应的公钥来验证 token 就可以了
+利用 Redis 共享 session 这个方案需要把 session 存储在服务器内存中——即 session 是有状态的、这是共享 session 的本质问题，服务器既负责存储 session 也负责验证 session
 
-token 也是用来辨别用户身份的一套实现方案
+而 token 则是无状态的——即不需要把 token 存储在服务器内存中、这是 token 的本质优势，服务器只负责验证 token 不负责存储 token。这样一来：客户端要登录，这一次 Nginx 负载均衡服务器把这个登录请求转发给了服务器 3，那登录成功后服务器直接把生成的 token 返回给客户端、不需要存储在任意一台服务器上；客户端下次要支付、携带了 token，这一次 Nginx 负载均衡服务器把这个支付请求转发给了服务器 1，服务器 1 照样可以验证 token，token 验证通过后可以正常执行后续的操作，这同样能解决分布式部署下的 session 问题
 
 ## 三、token 是怎么工作的
 
 * 服务端生成私钥和公钥存储在项目里
-```
+
+```shell
 cd desktop
 
 # 生成私钥（PEM 格式）
@@ -72,9 +71,84 @@ openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private_key.pe
 # 从私钥导出公钥
 openssl rsa -pubout -in private_key.pem -out public_key.pem
 ```
+
 * 客户端走登录接口
 * 服务端判断到登录接口走成功后，服务端用非对称加密里的**私钥生成一个 token **并返回给客户端
+  * token 里一般会携带用户的唯一标识、用户名或邮箱、角色或权限等业务信息
 * 客户端手动持久化 token
 * 后续客户端走其它接口时，手动把 token 携带到 header 里传递给服务端
 * 服务端可以在这些接口里读取到 header 里的 token，用非对称加密里的**公钥验证 token **来确定用户身份，没登录过或 token 过期（token 库全部会自己判断）就返回登录凭证无效，否则就返回相应的数据
 * 客户端收到登录凭证无效就跳转登录界面让用户重新登录，收到正常数据就正常使用
+* 客户端退出登录时，只需要清除客户端本地持久化的 token、跳转到登录界面就可以了，不需要跟服务端做任何交互、因为服务端压根儿没存储任何 token 而只是认证 token
+
+```json
+// token 在请求头里的 key 我们当然可以随便取名，value 也可以直接就是 token，只要服务端和客户端约定好、这没有任何问题，比如：
+{"token": "${token}"}
+
+// 但是 token 的建议格式如下：
+// 因为 Authorization 是 HTTP 协议定义的“认证专用请求头”，这样更标准；Bearer 代表是 OAuth2 访问令牌，token 就是这种认证类型，这样更标准
+{"Authorization": "Bearer ${token}"}
+```
+
+## 四、在 SpringBoot 项目里使用 JWT Token
+
+#### 1、添加依赖
+
+```xml
+<!-- JWT -->
+<dependency>
+  <groupId>io.jsonwebtoken</groupId>
+  <artifactId>jjwt-api</artifactId>
+  <version>0.13.0</version>
+</dependency>
+<dependency>
+  <groupId>io.jsonwebtoken</groupId>
+  <artifactId>jjwt-impl</artifactId>
+  <version>0.13.0</version>
+  <scope>runtime</scope>
+</dependency>
+<dependency>
+  <groupId>io.jsonwebtoken</groupId>
+  <artifactId>jjwt-jackson</artifactId>
+  <version>0.13.0</version>
+  <scope>runtime</scope>
+</dependency>
+```
+
+#### 2、在登录等接口里生成 token、返回 token 给客户端
+
+#### 3、自定义一个 filter 统一拦截所有接口来验证 token，别忘了配置 filter
+
+#### 4、验证 token 通过后，自定义一个 UserContext 来全局存储 token 里的业务信息
+
+#### 5、各个 Controller 或 Service 里通过 UserContext 获取到 token 里的业务信息，再去操作指定的数据
+
+## 五、双 token
+
+#### 1、单 token 存在的问题
+
+上面的方案是单 token，项目里这么用没毛病，但是它存在一些缺陷：
+
+* **长时间登录和安全性的冲突：**为了保证用户不用频繁登录，我们一般会给 token 设置一个较长的过期时间、比如 7~30 天，但是一旦 token 被窃取，那么攻击者就可以拿着这个 token 胡作非为 7~30 天，也就是说长有效期的 token 安全性不足；但是如果我们把 token 的有效期缩短为 15~30 分钟，安全性是相应提高了，但是用户每次打开 App 几乎都得跳到登录界面重新登录，体验极差
+* **无法强制下线：**服务器上是没有存储 token 的、只负责校验，所以我们没法实现强制把用户踢下线的操作，比如我们要实现单设备登录或者风控踢人等
+
+#### 2、双 token 的工作流程
+
+双 token 可以解决单 token 的缺陷，不过双 token 又需要 Redis、又变成“有状态”的了，实际开发中要根据实际情况决定使用单 token 还是双 token：
+
+* 客户端走登录接口
+* 服务端判断到登录接口走成功后，服务端用非对称加密里的**私钥生成 accessToken、refreshToken**，把两个 token 都返回给客户端，把 refreshToken 存进 Redis。accessToken 有效期可以设置为 15~30 分钟、是用来获取数据的一个 token，refreshToken 的有效期设置为 7~30 天、是用来获取 accessToken 的一个 token
+* 客户端手动持久化 accessToken、refreshToken
+* 后续客户端走其它接口时，手动把 accessToken 携带到 header 里传递给服务端
+* 服务端可以在这些接口里读取到 header 里的 accessToken，用非对称加密里的**公钥验证 accessToken**
+  * 如果验证到用户登录过且 accessToken 没过期，那就返回相应的数据给客户端
+  * 如果验证到用户没登录过或 accessToken 过期（token 库全部会自己判断），那就返回“accessToken 过期”的错误响应给客户端
+    * 客户端收到“accessToken 过期”的错误响应后，需要立即再走另外一个 refreshAccessToken 的接口，手动把 refreshToken 携带到 header 里传递给服务端
+    * 服务端可以在这些接口里读取到 header 里的 refreshToken，用非对称加密里的**公钥验证 refreshToken**
+      * 如果 refreshToken 没过期，那就给客户端返回一个崭新 15~30 分钟的 accessToken，客户端接收到这个新 accessToken 后，可以再次走其它接口
+      * 如果 refreshToken 过期，那就给客户端返回“refreshToken 过期”的错误响应，客户端直接跳转到登录界面让用户重新登录
+* 客户端退出登录时，需要走一个 logout 接口把 Redis 里存储的 refreshToken 删除掉，然后再清除客户端本地持久化的 accessToken、refreshToken、跳转到登录界面
+* 如果要实现强制下线，直接删除某个用户在 Redis 里的 refreshToken 即可，这样一来用户顶多能再使用 accessToken 15~30 分钟，下一次刷新时就得重新登录了
+
+
+

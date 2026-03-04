@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.error.ProductServiceError;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.common.context.TokenInfo;
+import com.ineyee.common.context.UserContext;
 import com.ineyee.mapper.ProductMapper;
 import com.ineyee.pojo.dto.ProductDetailDto;
 import com.ineyee.pojo.dto.ProductListDto;
@@ -40,6 +42,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public ListData<ProductListDto> list(ProductListQuery query) {
+        TokenInfo tokenInfo = UserContext.getTokenInfo();
+        log.debug("ProductServiceImpl tokenInfo：" + tokenInfo.getEmail());
+
         // wrapper 用来添加查询条件
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
 

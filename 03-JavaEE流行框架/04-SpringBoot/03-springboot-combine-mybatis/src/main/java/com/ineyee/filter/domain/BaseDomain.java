@@ -1,4 +1,4 @@
-package com.ineyee.domain;
+package com.ineyee.filter.domain;
 
 import lombok.Data;
 

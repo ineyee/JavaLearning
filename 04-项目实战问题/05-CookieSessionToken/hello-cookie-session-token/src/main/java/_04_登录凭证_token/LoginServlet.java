@@ -31,8 +31,8 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 假设这里服务端判断到登录接口走成功...
 
-        // 服务端生成 token
-        //   claims：携带的业务信息，将来其它接口验证 token 时可以通过业务信息决定是哪个用户
+        // 服务端用非对称加密里的私钥生成 token
+        //   claims：携带的业务信息，将来其它接口验证 token 时可以通过业务信息决定是哪个用户，token 里一般会携带用户的唯一标识、用户名或邮箱、角色或权限等业务信息
         //   expiration：过期时间（单位秒）
         //   signWith：私钥
         Map<String, Object> claims = new HashMap<>();

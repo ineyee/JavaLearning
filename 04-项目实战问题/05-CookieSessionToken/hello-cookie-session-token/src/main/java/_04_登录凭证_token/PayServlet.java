@@ -27,7 +27,8 @@ public class PayServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 获取 token
-        String token = req.getHeader("token");
+        String bearerToken = req.getHeader("Authorization");
+        String token = bearerToken.substring(7);
 
         try {
             // 验证 token

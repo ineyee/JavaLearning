@@ -28,13 +28,10 @@ public class SwaggerConfig {
                         .version("1.0.0"))
                 // 配置安全方案
                 .components(new Components()
-                        .addSecuritySchemes("Bearer Token", new SecurityScheme()
-                                // 代表是基于 HTTP Header 的认证机制
-                                .type(SecurityScheme.Type.HTTP)
-                                // 代表是采用 Authorization: Bearer ${Token} 的认证方案
-                                .scheme("bearer")
-                                // 代表 Token 的格式是 JWT
-                                .bearerFormat("JWT")))
+                        .addSecuritySchemes(securitySchemeName, new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP) // 代表是基于 HTTP Header 的认证机制
+                                .scheme("bearer") // 代表是采用 Bearer 的认证类型
+                                .bearerFormat("JWT"))) // 代表 Token 的格式是 JWT
                 // 全局应用此安全方案，即默认所有接口都需要 Token
                 // 而只在登录、注册、获取验证码等接口上用 @SecurityRequirements() 空注解覆盖这个全局配置，让这些接口不需要 Token
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName));

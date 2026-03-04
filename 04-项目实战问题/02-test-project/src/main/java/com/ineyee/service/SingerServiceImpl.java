@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.common.context.TokenInfo;
+import com.ineyee.common.context.UserContext;
 import com.ineyee.mapper.SingerMapper;
 import com.ineyee.pojo.dto.SingerDetailDto;
 import com.ineyee.pojo.dto.SingerListDto;
@@ -42,6 +44,9 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer> impleme
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public ListData<SingerListDto> list(SingerListQuery query) {
+        TokenInfo tokenInfo = UserContext.getTokenInfo();
+        log.debug("SingerServiceImpl tokenInfo：" + tokenInfo.getEmail());
+
         Page<SingerListDto> queriedPage = new Page<>();
 
         if (query.getPageNum() != null && query.getPageSize() != null) {

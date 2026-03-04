@@ -6,7 +6,9 @@ public enum UserServiceError implements ServiceError {
     USER_ALREADY_EXIST(-200000, "User Already Exist"),
     USER_NOT_EXIST(-200001, "User Not Exist"),
     CANT_BATCH_UPDATE_EMAIL(-200002, "Cant Batch Update Email"),
-    EMAIL_ALREADY_EXIST(-200003, "Email Already Exist");
+    EMAIL_ALREADY_EXIST(-200003, "Email Already Exist"),
+    WRONG_EMAIL_PASSWORD(-200004, "邮箱或密码不正确"),
+    INVALID_TOKEN(-200005, "未登录或 token 已过期");
 
     UserServiceError(Integer code, String message) {
         this.code = code;

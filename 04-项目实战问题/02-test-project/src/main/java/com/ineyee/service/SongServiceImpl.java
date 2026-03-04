@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ineyee.common.api.error.CommonServiceError;
 import com.ineyee.common.api.error.SingerServiceError;
 import com.ineyee.common.api.exception.ServiceException;
+import com.ineyee.common.context.TokenInfo;
+import com.ineyee.common.context.UserContext;
 import com.ineyee.mapper.SingerMapper;
 import com.ineyee.mapper.SongMapper;
 import com.ineyee.pojo.dto.SongDetailDto;
@@ -41,6 +43,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public SongDetailDto get(SongGetQuery query) throws ServiceException {
+        TokenInfo tokenInfo = UserContext.getTokenInfo();
+        log.debug("SongServiceImpl tokenInfo：" + tokenInfo.getEmail());
+
         Song songPo = getById(query.getId());
         if (songPo == null) {
             throw new ServiceException(CommonServiceError.REQUEST_ERROR);
