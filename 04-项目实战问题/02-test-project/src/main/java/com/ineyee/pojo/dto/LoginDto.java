@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-public class UserCreateDto {
+public class LoginDto {
     @Schema(description = "token")
     private String token;
 

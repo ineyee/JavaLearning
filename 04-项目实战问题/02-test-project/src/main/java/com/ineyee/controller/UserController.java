@@ -3,8 +3,8 @@ package com.ineyee.controller;
 import com.ineyee.common.api.HttpResult;
 import com.ineyee.common.api.error.UserServiceError;
 import com.ineyee.common.util.KeyLoadUtil;
-import com.ineyee.pojo.dto.UserCreateDto;
-import com.ineyee.pojo.req.UserCreateReq;
+import com.ineyee.pojo.dto.LoginDto;
+import com.ineyee.pojo.req.LoginReq;
 import io.jsonwebtoken.Jwts;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -56,7 +56,7 @@ public class UserController {
     @PostMapping("login")
     @Operation(summary = "登录")
     @SecurityRequirements()  // 覆盖全局配置，此接口不需要 token
-    public HttpResult<UserCreateDto> login(@Valid @RequestBody UserCreateReq req) {
+    public HttpResult<LoginDto> login(@Valid @RequestBody LoginReq req) {
         // 假设这里服务端判断到登录接口走成功...
         if (req.getEmail().equals("123456") && req.getPassword().equals("123456")) {
             // 服务端用非对称加密里的私钥生成 token
@@ -72,7 +72,7 @@ public class UserController {
                     .compact();
 
             // 服务端给客户端返回 token
-            UserCreateDto dto = new UserCreateDto();
+            LoginDto dto = new LoginDto();
             // token
             dto.setToken(token);
             // 用户信息

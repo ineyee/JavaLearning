@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class UserCreateReq {
+public class LoginReq {
     @NotBlank(message = "email 字段不能为空")
     @Schema(description = "邮箱", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
