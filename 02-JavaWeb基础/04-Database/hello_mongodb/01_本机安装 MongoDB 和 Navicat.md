@@ -29,8 +29,8 @@ MongoDB Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯
     # 2️⃣ 日志相关配置
     # -------------------------------
     systemLog:
-      destination: file                                                # 日志输出到文件（生产环境需要修改）
-      path: /usr/local/mongodb-macos-aarch64--8.2.5/log/mongodb.log    # 日志文件路径
+      destination: file                                                # 日志输出到文件
+      path: /usr/local/mongodb-macos-aarch64--8.2.5/log/mongodb.log    # 日志文件路径（生产环境需要修改）
       logAppend: true                                                  # 是否追加日志（true=追加，false=覆盖）
     
     # -------------------------------
@@ -81,8 +81,8 @@ MongoDB Server 跟 Tomcat 一样也是一个服务器软件，它在启动时肯
       ]
     })
     ```
-  
-* 停止 MongoDB 服务，重新启动 MongoDB 服务
+    
+  * 停止 MongoDB 服务，重新启动 MongoDB 服务
 
 ## 二、本机安装 Navicat
 
