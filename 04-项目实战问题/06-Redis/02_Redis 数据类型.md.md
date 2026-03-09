@@ -1,49 +1,162 @@
 ## 一、通用命令
 
-* 查询数据库里数据的总条数
+###### 查询数据库里数据的总条数
 
 ```
 DBSIZE
 ```
 
-* 查询数据库里所有的 key（生产环境不建议使用，因为会扫描所有的数据，阻塞其它命令的执行）
+###### 查询数据库里所有的 key，生产环境不建议使用，因为会扫描所有的数据，阻塞其它命令的执行
 
 ```
 KEYS *
 ```
 
-* 查询数据库里是否存在某个 key，存在返回 1、不存在返回 0
+###### 查询数据库里是否存在某个 key，存在返回 1、不存在返回 0
 
 ```
 EXISTS $key
 ```
 
-* 给某个 key 设置有效时间、单位秒，过期后会自动删除
+###### 给某个 key 设置有效时间、单位秒，过期后会自动删除
 
 ```
 EXPIRE $key $seconds
 ```
 
-* 给某个 key 设置永久有效
+###### 给某个 key 设置永久有效
 
 ```
 PERSIST $key
 ```
 
-* 查询某个 key 的有效时间，>= 0 代表有效秒数、-1 代表永久有效、-2 代表没有这个 key
+###### 查询某个 key 的有效时间，>= 0 代表有效秒数、-1 代表永久有效、-2 代表没有这个 key
 
 ```
 TTL $key
 ```
 
-* 查询某个 key 的数据类型
+###### 查询某个 key 的数据类型
 
 ```
 TYPE $key
 ```
 
-* 删除某个 key，成功返回 1、失败返回 0
+## 二、String 命令
+
+> * 布尔型、整型、浮点型都当成字符串往里存即可
+> * 一个 String 类型的值最大能存储 512M 的数据
+
+#### 1、增&改、删、查
+
+###### [SET $key $value NX]、[SET $key $value XX]
 
 ```
-DEL $key
+// SET NX（Not eXists）：key 不存在时才新增、存在时啥也不干（可以避免误覆盖数据）
+SET name "张三" NX
+SET age 18 NX
+SET height 1.88 NX
+
+// SET XX（eXists）：key 存在时才修改、不存在时啥也不干（可以避免误新增数据）
+SET adult 0 XX // 0 - false
+SET adult 1 XX // 1 - true
 ```
+
+###### [DEL $key]
+
+```
+// 删除成功时返回 1、删除失败时返回 0
+DEL name
+DEL age
+DEL height
+DEL adult
+```
+
+###### [GET $key]
+
+```
+GET name
+GET age
+GET height
+GET adult
+```
+
+#### 2、批量增&批量改、批量删、批量查
+
+###### [MSET $key1 $value1 $key2 $value2 ...]
+
+```
+// 批量增&改没有 NX|XX 之类的命令
+// key 不存在时就新增、存在时就修改
+MSET name "李四" age 19 graduate 0
+```
+
+###### [DEL $key1 $key2 ...]
+
+```
+// DEL 本来就支持批量删除，会返回删除成功的条数
+DEL name age height adult
+```
+
+###### [MGET $key1 $key2 ...]
+
+```
+MGET name age height adult
+```
+
+#### 3、字符串常见操作
+
+###### 字符串拼接 [APPEND $key $value]
+
+```
+APPEND name "(zhangsan)"
+```
+
+###### 字符串截取 [GETRANGE $key $startIndex $endIndex]
+
+```
+// [$startIndex, endIndex] 闭区间、前后都包含
+GETRANGE name 0 0
+```
+
+###### 字符串替换 [SETRANGE $key $offset $value]
+
+```
+SETRANGE name 0 z
+```
+
+###### 获取字符串长度 [STRLEN $key]
+
+```
+STRLEN name
+```
+
+#### 4、“整型”专用
+
+###### [INCR $key]、[DECR $key]、[INCRBY $key $n]、[DECRBY $key $n]
+
+```
+// +1
+INCR age
+// -1
+DECR age
+// +n
+INCRBY age 10
+// -1
+DECRBY age 10
+```
+
+#### 5、“浮点型”专用
+
+###### [INCRBYFLOAT $key $n]
+
+```
+INCRBYFLOAT height 1
+```
+
+
+
+
+
+
+
