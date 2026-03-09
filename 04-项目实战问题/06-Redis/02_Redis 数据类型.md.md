@@ -44,8 +44,18 @@ TYPE $key
 
 ## 二、String 命令
 
-> * 布尔型、整型、浮点型都当成字符串往里存即可
-> * 一个 String 类型的值最大能存储 512M 的数据
+```json
+// 适合缓存基本数据类型的数据
+//
+// 布尔型、整型、浮点型都当成字符串往里存即可
+// 一个 String 类型的值最大能存储 512M 的数据
+{
+  "name": "张三",
+  "age": 18,
+  "height": 1.88,
+  "adult": 1
+}
+```
 
 #### 1、增&改、删、查
 
@@ -151,12 +161,113 @@ DECRBY age 10
 ###### [INCRBYFLOAT $key $n]
 
 ```
+// +n，n 可以是负数
 INCRBYFLOAT height 1
 ```
 
+## 三、Hash 命令
 
+```json
+// 适合缓存对象类型的数据
+//
+// 不过不能整体操作整个 hash，只能单独操作 hash 里的每一对儿 key-value
+{
+	"user:id:1001": {
+    "name": "张三",
+    "age": 18,
+    "height": 1.88,
+    "adult": 1
+  }
+}
+```
 
+#### 1、增&改、删、查
 
+###### [HSET $key $field $value]
 
+```
+// field 不存在时就新增、存在时就修改
+HSET user:id:1001 name "zhangsan"
+HSET user:id:1001 age 18
+HSET user:id:1001 height 1.88
+HSET user:id:1001 adult 1
+```
 
+###### [HDEL $key $field]
 
+```
+// 删除成功时返回 1、删除失败时返回 0
+HDEL user:id:1001 name
+HDEL user:id:1001 age
+HDEL user:id:1001 height
+HDEL user:id:1001 adult
+```
+
+###### [HGET $key $field]
+
+```
+HGET user:id:1001 name
+HGET user:id:1001 age
+HGET user:id:1001 height
+HGET user:id:1001 adult
+```
+
+#### 2、批量增&批量改、批量删、批量查
+
+###### [HMSET $key $field1 $value1 $field2 $value2 ...]
+
+```
+// field 不存在时就新增、存在时就修改
+HMSET user:id:1001 name "zhangsan" age 18 height 1.88 adult 1
+```
+
+###### [DEL $key $field1 $field2 ...]
+
+```
+// DEL 本来就支持批量删除，会返回删除成功的条数
+HDEL user:id:1001 name age height adult
+```
+
+###### [HMGET $key $field1 $field2 ...]
+
+```
+HMGET user:id:1001 name age height adult
+```
+
+#### 3、Hash 常见操作
+
+###### 查询 Hash 里 filed 的总个数 [HLEN $key]
+
+```
+HLEN user:id:1001
+```
+
+###### 查询 Hash 里所有的 field [HKEYS $key]
+
+```
+HKEYS user:id:1001
+```
+
+###### 查询 Hash 里是否存在某个 filed，存在返回 1、不存在返回 0 [HEXISTS $key $field]
+
+```
+HEXISTS user:id:1001 name
+```
+
+#### 4、“整型” field 专用
+
+###### [HINCRBY $key $field $n]
+
+```
+// +n，n 可以是负数
+HINCRBY user:id:1001 age 1
+```
+
+#### 5、“浮点型” field 专用
+
+###### [HINCRBYFLOAT $key $field $n]
+
+```
+// +n，n 可以是负数
+HINCRBYFLOAT user:id:1001 height -0.1
+```
