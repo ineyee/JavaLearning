@@ -263,11 +263,193 @@ HEXISTS user:id:1001 name
 HINCRBY user:id:1001 age 1
 ```
 
-#### 5、“浮点型” field 专用
+#### 5、”浮点型” field 专用
 
 ###### [HINCRBYFLOAT $key $field $n]
 
 ```
 // +n，n 可以是负数
 HINCRBYFLOAT user:id:1001 height -0.1
+```
+
+## 四、List 命令
+
+```json
+// 适合缓存数组类型的数据（底层其实是双向链表）
+//
+// 有序、可重复
+// 不过因为 Redis 的数据结构是扁平的，没有嵌套能力，所以 List 里只能存储字符串类型
+{
+  “news:hot”: ["新闻C", "新闻B", "新闻A"]
+}
+```
+
+#### 1、插入元素、删除元素、修改元素、获取元素
+
+###### [LPUSH $key $value1 $value2 ...]、[RPUSH $key $value1 $value2 ...]
+
+```
+// 从左边插入元素
+LPUSH news:hot "新闻C" "新闻B" "新闻A"
+
+// 从右边插入元素
+RPUSH news:hot "新闻CC" "新闻BB" "新闻AA"
+```
+
+###### [LPOP $key]、[RPOP $key]
+
+```
+// 从左边删除一个元素
+LPOP news:hot
+
+// 从右边删除一个元素
+RPOP news:hot
+```
+
+###### [LREM $key $count $value]
+
+```
+// 删除指定内容的元素
+// count = 0：删除所有匹配的元素
+// count > 0：从左往右删除 count 个匹配到的元素
+// count < 0：从右往左删除 |count| 个匹配到的元素
+LREM news:hot 1 "新闻A"
+```
+
+###### [LSET $key $index $value]
+
+```
+// 修改指定索引的元素，这里的 L 不是 Left 而是 List 
+LSET news:hot 0 “新闻000”
+```
+
+###### [LINDEX $key $index]
+
+```
+// ["新闻A", "新闻B", "新闻C", "新闻CC", "新闻BB", "新闻AA"]
+// 左侧开始的 index 依次为：0 1 2 3 4 5
+// 右侧开始的 index 依次为：-6 -5 -4 -3 -2 -1
+//
+// 按索引获取元素，这里的 L 不是 Left 而是 List 
+
+// 获取 index == 0 的元素和获取 index == -6 的元素，其实是同一个元素"新闻A"
+LINDEX news:hot 0
+LINDEX news:hot -6
+```
+
+###### [LRANGE $key $startIndex $endIndex]
+
+```
+// 查询指定范围内的元素，这里的 L 不是 Left 而是 List
+// [$startIndex, $endIndex] 闭区间、前后都包含，-1 表示最后一个元素
+
+// 查询所有元素
+LRANGE news:hot 0 -1
+// 查询前 3 和元素
+LRANGE news:hot 0 2
+```
+
+#### 2、List 常见操作
+
+###### 获取 List 长度 [LLEN $key]
+
+```
+LLEN news:hot
+```
+
+###### 截取 List [LTRIM $key $startIndex $endIndex]
+
+```
+// [$startIndex, $endIndex] 闭区间、前后都包含，-1 表示最后一个元素
+
+// 只保留前 3 个元素，影响的是原 List
+LTRIM news:hot 0 2
+```
+
+## 五、Set 命令
+
+```json
+// 适合缓存集合类型的数据
+//
+// 无需、不可重复
+// 不过因为 Redis 的数据结构是扁平的，没有嵌套能力，所以 Set 里只能存储字符串类型
+{
+  “user:id:1001:tags”: ["Java", "Redis", "MySQL"]
+}
+```
+
+#### 1、插入元素、删除元素、获取元素
+
+###### [SADD $key $member1 $member2 ...]
+
+```
+// 不存在的元素才会新增，已存在的元素会被忽略，返回实际新增的个数
+SADD user:id:1001:tags "Java" "Redis" "MySQL"
+```
+
+###### [SREM $key $member1 $member2 ...]
+
+```
+// 返回实际删除的个数
+SREM user:id:1001:tags "MySQL"
+```
+
+###### [SMEMBERS $key]
+
+```
+// 查询 Set 里所有的元素（注意：Set 无序，返回顺序不固定）
+SMEMBERS user:id:1001:tags
+```
+
+#### 2、Set 常见操作
+
+###### 查询 Set 里的元素个数 [SCARD $key]
+
+```
+SCARD user:id:1001:tags
+```
+
+###### 查询某个元素是否存在 [SISMEMBER $key $member]
+
+```
+// 存在返回 1、不存在返回 0
+SISMEMBER user:id:1001:tags "Java"
+```
+
+###### 随机返回 n 个 member（不删除）[SRANDMEMBER $key n]
+
+```
+SRANDMEMBER user:id:1001:tags 3
+```
+
+###### 随机返回一个元素（删除）[SPOP $key]
+
+```
+SPOP user:id:1001:tags
+```
+
+#### 3、集合运算
+
+###### 交集 [SINTER $key1 $key2 ...]
+
+```
+// 返回两个用户都拥有的标签
+SINTER user:id:1001:tags user:1002:tags
+```
+
+###### 并集 [SUNION $key1 $key2 ...]
+
+```
+// 返回两个用户合并起来并去重后所有的标签
+SUNION user:id:1001:tags user:1002:tags
+```
+
+###### 差集（我有、对方没有）[SDIFF $key1 $key2 ...]
+
+```
+// 返回 1001 有但 1002 没有的标签
+SDIFF user:id:1001:tags user:1002:tags
+
+// 返回 1002 有但 1001 没有的标签
+SDIFF user:id:1002:tags user:1001:tags
 ```
