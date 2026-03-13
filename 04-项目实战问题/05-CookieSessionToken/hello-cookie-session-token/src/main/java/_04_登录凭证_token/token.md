@@ -79,7 +79,7 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 * 后续客户端走其它接口时，手动把 token 携带到 header 里传递给服务端
 * 服务端可以在这些接口里读取到 header 里的 token，用非对称加密里的**公钥验证 token **来确定用户身份，没登录过或 token 过期（token 库全部会自己判断）就返回登录凭证无效，否则就返回相应的数据
 * 客户端收到登录凭证无效就跳转登录界面让用户重新登录，收到正常数据就正常使用
-* 客户端退出登录时，只需要清除客户端本地持久化的 token、跳转到登录界面就可以了，不需要跟服务端做任何交互、因为服务端压根儿没存储任何 token 而只是认证 token
+* **客户端退出登录时，只需要清除客户端本地持久化的 token、跳转到登录界面就可以了，不需要跟服务端做任何交互、因为服务端压根儿没存储任何 token 而只是认证 token**
 
 ```json
 // token 在请求头里的 key 我们当然可以随便取名，value 也可以直接就是 token，只要服务端和客户端约定好、这没有任何问题，比如：
@@ -123,24 +123,43 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 
 #### 5、各个 Controller 或 Service 里通过 UserContext 获取到 token 里的业务信息，再去操作指定的数据
 
-## 五、双 token
+## 五、其它 token 方案
 
-#### 1、单 token 存在的问题
+#### 1、【方案一】单 token 存在的问题
 
 上面的方案是单 token，项目里这么用没毛病，但是它存在一些缺陷：
 
-* **长时间登录和安全性的冲突：**为了保证用户不用频繁登录，我们一般会给 token 设置一个较长的过期时间、比如 7~30 天，但是一旦 token 被窃取，那么攻击者就可以拿着这个 token 胡作非为 7~30 天，也就是说长有效期的 token 安全性不足；但是如果我们把 token 的有效期缩短为 30~60 分钟，安全性是相应提高了，但是用户每次打开 App 几乎都得跳到登录界面重新登录，体验极差
 * **无法强制下线：**服务器上是没有存储 token 的、只负责校验，所以我们没法实现强制把用户踢下线的操作，比如我们要实现单设备登录或者风控踢人等
 
-#### 2、双 token 的工作流程
+* **长时间登录和安全性的冲突：**为了保证用户不用频繁登录，我们一般会给 token 设置一个较长的过期时间、比如 7~30 天，但是一旦 token 被窃取，那么攻击者就可以拿着这个 token 胡作非为 7~30 天，也就是说长有效期的 token 安全性不足；但是如果我们把 token 的有效期缩短为 30~60 分钟，安全性是相应提高了，但是用户每次打开 App 几乎都得跳到登录界面重新登录，体验极差
 
-双 token 可以解决单 token 的缺陷，因为 accessToken 的传输不是那么频繁、所以可以用 accessToken 来满足长时间登录的要求，而 accessToken 的传输比较频繁、所以把它的有效期缩短来满足安全性的要求。不过双 token 又需要 Redis、又变成“有状态”的了，实际开发中要根据实际情况决定使用单 token 还是双 token：
+#### 2、【方案二】单 token + redis 缓存
+
+单 token + redis 缓存可以解决**无法强制下线**的问题，其工作流程如下：
 
 * 客户端走登录接口
-* 服务端判断到登录接口走成功后，服务端用非对称加密里的**私钥生成 accessToken、refreshToken**，把两个 token 都返回给客户端，把 refreshToken 存进 Redis。accessToken 有效期可以设置为 15~30 分钟、是用来获取数据的一个 token，refreshToken 的有效期设置为 7~30 天、是用来获取 accessToken 的一个 token
+
+* 服务端判断到登录接口走成功后，服务端用 **UUID 随机生成一个 token，把这个 token 缓存到 redis 中、并把用户信息也缓存到 redis 中，token 和用户信息的的缓存有效期都设置为 7~30 天，**然后把 token 返回给客户端
+  * 这里的 token 就可以不用 JWT Token 了。因为之前没有 redis，所以用户信息必须携带在 token 里传来传去，而现在有 Reids 了，用户信息可以直接缓存在 redis 中不用传来传去。**UUID 随机 token 的体积要比 JWT Token 小很多**
+  * 这里我们设计在 redis 中缓存两个信息：
+    * **key = user\:email\:${email} 或 user\:id\:${id}，value = ${token}，这对 key-value 专门用来做强制踢人、单设备登录这类用户管理操作**
+    * **key = user:token:${token}，value = 关键用户信息的 Hash，这对 key-value 专门用来做登录成功后其它接口的 token 校验**
+* 客户端手动持久化 token
+* 后续客户端走其它接口时，手动把 token 携带到 header 里传递给服务端
+* 服务端可以在这些接口里读取到 header 里的 token，**去 redis 缓存中看看有没有这个 token（不存在或已过期，查询结果都将是没有这个 token）**，没有这个 token 就返回登录凭证无效，否则就返回相应的数据
+* 客户端收到登录凭证无效就跳转登录界面让用户重新登录，收到正常数据就正常使用
+* **客户端退出登录时，需要走一个 logout 接口把 redis 里缓存的 token 删除掉，然后再清除客户端本地持久化的 token、跳转到登录界面**
+* **如果要实现强制下线，直接去 Redis 数据库里根据邮箱或 userId 删除掉某个用户在 redis 里的 token 缓存即可**
+
+#### 3、【方案三】双 token + redis 缓存
+
+双 token + redis 缓存可以解决**无法强制下线 + 长时间登录和安全性的冲突**的问题，因为 refreshToken 的传输不是那么频繁、所以可以用 refreshToken 来满足长时间登录的要求，而 accessToken 的传输比较频繁、所以把它的有效期缩短来满足安全性的要求，其工作流程如下：
+
+* 客户端走登录接口
+* 服务端判断到登录接口走成功后，服务端用 **UUID 随机生成一个 accessToken、refreshToken**，把两个 token 都返回给客户端，把 refreshToken 存进 Redis。accessToken 有效期可以设置为 15~30 分钟、是用来获取数据的一个 token，refreshToken 的有效期设置为 7~30 天、是用来获取 accessToken 的一个 token
 * 客户端手动持久化 accessToken、refreshToken
 * 后续客户端走其它接口时，手动把 accessToken 携带到 header 里传递给服务端
-* 服务端可以在这些接口里读取到 header 里的 accessToken，用非对称加密里的**公钥验证 accessToken**
+* 服务端可以在这些接口里读取到 header 里的 accessToken，**去 redis 缓冲中看看有没有这个 token（不存在或已过期，查询结果都将是没有这个 token）**
   * 如果验证到用户登录过且 accessToken 没过期，那就返回相应的数据给客户端
   * 如果验证到用户没登录过或 accessToken 过期（token 库全部会自己判断），那就返回“accessToken 过期”的错误响应给客户端
     * 客户端收到“accessToken 过期”的错误响应后，需要立即再走另外一个 refreshAccessToken 的接口，手动把 refreshToken 携带到 header 里传递给服务端

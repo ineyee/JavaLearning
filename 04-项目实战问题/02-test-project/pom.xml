@@ -143,6 +143,19 @@
             <version>0.13.0</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- Redis 相关依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!--
+            Lettuce 连接池依赖
+            SpringBoot 默认使用 Lettuce 作为 Redis 客户端，Lettuce 是基于 Netty 的异步客户端，性能更好。如果要使用连接池，还需要额外引入 commons-pool2 依赖
+        -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
         <!--
             单元测试：
             JUnit Jupiter（JUnit 5）
