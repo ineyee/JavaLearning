@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.getpagespeed.com)",
+      "WebFetch(domain:serverfault.com)",
+      "Bash(brew --prefix pcre 2>/dev/null; brew --prefix zlib 2>/dev/null)"
+    ]
+  }
+}
