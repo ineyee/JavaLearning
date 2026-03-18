@@ -57,7 +57,7 @@ Nginx（engine x）跟 Tomcat 一样也是一个服务器软件，它在启动�
 
   * 编译：make
 
-  * 安装：sudo make install，这样就会在 nginx-1.28.2 目录下生成一个 sbin 目录，其中 sbin/nginx 就是 Nginx 的可执行文件
+  * 安装：sudo make install，这样就会在 nginx-1.28.2 目录下生成一个 sbin 可执行文件目录，其中 sbin/nginx 就是 Nginx 的可执行文件，conf 目录就是配置文件目录，html 就是静态资源目录
 
   * 然后在 nginx 目录下手动创建一个 logs 目录（即 /usr/local/nginx-1.28.2/logs），用来存放访问日志和错误日志
 
@@ -133,3 +133,191 @@ Nginx（engine x）跟 Tomcat 一样也是一个服务器软件，它在启动�
       }
   }
   ```
+
+## 三、Nginx 配置文件详解
+
+#### 1、Nginx 配置文件的语法
+
+* ① 配置文件里由指令和指令块组成
+
+```yaml
+# 指令，没用 {} 包着的就是指令
+# 每条指令必须以分号结尾，指令名和指令值之间用一个或多个空格隔开
+worker_processes  1;
+```
+
+```yaml
+# 指令块，用 {} 包着的就是指令块
+# 指令块里可以写多条指令
+events {
+    worker_connections  1024;
+}
+```
+
+* ② include 用来导入其它配置文件
+
+```yaml
+http {
+		# 如果觉得一个配置文件里的内容太多，可以拆分成多个小配置文件，然后用 include 来导入
+    include       mime.types;
+}
+```
+
+* ③ \# 用来添加注释，\$ 用来引用 Nginx 内置的变量
+
+```yaml
+# 定义一个名为 main 的日志格式，具体的日志格式为
+#
+# 示例：192.168.1.10 - (空) [18/Mar/2026:18:30:12 +0800] "GET /api/user HTTP/1.1" 200 532 "https://google.com" "Mozilla/5.0..." "1.2.3.4"
+#
+# $remote_addr：客户端的 IP 地址（谁访问了你）
+# $remote_user：认证用户名（一般为空，除非用了 HTTP Basic Auth）
+# [$time_local]：请求发生的时间（服务器本地时间）
+# $request：完整的 HTTP 请求行
+# $status：HTTP 响应状态码
+# $body_bytes_sent：返回给客户端的字节数（不含 header）
+# "$http_referer"：用户从哪个页面跳过来的
+# "$http_user_agent"：用户设备信息
+# "$http_x_forwarded_for"：经过代理后的真实客户端 IP（可能有多个，用逗号分隔）
+log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                  '$status $body_bytes_sent "$http_referer" '
+                  '"$http_user_agent" "$http_x_forwarded_for"';
+```
+
+#### 2、Nginx 配置文件的常见指令
+
+```
+events
+http
+	- upstream1（主要用于配置负载均衡，设置一系列后端服务器）
+	- server1（主要用于配置虚拟主机，指定主机和端口。server 跟项目什么关系？一个项目可以部署在多个服务器上，那 server 是跟每个项目有关系，还是跟这多个项目都是一样的“系统”有关）
+		- location1（主要用于配置不同情况下该找哪个网页返回给客户端）
+    - location2
+	- upstream2
+	- server2
+  	- location1
+    - location2
+```
+
+
+
+```yaml
+
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+		# 虽然注释了，但默认的日志格式就是这个
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+}
+```
+
