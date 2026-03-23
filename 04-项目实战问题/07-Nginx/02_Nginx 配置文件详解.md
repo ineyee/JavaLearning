@@ -39,66 +39,161 @@ log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
 
 ## 二、Nginx 配置文件的常见指令
 
-#### 1、先回顾下一个 HTTP 请求的完整访问流程
+> #### 回顾下一个 HTTP 请求的完整访问流程
+>
+> * ① URL
+>
+> http://sixpense.com 是 baseUrl，/ 是根路径，http://sixpense.com/ 是访问根路径
+>
+> 当我们直接访问 http://sixpense.com 时会被自动在尾部加上 / 来访问根路径，所以跟我们显式写 http://sixpense.com/ 是一样的效果，但是注意在尾部自动加 / 这个行为仅限于访问根路径缺失时，只有后面有路径了就不会再自动加了
+>
+> * ② IP 地址
+>
+> IP 地址是服务器的唯一标识，也就是说 IP 地址和服务器是一对一的关系，我们可以通过 IP 地址找到唯一一台与之对应的服务器。比如我们在阿里云购买了三台云服务器，服务器 1 的 IP 地址是 8.136.43.114、服务器 2 的 IP 地址是 8.136.43.115、服务器 3 的 IP 地址是 8.136.43.116
+>
+> * ③ 域名
+>
+> 但是 IP 地址太难记了，所以我们一般都会给 IP 地址配个见名知意的别名来方便大家使用，这个别名其实就是域名。比如我们在阿里云购买了三个域名 sixpense.com、sixpense.cn、sixpense.us
+>
+> 注意：我们在阿里云购买域名这一步的时候，阿里云其实就会自动把 sixpense.com --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .com 顶级域名服务器（意思就是告诉 .com 顶级域名服务器将来 sixpense.com 这个域名的解析权交给 alidns）、sixpense.cn --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .cn 顶级域名服务器、 sixpense.us --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .us 顶级域名服务器
+>
+> * ④ DNS（Domain Name System，域名系统）
+>
+> 当我们购买完 IP 地址和域名后，接下来就可以去阿里云 DNS 配置一下 IP 地址和域名的对应关系了。不过需要知道的是 **IP 地址和域名不是一对一的关系，而是多对多的关系，也就是说一个 IP 地址可以对应多个域名（即通过多个不同的域名访问时，DNS 解析出来的是同一个 IP 地址、访问的是同一台服务器，这个一般用来实现一台服务器上部署多个前端项目或后端项目，这种情况必须使用 Nginx 来配置多个虚拟主机），一个域名也可以对应多个 IP 地址（即通过同一个域名访问时，DNS 解析出来的是多个不同的 IP 地址、可以分流到不同的服务器访问，这个一般用来实现负载均衡，不过这个负载均衡方案是 DNS 负载均衡，跟使用 Nginx 实现负载均衡是不同的方案，实际开发中我们更多会使用 Nginx 负载均衡）**。比如我们这里配置 sixpense.com、sixpense.cn => 8.136.43.114，sixpense.us => 8.136.43.115、8.136.43.116
+>
+> * ⑤ 端口
+>
+> IP 地址或域名只能保证我们顺利找到服务器，但是怎么处理我们的请求就得由监听相应端口的服务器软件来决定了，如果我们的服务器上没有安装或没有启动相应的软件来监听相应的端口，那么通过某个端口请求时服务器必然是响应“50x，无法处理此请求”。比如 Nginx 默认监听着 80 端口、Tomcat 默认监听着 8080 端口
+>
+> 注意：一个端口只能被一个运行中的服务器软件监听，比如我们启动 Nginx 后它默认已经监听了 80 端口，此时如果我们启动 Tomcat 后也设置它监听 80 端口就会直接报错 Address already in use
+>
+> * ⑥ 协议
+>
+> http 协议采用明文传输数据，https 协议采用密文传输数据，用 http 协议发起的请求默认访问的是 80 端口，用 https 协议发起的请求默认访问的是 443 端口，也就是说就算我们不写端口也会被自动补上。比如 http://sixpense.com/ 和 http://sixpense.com:80/ 是完全一样的效果、https://sixpense.com/ 和 https://sixpense.com:443/ 是完全一样的效果，当然我们也可以强制访问某一端口 http://sixpense.com:8888/、https://sixpense.com:9999/
+>
+> * ⑦ 路径
+>
+> 路径用来匹配具体的资源。比如 http://sixpense.com/tp/login.html 中的路径“/tp/login.html”就是访问前端 tp 项目的登录页面，http://sixpense.com/tp/user/login 中的路径“tp/user/login”就是访问后端 tp 项目的登录接口
+>
+> * ⑧ 一个 HTTP 请求的完整访问流程
+>
+> 1️⃣ 客户端输入 http://sixpense.com/tp/login.html
+>
+> 2️⃣ 全球根域名服务器接收到这个请求，它说：你应该去问 .com 顶级域名服务器
+>
+> 3️⃣ .com 顶级域名服务器接收到这个请求，它说：你应该去问 alidns 服务器
+>
+> 4️⃣ alidns 服务器接收到这个请求，它说：我能解析 sixpense.com 这个域名，它对应的 IP 地址是 8.136.43.114
+>
+> 5️⃣ 8.136.43.114 这台服务器收到这个请求，看了一下端口是 80，而 Nginx 刚好在监听 80 端口，于是这个请求就交给 Nginx 去处理了
+>
+> 6️⃣ Nginx 就会根据“端口+主机名”匹配到相应的虚拟主机，然后再根据路径 /tp/login.html 匹配到相应的 location，然后就会把该 location 里对应的静态资源返回给客户端了
 
-* ① URL
+#### 1、user 指令
 
-http://sixpense.com 是 baseUrl，/ 是根路径，http://sixpense.com/ 是访问根路径
+user 指令一般有两个取值：root、nginx（推荐）
 
-当我们直接访问 http://sixpense.com 时会被自动在尾部加上 / 来访问根路径，所以跟我们显式写 http://sixpense.com/ 是一样的效果，但是注意在尾部自动加 / 这个行为仅限于访问根路径缺失时，只有后面有路径了就不会再自动加了
+如果我们把 Web 项目部署在 /root/${项目名} 下，那就只能用 root，因为只有 root 用户才有权限访问 /root 目录下的东西
 
-* ② IP 地址
+如果我们把 Web 项目部署在 /var/www/${项目名} 下，那就可以使用 nginx，但是需要执行下面的命令授予 nginx 用户访问我们项目的权限：chown -R nginx:nginx /var/www/${项目名}
 
-IP 地址是服务器的唯一标识，也就是说 IP 地址和服务器是一对一的关系，我们可以通过 IP 地址找到唯一一台与之对应的服务器。比如我们在阿里云购买了三台云服务器，服务器 1 的 IP 地址是 8.136.43.114、服务器 2 的 IP 地址是 8.136.43.115、服务器 3 的 IP 地址是 8.136.43.116
+```yaml
+# 代表 Nginx 有 root 用户权限，可以读取服务器上的任何资源
+# 实际开发中不推荐，因为万一 Nginx 有漏洞被攻击者利用，攻击者直接拿到 root 权限，整台服务器沦陷
+user  root;
 
-* ③ 域名
+# 代表 Nginx 仅有 nginx 用户权限，只可以读取 nginx 用户有权限访问的资源
+# 实际开发中默认，推荐
+user  nginx;
+```
 
-但是 IP 地址太难记了，所以我们一般都会给 IP 地址配个见名知意的别名来方便大家使用，这个别名其实就是域名。比如我们在阿里云购买了三个域名 sixpense.com、sixpense.cn、sixpense.us
+#### 2、worker_processes 指令
 
-注意：我们在阿里云购买域名这一步的时候，阿里云其实就会自动把 sixpense.com --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .com 顶级域名服务器（意思就是告诉 .com 顶级域名服务器将来 sixpense.com 这个域名的解析权交给 alidns）、sixpense.cn --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .cn 顶级域名服务器、 sixpense.us --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .us 顶级域名服务器
+worker_processes 指令用来指定 worker 进程数，通常设置为 CPU 核数来发挥最大性能
 
-* ④ DNS（Domain Name System，域名系统）
+```yaml
+# 推荐根据当前系统的 CPU 核数自动设定
+worker_processes auto;
 
-当我们购买完 IP 地址和域名后，接下来就可以去阿里云 DNS 配置一下 IP 地址和域名的对应关系了。不过需要知道的是 **IP 地址和域名不是一对一的关系，而是多对多的关系，也就是说一个 IP 地址可以对应多个域名（即通过多个不同的域名访问时，DNS 解析出来的是同一个 IP 地址、访问的是同一台服务器，这个一般用来实现一台服务器上部署多个前端项目或后端项目，这种情况必须使用 Nginx 来配置多个虚拟主机），一个域名也可以对应多个 IP 地址（即通过同一个域名访问时，DNS 解析出来的是多个不同的 IP 地址、可以分流到不同的服务器访问，这个一般用来实现负载均衡，不过这个负载均衡方案是 DNS 负载均衡，跟使用 Nginx 实现负载均衡是不同的方案，实际开发中我们更多会使用 Nginx 负载均衡）**。比如我们这里配置 sixpense.com、sixpense.cn => 8.136.43.114，sixpense.us => 8.136.43.115、8.136.43.116
+# 也可以手动指定
+worker_processes  2;
+```
 
-* ⑤ 端口
+#### 3、Nginx 本身的日志：error_log 指令
 
-IP 地址或域名只能保证我们顺利找到服务器，但是怎么处理我们的请求就得由监听相应端口的服务器软件来决定了，如果我们的服务器上没有安装或没有启动相应的软件来监听相应的端口，那么通过某个端口请求时服务器必然是响应“50x，无法处理此请求”。比如 Nginx 默认监听着 80 端口、Tomcat 默认监听着 8080 端口
+这个日志是 Nginx 本身的日志，包含 Nginx 的启动日志、重载日志、崩溃异常日志等
 
-注意：一个端口只能被一个运行中的服务器软件监听，比如我们启动 Nginx 后它默认已经监听了 80 端口，此时如果我们启动 Tomcat 后也设置它监听 80 端口就会直接报错 Address already in use
+```yaml
+# 日志的存放路径为 /var/log/nginx/error.log 这个路径，日志的级别为 notice
+error_log  /var/log/nginx/error.log notice;
+```
 
-* ⑥ 协议
+#### 4、Nginx PID 指令：pid 指令
 
-http 协议采用明文传输数据，https 协议采用密文传输数据，用 http 协议发起的请求默认访问的是 80 端口，用 https 协议发起的请求默认访问的是 443 端口，也就是说就算我们不写端口也会被自动补上。比如 http://sixpense.com/ 和 http://sixpense.com:80/ 是完全一样的效果、https://sixpense.com/ 和 https://sixpense.com:443/ 是完全一样的效果，当然我们也可以强制访问某一端口 http://sixpense.com:8888/、https://sixpense.com:9999/
+```yaml
+# pid 的存放文件为 /var/run/nginx.pid，方便进行进程管理
+pid        /var/run/nginx.pid;
+```
 
-* ⑦ 路径
+#### 7、worker_connections 指令
 
-路径用来匹配具体的资源。比如 http://sixpense.com/tp/login.html 中的路径“/tp/login.html”就是访问前端 tp 项目的登录页面，http://sixpense.com/tp/user/login 中的路径“tp/user/login”就是访问后端 tp 项目的登录接口
+worker_connections 指令用来指定一个 worker 进程同一时间最多能处理多少个请求
 
-* ⑧ 一个 HTTP 请求的完整访问流程
+```yaml
+events {
+    worker_connections  1024;
+}
+```
 
-1️⃣ 客户端输入 http://sixpense.com/tp/login.html
+#### 6、include 指令
 
-2️⃣ 全球根域名服务器接收到这个请求，它说：你应该去问 .com 顶级域名服务器
+include 指令用来导入其它配置文件，它的值可以是其它配置文件的相对路径或绝对路径
 
-3️⃣ .com 顶级域名服务器接收到这个请求，它说：你应该去问 alidns 服务器
+```yaml
+http {
+		# 如果觉得一个配置文件里的内容太多，可以拆分成多个小配置文件，然后用 include 来导入
+    include       mime.types;
+}
+```
 
-4️⃣ alidns 服务器接收到这个请求，它说：我能解析 sixpense.com 这个域名，它对应的 IP 地址是 8.136.43.114
+#### 7、HTTP 请求的日志指令：log_format 指令、access_log 指令
 
-5️⃣ 8.136.43.114 这台服务器收到这个请求，看了一下端口是 80，而 Nginx 刚好在监听 80 端口，于是这个请求就交给 Nginx 去处理了
+这个日志只包含 HTTP 请求的日志，不是 Nginx 本身的日志
 
-6️⃣ Nginx 就会根据“端口+主机名”匹配到相应的虚拟主机，然后再根据路径 /tp/login.html 匹配到相应的 location，然后就会把该 location 里对应的静态资源返回给客户端了
+```yaml
+http {
+    # 定义一个名为 main 的日志格式，具体的日志格式为
+    #
+    # 示例：192.168.1.10 - (空) [18/Mar/2026:18:30:12 +0800] "GET /api/user HTTP/1.1" 200 532 "https://google.com" "Mozilla/5.0..." "1.2.3.4"
+    #
+    # $remote_addr：客户端的 IP 地址（谁访问了你）
+    # $remote_user：认证用户名（一般为空，除非用了 HTTP Basic Auth）
+    # [$time_local]：请求发生的时间（服务器本地时间）
+    # $request：完整的 HTTP 请求行
+    # $status：HTTP 响应状态码
+    # $body_bytes_sent：返回给客户端的字节数（不含 header）
+    # "$http_referer"：用户从哪个页面跳过来的
+    # "$http_user_agent"：用户设备信息
+    # "$http_x_forwarded_for"：经过代理后的真实客户端 IP（可能有多个，用逗号分隔）
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
 
-#### 2、server 指令块
+		# HTTP 请求的日志的存放路径为 /var/log/nginx/access.log 这个路径，日志的格式为 main
+    access_log  /var/log/nginx/access.log  main;
+}
+```
 
-###### 2.1 server 的匹配规则
+#### 8、server 指令块
+
+###### 8.1 server 的匹配规则
 
 一个 server 命令块就是一台虚拟主机，所谓虚拟主机就是指虚拟出来的服务器，不是真实存在的物理服务器，也就是说是在一台真实存在的物理服务器上虚拟出多台虚拟服务器来。那么当客户端发起 HTTP 请求时，该由哪个虚拟主机处理呢？server 的匹配规则分两步：
 
 * 第一步：先看端口
 * 第二步：再看主机名
 
-###### 2.2 server 里面的指令
+###### 8.2 server 里面的指令
 
 ```yaml
 http {
@@ -138,9 +233,9 @@ http {
 }
 ```
 
-#### 3、location 指令块
+#### 9、location 指令块
 
-###### 3.1 location 的匹配规则
+###### 9.1 location 的匹配规则
 
 |             类型              |      写法实例      |                          匹配规则                           |                         优先级/说明                          |
 | :---------------------------: | :----------------: | :---------------------------------------------------------: | :----------------------------------------------------------: |
@@ -214,7 +309,7 @@ http://localhost/a.PNG
 http://localhost/a.html
 ```
 
-###### 3.2 location 里面的指令
+###### 9.2 location 里面的指令
 
 * ① 作为 Web 服务器、静态资源服务器时的常用指令：root 指令、index 指令、try_files 指令，用来返回静态资源
 
@@ -262,7 +357,7 @@ server {
 }
 ```
 
-#### 4、upstream 指令块
+#### 10、upstream 指令块
 
 upstream 指令块用来定义一组服务器，主要用于配置负载均衡，必须配合 proxy_pass 指令使用
 
@@ -287,53 +382,6 @@ server {
     		# 比如请求是 http://sixpense.com/api/tp/user/login，请求路径就是 /api/tp/user/login，因为 proxy_pass 尾部有根路径 /，所以最终的截断路径就是剔除 location 的前缀 /api/ 后的 tp/user/login，然后在拼接在 proxy_pass 后面，假设 Nginx 给我们选中了 8.136.43.120:8888，所以最终的转发路径是 http://8.136.43.120:8888/tp/user/login
     		proxy_pass http://backend/;
     }
-}
-```
-
-#### 5、user 指令
-
-user 指令一般有两个取值：root、nginx
-
-如果我们把 Web 项目部署在 /root/${项目名} 下，那就只能用 root，因为只有 root 用户才有权限访问 /root 目录下的东西
-
-如果我们把 Web 项目部署在 /var/www/${项目名} 下，那就可以使用 nginx，但是需要执行下面的命令授予 nginx 用户访问我们项目的权限：chown -R nginx:nginx /var/www/${项目名}
-
-```yaml
-# 代表 Nginx 有 root 用户权限，可以读取服务器上的任何资源
-# 实际开发中不推荐，因为万一 Nginx 有漏洞被攻击者利用，攻击者直接拿到 root 权限，整台服务器沦陷
-user  root;
-
-# 代表 Nginx 仅有 nginx 用户权限，只可以读取 nginx 用户有权限访问的资源
-# 实际开发中默认
-user  nginx;
-```
-
-#### 6、worker_processes 指令
-
-worker_processes 指令用来指定 worker 进程数，通常设置为 CPU 核数来发挥最大性能
-
-```
-worker_processes  2;
-```
-
-#### 7、worker_connections 指令
-
-worker_connections 指令用来指定一个 worker 进程同一时间最多能处理多少个请求
-
-```yaml
-events {
-    worker_connections  1024;
-}
-```
-
-#### 8、include 指令
-
-include 指令用来导入其它配置文件，它的值可以是其它配置文件的相对路径或绝对路径
-
-```yaml
-http {
-		# 如果觉得一个配置文件里的内容太多，可以拆分成多个小配置文件，然后用 include 来导入
-    include       mime.types;
 }
 ```
 
