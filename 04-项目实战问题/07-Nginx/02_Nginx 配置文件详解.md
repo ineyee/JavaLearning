@@ -43,9 +43,9 @@ log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
 >
 > * ① URL
 >
-> http://sixpense.com 是 baseUrl，/ 是根路径，http://sixpense.com/ 是访问根路径
+> http://sixpence.com 是 baseUrl，/ 是根路径，http://sixpence.com/ 是访问根路径
 >
-> 当我们直接访问 http://sixpense.com 时会被自动在尾部加上 / 来访问根路径，所以跟我们显式写 http://sixpense.com/ 是一样的效果，但是注意在尾部自动加 / 这个行为仅限于访问根路径缺失时，只有后面有路径了就不会再自动加了
+> 当我们直接访问 http://sixpence.com 时会被自动在尾部加上 / 来访问根路径，所以跟我们显式写 http://sixpence.com/ 是一样的效果，但是注意在尾部自动加 / 这个行为仅限于访问根路径缺失时，只有后面有路径了就不会再自动加了
 >
 > * ② IP 地址
 >
@@ -53,13 +53,13 @@ log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
 >
 > * ③ 域名
 >
-> 但是 IP 地址太难记了，所以我们一般都会给 IP 地址配个见名知意的别名来方便大家使用，这个别名其实就是域名。比如我们在阿里云购买了三个域名 sixpense.com、sixpense.cn、sixpense.us
+> 但是 IP 地址太难记了，所以我们一般都会给 IP 地址配个见名知意的别名来方便大家使用，这个别名其实就是域名。比如我们在阿里云购买了三个域名 sixpence.com、sixpence.cn、sixpence.us
 >
-> 注意：我们在阿里云购买域名这一步的时候，阿里云其实就会自动把 sixpense.com --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .com 顶级域名服务器（意思就是告诉 .com 顶级域名服务器将来 sixpense.com 这个域名的解析权交给 alidns）、sixpense.cn --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .cn 顶级域名服务器、 sixpense.us --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .us 顶级域名服务器
+> 注意：我们在阿里云购买域名这一步的时候，阿里云其实就会自动把 sixpence.com --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .com 顶级域名服务器（意思就是告诉 .com 顶级域名服务器将来 sixpence.com 这个域名的解析权交给 alidns）、sixpence.cn --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .cn 顶级域名服务器、 sixpence.us --> ns1.alidns.com + ns2.alidns.com 这样的映射信息注册到 .us 顶级域名服务器
 >
 > * ④ DNS（Domain Name System，域名系统）
 >
-> 当我们购买完 IP 地址和域名后，接下来就可以去阿里云 DNS 配置一下 IP 地址和域名的对应关系了。不过需要知道的是 **IP 地址和域名不是一对一的关系，而是多对多的关系，也就是说一个 IP 地址可以对应多个域名（即通过多个不同的域名访问时，DNS 解析出来的是同一个 IP 地址、访问的是同一台服务器，这个一般用来实现一台服务器上部署多个前端项目或后端项目，这种情况必须使用 Nginx 来配置多个虚拟主机），一个域名也可以对应多个 IP 地址（即通过同一个域名访问时，DNS 解析出来的是多个不同的 IP 地址、可以分流到不同的服务器访问，这个一般用来实现负载均衡，不过这个负载均衡方案是 DNS 负载均衡，跟使用 Nginx 实现负载均衡是不同的方案，实际开发中我们更多会使用 Nginx 负载均衡）**。比如我们这里配置 sixpense.com、sixpense.cn => 8.136.43.114，sixpense.us => 8.136.43.115、8.136.43.116
+> 当我们购买完 IP 地址和域名后，接下来就可以去阿里云 DNS 配置一下 IP 地址和域名的对应关系了。不过需要知道的是 **IP 地址和域名不是一对一的关系，而是多对多的关系，也就是说一个 IP 地址可以对应多个域名（即通过多个不同的域名访问时，DNS 解析出来的是同一个 IP 地址、访问的是同一台服务器，这个一般用来实现一台服务器上部署多个前端项目或后端项目，这种情况必须使用 Nginx 来配置多个虚拟主机），一个域名也可以对应多个 IP 地址（即通过同一个域名访问时，DNS 解析出来的是多个不同的 IP 地址、可以分流到不同的服务器访问，这个一般用来实现负载均衡，不过这个负载均衡方案是 DNS 负载均衡，跟使用 Nginx 实现负载均衡是不同的方案，实际开发中我们更多会使用 Nginx 负载均衡）**。比如我们这里配置 sixpence.com、sixpence.cn => 8.136.43.114，sixpence.us => 8.136.43.115、8.136.43.116
 >
 > * ⑤ 端口
 >
@@ -69,21 +69,21 @@ log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
 >
 > * ⑥ 协议
 >
-> http 协议采用明文传输数据，https 协议采用密文传输数据，用 http 协议发起的请求默认访问的是 80 端口，用 https 协议发起的请求默认访问的是 443 端口，也就是说就算我们不写端口也会被自动补上。比如 http://sixpense.com/ 和 http://sixpense.com:80/ 是完全一样的效果、https://sixpense.com/ 和 https://sixpense.com:443/ 是完全一样的效果，当然我们也可以强制访问某一端口 http://sixpense.com:8888/、https://sixpense.com:9999/
+> http 协议采用明文传输数据，https 协议采用密文传输数据，用 http 协议发起的请求默认访问的是 80 端口，用 https 协议发起的请求默认访问的是 443 端口，也就是说就算我们不写端口也会被自动补上。比如 http://sixpence.com/ 和 http://sixpence.com:80/ 是完全一样的效果、https://sixpence.com/ 和 https://sixpence.com:443/ 是完全一样的效果，当然我们也可以强制访问某一端口 http://sixpence.com:8888/、https://sixpence.com:9999/
 >
 > * ⑦ 路径
 >
-> 路径用来匹配具体的资源。比如 http://sixpense.com/tp/login.html 中的路径“/tp/login.html”就是访问前端 tp 项目的登录页面，http://sixpense.com/tp/user/login 中的路径“tp/user/login”就是访问后端 tp 项目的登录接口
+> 路径用来匹配具体的资源。比如 http://sixpence.com/tp/login.html 中的路径“/tp/login.html”就是访问前端 tp 项目的登录页面，http://sixpence.com/tp/user/login 中的路径“tp/user/login”就是访问后端 tp 项目的登录接口
 >
 > * ⑧ 一个 HTTP 请求的完整访问流程
 >
-> 1️⃣ 客户端输入 http://sixpense.com/tp/login.html
+> 1️⃣ 客户端输入 http://sixpence.com/tp/login.html
 >
 > 2️⃣ 全球根域名服务器接收到这个请求，它说：你应该去问 .com 顶级域名服务器
 >
 > 3️⃣ .com 顶级域名服务器接收到这个请求，它说：你应该去问 alidns 服务器
 >
-> 4️⃣ alidns 服务器接收到这个请求，它说：我能解析 sixpense.com 这个域名，它对应的 IP 地址是 8.136.43.114
+> 4️⃣ alidns 服务器接收到这个请求，它说：我能解析 sixpence.com 这个域名，它对应的 IP 地址是 8.136.43.114
 >
 > 5️⃣ 8.136.43.114 这台服务器收到这个请求，看了一下端口是 80，而 Nginx 刚好在监听 80 端口，于是这个请求就交给 Nginx 去处理了
 >
@@ -223,7 +223,7 @@ http {
     # 另外一台虚拟主机
     server {
         listen       80;
-        server_name  sixpense.com;
+        server_name  sixpence.com;
 
         location / {
             root   html;
@@ -316,17 +316,17 @@ http://localhost/a.html
 ```yaml
 server {
     listen       80;
-    server_name  sixpense.com;
+    server_name  sixpence.com;
 		
     location / {
     		# root 指令：用来指定静态资源文件所在的绝对路径目录，Nginx 会用【这个目录 root + 请求的路径部分】去找资源
-    		# 比如请求是 http://sixpense.com/test.html，那 Nginx 就会去 html/test.html 这个位置去找这个 html，找到就直接返回静态资源，找不到就尝试 index 那条路
-    		# 又比如请求 http://sixpense.com/img/a.png，那 Nginx 就会去 html/img/a.png 这个位置去找这个 png，找到就直接返回静态资源，找不到就尝试 index 那条路
+    		# 比如请求是 http://sixpence.com/test.html，那 Nginx 就会去 html/test.html 这个位置去找这个 html，找到就直接返回静态资源，找不到就尝试 index 那条路
+    		# 又比如请求 http://sixpence.com/img/a.png，那 Nginx 就会去 html/img/a.png 这个位置去找这个 png，找到就直接返回静态资源，找不到就尝试 index 那条路
         root   html;
         
         # index 指令：这个指令是以防万一客户端发过来的【请求是一个目录】而不是一个静态资源文件这种情况，那 Nginx 就会用【root + 请求的路径部分 + index】去找资源、总不能返回个目录吧
-        # 比如请求是 http://sixpense.com/，那 Nginx 就会去 html/index.html 或 html/index.htm 这个位置去找，找到就直接返回静态资源，找不到就返回兜底资源
-        # 又比如请求是 http://sixpense.com/admin/，那 Nginx 就会去 html/admin/index.html 或 html/admin/index.htm 这个位置去找，找到就直接返回静态资源，找不到就返回兜底资源
+        # 比如请求是 http://sixpence.com/，那 Nginx 就会去 html/index.html 或 html/index.htm 这个位置去找，找到就直接返回静态资源，找不到就返回兜底资源
+        # 又比如请求是 http://sixpence.com/admin/，那 Nginx 就会去 html/admin/index.html 或 html/admin/index.htm 这个位置去找，找到就直接返回静态资源，找不到就返回兜底资源
         index  index.html index.htm;
         
         # try_files 指令：用来告诉 Nginx 怎么找资源
@@ -343,7 +343,7 @@ server {
 ```yaml
 server {
     listen       80;
-    server_name  sixpense.com;
+    server_name  sixpence.com;
     
     location /api/ {
     		# proxy_pass 指令：用来把请求转发给另外一台服务器处理，另一台服务器处理完成后会把结果再交由这里返回给客户端
@@ -351,7 +351,7 @@ server {
     		#
     		# proxy_pass 截断路径和拼接路径的规则：
     		# 只要 proxy_pass 尾部有路径，不管是根路径 / 也好、还是其它长路径也好，那么在截断原请求路径的时候，都会从路径里剔除掉 location 前缀，然后再拼接在 proxy_pass 后面形成最终的转发路径
-    		# 比如请求是 http://sixpense.com/api/tp/user/login，请求路径就是 /api/tp/user/login，因为 proxy_pass 尾部有根路径 /，所以最终的截断路径就是剔除 location 的前缀 /api/ 后的 tp/user/login，然后在拼接在 proxy_pass 后面，所以最终的转发路径是 http://8.136.43.120:8888/tp/user/login
+    		# 比如请求是 http://sixpence.com/api/tp/user/login，请求路径就是 /api/tp/user/login，因为 proxy_pass 尾部有根路径 /，所以最终的截断路径就是剔除 location 的前缀 /api/ 后的 tp/user/login，然后在拼接在 proxy_pass 后面，所以最终的转发路径是 http://8.136.43.120:8888/tp/user/login
     		proxy_pass http://8.136.43.120:8888/;
     }
 }
@@ -371,7 +371,7 @@ upstream backend {
 
 server {
     listen       80;
-    server_name  sixpense.com;
+    server_name  sixpence.com;
     
     location /api/ {
     		# proxy_pass 指令：用来把请求转发给另外一台服务器处理，另一台服务器处理完成后会把结果再交由这里返回给客户端
@@ -379,7 +379,7 @@ server {
     		#
     		# proxy_pass 截断路径和拼接路径的规则：
     		# 只要 proxy_pass 尾部有路径，不管是根路径 / 也好、还是其它长路径也好，那么在截断原请求路径的时候，都会从路径里剔除掉 location 前缀，然后再拼接在 proxy_pass 后面形成最终的转发路径
-    		# 比如请求是 http://sixpense.com/api/tp/user/login，请求路径就是 /api/tp/user/login，因为 proxy_pass 尾部有根路径 /，所以最终的截断路径就是剔除 location 的前缀 /api/ 后的 tp/user/login，然后在拼接在 proxy_pass 后面，假设 Nginx 给我们选中了 8.136.43.120:8888，所以最终的转发路径是 http://8.136.43.120:8888/tp/user/login
+    		# 比如请求是 http://sixpence.com/api/tp/user/login，请求路径就是 /api/tp/user/login，因为 proxy_pass 尾部有根路径 /，所以最终的截断路径就是剔除 location 的前缀 /api/ 后的 tp/user/login，然后在拼接在 proxy_pass 后面，假设 Nginx 给我们选中了 8.136.43.120:8888，所以最终的转发路径是 http://8.136.43.120:8888/tp/user/login
     		proxy_pass http://backend/;
     }
 }
