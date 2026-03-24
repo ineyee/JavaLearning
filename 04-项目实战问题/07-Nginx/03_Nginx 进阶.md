@@ -191,3 +191,90 @@ server {
 
 * 重载下 Nginx，去访问 https://ssm.sixpence.cloud/user/list、https://tp.sixpence.cloud/product/list 试试效果吧
 
+## 二、限流
+
+运行一个 Nginx 实例可以支持 3w~5w 的并发，运行一个 Tomcat 实例可以支持 100~300 的并发，这是一个很大的比例。虽然客户端发起的请求会先到达 Nginx，但是最终还是会被转发给 Tomcat 去处理。因此就算我们在 Nginx 背后搞了很多台 Tomcat，也仍然难免 Tomcat 被 Nginx 分配了大量的客户端请求而扛不住，此时我们就可以做限流。
+
+所谓限流就是指限制 Nginx 转发给 Tomcat 的请求数，不要一下子给太多给它搞崩了，而是先转发一部分、处理一部分，处理完上一部分后、再给下一部分，常见的实现方案是漏桶算法：
+
+```yaml
+http {
+		# limit_req_zone 指令：代表定义一个名字叫做 api、大小为 10M 的内存空间（能存约 16 万个 IP）
+		# 定义 zone 只能在 http 指令块里定义，不能在其它地方定义
+		# 
+		# $binary_remote_addr：是客户端的 IP 地址，代表这块内存空间里以客户端的 IP 地址为 key，每个 key 都对应一个独立的漏桶，也就是说这块内存空间里有很多个漏桶，不同的客户端使用自己独立的漏桶单独技术、互不影响
+		# 
+		# rate=5r/s：是漏桶的流出速率，代表一秒钟 Nginx 最多转发来自同一个客户端（即同一个 IP 地址）的 5 个请求给 Tomcat 去处理
+		limit_req_zone $binary_remote_addr zone=api:10m rate=5r/s;
+		# 我们也可以定义多个 zone
+		# 接口有多少个风险等级，我们就定义多少个 zone 提供给不同风险等级的接口使用
+		# 实际项目一般就 1~3 个 zone 就够了
+		limit_req_zone $binary_remote_addr zone=login:10m rate=1r/s;
+		
+    server {
+    		# 应用漏桶可以直接写在 server 里，代表对这台虚拟主机下的所有请求都生效
+    		# 但实际开发中一般不这么做，因为不同接口的风险不一样，比如登录接口要求更严、而普通接口可以宽松一些，所以一般都是写在 location 里
+    		
+        listen 80;
+        server_name ssm.ineyee.com;
+        
+        location ^~ /api/singer/ {
+        		# limit_req 指令：代表应用上面定义的 api zone
+        		# burst=10：代表漏桶突发性最多“加号” 10 个请求，即在突发请求增加的那一刻 Nginx 最多转发来自同一个客户端（即同一个 IP 地址）的 15 个请求给 Tomcat 去处理，但这只是“容错率”，不是常态
+        		# nodelay：代表突发请求增加超过 10 个时，只接收 10 个，其它的直接拒绝处理
+        		limit_req zone=api  burst=10 nodelay;
+            proxy_pass http://8.136.43.114:8080/ssm/;
+        }
+        
+        location ^~ /api/song/ {
+						# 多个 location 可以共用同一个 zone
+        		limit_req zone=api  burst=10 nodelay;
+            proxy_pass http://8.136.43.114:8080/ssm/;
+        }
+        
+        location ^~ /api/login {
+        		limit_req zone=login  burst=3 nodelay;
+            proxy_pass http://8.136.43.114:8080/ssm/;
+        }
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
