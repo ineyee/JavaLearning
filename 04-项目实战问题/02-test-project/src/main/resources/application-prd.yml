@@ -25,6 +25,24 @@ spring:
     druid:
       initial-size: 5
       max-active: 10
+  data:
+    redis:
+      host: 8.136.43.114
+      port: 6379
+      # redis 里默认有 16 个数据库，要连接哪个数据库，默认 0
+      database: 0
+      username: root
+      password: Redis666!
+      lettuce:
+        pool:
+          # 连接池最大连接数
+          max-active: 10
+          # 连接池最大空闲连接数
+          max-idle: 10
+          # 连接池最小空闲连接数
+          min-idle: 10
+          # 连接池最大阻塞等待时间(ms)，-1 表示没有限制
+          max-wait: 10000
 
 # 跨域处理配置，静态资源服务器的源白名单（cors 是我们自定义的属性绑定）
 cors:
